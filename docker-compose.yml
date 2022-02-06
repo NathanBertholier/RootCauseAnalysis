@@ -1,0 +1,54 @@
+version: '3.8'
+
+services:
+
+  rabbitmq:
+    container_name: "rabbitmq"
+    image: rabbitmq:3.9-management-alpine
+    hostname: rabbitmq
+    networks:
+      - root-cause-net
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+
+  timescale:
+    image: timescale/timescaledb:latest-pg12
+    container_name: "Timescale"
+    environment:
+      POSTGRES_USER: "root"
+      POSTGRES_PASSWORD: "root"
+      POSTGRES_DB: "rootcause"
+    networks:
+      - root-cause-net
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./DockerVolumes/TimeScale/Setup/DBinit:/docker-entrypoint-initdb.d
+
+  grafana:
+    image: grafana/grafana
+    container_name: "grafana"
+    ports:
+      - "3001:3000"
+    networks:
+      - root-cause-net
+    volumes:
+      - .DockerVolumes/Grafana/Setup/provisioning:/etc/grafana/provisioning
+      - ./DockerVolumes/Grafana/Setup/dashboards:/var/lib/grafana/dashboards
+    environment:
+      GF_SECURITY_ALLOW_EMBEDDING: true
+      GF_AUTH_ANONYMOUS_ENABLED: true
+      GF_AUTH_ANONYMOUS_ORG_ROLE: viewer
+
+  rootcause:
+    build: .
+    container_name: "RootCause"
+    ports:
+      - "80:8080"
+    networks:
+      - root-cause-net
+
+networks:
+  root-cause-net:
+    driver: bridge

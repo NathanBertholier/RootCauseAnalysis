@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/rootcausecore/backend/backend.iml" filepath="$PROJECT_DIR$/rootcausecore/backend/backend.iml" />
+      <module fileurl="file://$PROJECT_DIR$/RootCauseCore/Tools/Benchmark/benchmark.iml" filepath="$PROJECT_DIR$/RootCauseCore/Tools/Benchmark/benchmark.iml" />
+      <module fileurl="file://$PROJECT_DIR$/RootCauseCore/DB/db.iml" filepath="$PROJECT_DIR$/RootCauseCore/DB/db.iml" />
+      <module fileurl="file://$PROJECT_DIR$/rootcausecore/DB/DBInsertLogToken/dbinsertlogtoken.iml" filepath="$PROJECT_DIR$/rootcausecore/DB/DBInsertLogToken/dbinsertlogtoken.iml" />
+      <module fileurl="file://$PROJECT_DIR$/RootCauseCore/DB/DBInsertMonitoring/dbinsertmonitoring.iml" filepath="$PROJECT_DIR$/RootCauseCore/DB/DBInsertMonitoring/dbinsertmonitoring.iml" />
+      <module fileurl="file://$PROJECT_DIR$/rootcausecore/modules/linking_synthetization/linking_synthetization.iml" filepath="$PROJECT_DIR$/rootcausecore/modules/linking_synthetization/linking_synthetization.iml" />
+      <module fileurl="file://$PROJECT_DIR$/RootCauseCore/Modules/modules.iml" filepath="$PROJECT_DIR$/RootCauseCore/Modules/modules.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/root-cause.iml" filepath="$PROJECT_DIR$/.idea/root-cause.iml" />
+      <module fileurl="file://$PROJECT_DIR$/RootCauseCore/rootcausecore.iml" filepath="$PROJECT_DIR$/RootCauseCore/rootcausecore.iml" />
+      <module fileurl="file://$PROJECT_DIR$/rootcausefront/rootcausefront.iml" filepath="$PROJECT_DIR$/rootcausefront/rootcausefront.iml" />
+      <module fileurl="file://$PROJECT_DIR$/RootCauseCore/Modules/Tokenization/tokenization.iml" filepath="$PROJECT_DIR$/RootCauseCore/Modules/Tokenization/tokenization.iml" />
+      <module fileurl="file://$PROJECT_DIR$/RootCauseCore/Tools/tools.iml" filepath="$PROJECT_DIR$/RootCauseCore/Tools/tools.iml" />
+    </modules>
+  </component>
+</project>
