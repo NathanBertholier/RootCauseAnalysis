@@ -30,7 +30,7 @@
       <module name="root-cause" target="1.5" />
       <module name="rootcausecore" target="1.5" />
       <module name="rootcausefront" target="1.5" />
-      <module name="tokenization" target="1.7" />
+      <module name="tokenization" target="8" />
       <module name="tools" target="17" />
     </bytecodeTargetLevel>
   </component>
