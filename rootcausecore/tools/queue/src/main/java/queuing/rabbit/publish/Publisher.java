@@ -43,7 +43,7 @@ public class Publisher {
     }
 
     public void send(long id, String line) {
-        LOGGER.log(Level.INFO,"Sending : " + id + " -> " + line);
+        LOGGER.log(Level.INFO,() -> "Sending : " + id + " -> " + line);
         try {
             channel.basicPublish(QUEUE_NAME,
                 "",
