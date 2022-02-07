@@ -3,17 +3,18 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/rootcausecore/backend/backend.iml" filepath="$PROJECT_DIR$/rootcausecore/backend/backend.iml" />
-      <module fileurl="file://$PROJECT_DIR$/RootCauseCore/Tools/Benchmark/benchmark.iml" filepath="$PROJECT_DIR$/RootCauseCore/Tools/Benchmark/benchmark.iml" />
-      <module fileurl="file://$PROJECT_DIR$/RootCauseCore/DB/db.iml" filepath="$PROJECT_DIR$/RootCauseCore/DB/db.iml" />
-      <module fileurl="file://$PROJECT_DIR$/rootcausecore/DB/DBInsertLogToken/dbinsertlogtoken.iml" filepath="$PROJECT_DIR$/rootcausecore/DB/DBInsertLogToken/dbinsertlogtoken.iml" />
-      <module fileurl="file://$PROJECT_DIR$/RootCauseCore/DB/DBInsertMonitoring/dbinsertmonitoring.iml" filepath="$PROJECT_DIR$/RootCauseCore/DB/DBInsertMonitoring/dbinsertmonitoring.iml" />
+      <module fileurl="file://$PROJECT_DIR$/rootcausecore/tools/benchmark/benchmark.iml" filepath="$PROJECT_DIR$/rootcausecore/tools/benchmark/benchmark.iml" />
+      <module fileurl="file://$PROJECT_DIR$/rootcausecore/modules/data/data.iml" filepath="$PROJECT_DIR$/rootcausecore/modules/data/data.iml" />
+      <module fileurl="file://$PROJECT_DIR$/rootcausecore/db/db.iml" filepath="$PROJECT_DIR$/rootcausecore/db/db.iml" />
+      <module fileurl="file://$PROJECT_DIR$/rootcausecore/db/dbinsertlogtoken/dbinsertlogtoken.iml" filepath="$PROJECT_DIR$/rootcausecore/db/dbinsertlogtoken/dbinsertlogtoken.iml" />
+      <module fileurl="file://$PROJECT_DIR$/rootcausecore/db/dbinsertmonitoring/dbinsertmonitoring.iml" filepath="$PROJECT_DIR$/rootcausecore/db/dbinsertmonitoring/dbinsertmonitoring.iml" />
       <module fileurl="file://$PROJECT_DIR$/rootcausecore/modules/linking_synthetization/linking_synthetization.iml" filepath="$PROJECT_DIR$/rootcausecore/modules/linking_synthetization/linking_synthetization.iml" />
-      <module fileurl="file://$PROJECT_DIR$/RootCauseCore/Modules/modules.iml" filepath="$PROJECT_DIR$/RootCauseCore/Modules/modules.iml" />
+      <module fileurl="file://$PROJECT_DIR$/rootcausecore/modules/modules.iml" filepath="$PROJECT_DIR$/rootcausecore/modules/modules.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/root-cause.iml" filepath="$PROJECT_DIR$/.idea/root-cause.iml" />
-      <module fileurl="file://$PROJECT_DIR$/RootCauseCore/rootcausecore.iml" filepath="$PROJECT_DIR$/RootCauseCore/rootcausecore.iml" />
+      <module fileurl="file://$PROJECT_DIR$/rootcausecore/rootcausecore.iml" filepath="$PROJECT_DIR$/rootcausecore/rootcausecore.iml" />
       <module fileurl="file://$PROJECT_DIR$/rootcausefront/rootcausefront.iml" filepath="$PROJECT_DIR$/rootcausefront/rootcausefront.iml" />
-      <module fileurl="file://$PROJECT_DIR$/RootCauseCore/Modules/Tokenization/tokenization.iml" filepath="$PROJECT_DIR$/RootCauseCore/Modules/Tokenization/tokenization.iml" />
-      <module fileurl="file://$PROJECT_DIR$/RootCauseCore/Tools/tools.iml" filepath="$PROJECT_DIR$/RootCauseCore/Tools/tools.iml" />
+      <module fileurl="file://$PROJECT_DIR$/rootcausecore/modules/tokenization/tokenization.iml" filepath="$PROJECT_DIR$/rootcausecore/modules/tokenization/tokenization.iml" />
+      <module fileurl="file://$PROJECT_DIR$/rootcausecore/tools/tools.iml" filepath="$PROJECT_DIR$/rootcausecore/tools/tools.iml" />
     </modules>
   </component>
 </project>
