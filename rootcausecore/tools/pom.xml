@@ -12,6 +12,7 @@
     <packaging>pom</packaging>
     <modules>
         <module>benchmark</module>
+        <module>queue</module>
     </modules>
     <artifactId>tools</artifactId>
 

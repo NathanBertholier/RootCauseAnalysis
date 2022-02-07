@@ -11,6 +11,10 @@ services:
     ports:
       - "5672:5672"
       - "15672:15672"
+    volumes:
+      - ./DockerVolumes/RabbitMQ/Setup/:/etc/rabbitmq/
+      - ./DockerVolumes/RabbitMQ/Volume/:/var/lib/rabbitmq/
+      - ./DockerVolumes/RabbitMQ/Volume/:/var/log/rabbitmq/
 
   timescale:
     image: timescale/timescaledb:latest-pg12
