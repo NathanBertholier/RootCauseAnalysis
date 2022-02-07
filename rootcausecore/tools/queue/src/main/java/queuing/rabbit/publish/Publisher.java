@@ -12,27 +12,30 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class Publisher {
     private final static String QUEUE_NAME = "logs";
     private final Channel channel;
-
+    private final static String HOST ="localhost";
+    private final static Logger LOGGER = Logger.getGlobal();
     public Publisher() throws IOException, TimeoutException {
         ConnectionFactory factory = new ConnectionFactory();
-        factory.setHost("localhost");
-        Connection connection = factory.newConnection();
-        this.channel = connection.createChannel();
+        factory.setHost(HOST);
+        try (Connection connection = factory.newConnection()) {
+            this.channel = connection.createChannel();
+        }
     }
 
     public void create() {
         try {
             ConnectionFactory factory = new ConnectionFactory();
-            factory.setHost("localhost");
+            factory.setHost(HOST);
             Connection connection = factory.newConnection();
-            var channel = connection.createChannel();
-            channel.exchangeDeclare(QUEUE_NAME, "fanout");
-
-            channel.close();
+            try (var newchannel = connection.createChannel()) {
+                newchannel.exchangeDeclare(QUEUE_NAME, "fanout");
+            }
         } catch (IOException | TimeoutException e) {
             e.printStackTrace();
         }
@@ -40,7 +43,7 @@ public class Publisher {
     }
 
     public void send(long id, String line) {
-        System.out.println("Sending : " + id + " -> " + line);
+        LOGGER.log(Level.INFO,"Sending : " + id + " -> " + line);
         try {
             channel.basicPublish(QUEUE_NAME,
                 "",
@@ -53,14 +56,15 @@ public class Publisher {
 
     public static void main(String[] argv) throws Exception {
         ConnectionFactory factory = new ConnectionFactory();
-        factory.setHost("localhost");
+        factory.setHost(HOST);
 
-        Connection connection = factory.newConnection();
-         var channel = connection.createChannel();
-        channel.exchangeDeclare(QUEUE_NAME, "fanout", true, false, null);
-
-
-        var runnable = send7450(channel);
+        Runnable runnable;
+        try (Connection connection = factory.newConnection()) {
+            try (var channel = connection.createChannel()) {
+                channel.exchangeDeclare(QUEUE_NAME, "fanout", true, false, null);
+                runnable = send7450(channel);
+            }
+        }
         ScheduledExecutorService executorService = Executors.newScheduledThreadPool(1);
         executorService.scheduleAtFixedRate(runnable, 0, 1, TimeUnit.SECONDS);
         runnable.run();
@@ -73,8 +77,7 @@ public class Publisher {
             } catch (FileNotFoundException e) {
                 e.printStackTrace();
             }
-
-            System.out.println("Send 7450 lines.");
+            LOGGER.log(Level.INFO,"Send 7450 lines.");
         };
     }
 
@@ -83,20 +86,24 @@ public class Publisher {
                      new InputStreamReader(is, StandardCharsets.UTF_8);
              BufferedReader reader = new BufferedReader(streamReader)) {
 
-            String line;
-            int i = 0;
-            while ((line = reader.readLine()) != null) {
-                try {
-                    channel.basicPublish(QUEUE_NAME,
-                            "",
-                            new AMQP.BasicProperties.Builder().headers(Map.of("id", i++)).build(),
-                            line.getBytes());
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
+            readChannel(channel, reader);
         } catch (IOException e) {
             e.printStackTrace();
+        }
+    }
+
+    private static void readChannel(Channel channel, BufferedReader reader) throws IOException {
+        String line;
+        int i = 0;
+        while ((line = reader.readLine()) != null) {
+            try {
+                channel.basicPublish(QUEUE_NAME,
+                        "",
+                        new AMQP.BasicProperties.Builder().headers(Map.of("id", i++)).build(),
+                        line.getBytes());
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
     }
 }
