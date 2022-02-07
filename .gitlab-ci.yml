@@ -22,7 +22,7 @@ sonarqube:
 
   stage: quality
   script:
-    - mvn verify sonar:sonar -Dsonar.projectKey=RootCause -Dsonar.qualitygate.wait=true
+    - mvn test
   only: 
     - merge_requests
 
