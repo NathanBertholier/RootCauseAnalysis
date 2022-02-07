@@ -1,9 +1,4 @@
-before_script:
-  - eval `ssh-agent -s`
-  - echo "$SSH_KEY" | tr -d '\r' | ssh-add -
-  - mkdir -p ~/.ssh
-  - chmod 700 ~/.ssh
-  - export TAG="${CI_COMMIT_TAG:-latest}" && echo $TAG
+
 
 stages:
   - quality
@@ -22,7 +17,7 @@ sonarqube:
 
   stage: quality
   script:
-    - mvn verify sonar:sonar -Dsonar.projectKey=RootCause -Dsonar.qualitygate.wait=true
+    - mvn test
   only: 
     - merge_requests
 

@@ -1,9 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="SqlDialectMappings">
-    <file url="file://$PROJECT_DIR$/DockerVolumes/TimeScale/Setup/DBinit/init.sql" dialect="PostgreSQL" />
-    <file url="file://$PROJECT_DIR$/rootcausecore/modules/linking_synthetization/src/test/java/fr/umlv/AppTest.java" dialect="GenericSQL" />
-    <file url="file://$PROJECT_DIR$/rootcausecore/modules/linking_synthetization/src/test/resources/lightdata.sql" dialect="PostgreSQL" />
     <file url="PROJECT" dialect="PostgreSQL" />
   </component>
 </project>
