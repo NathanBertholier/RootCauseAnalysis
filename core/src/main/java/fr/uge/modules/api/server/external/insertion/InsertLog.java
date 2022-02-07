@@ -1,7 +1,6 @@
 package fr.uge.modules.api.server.external.insertion;
 
 import fr.uge.modules.api.server.external.model.Log;
-import io.smallrye.mutiny.Uni;
 import org.eclipse.microprofile.reactive.messaging.Channel;
 import org.eclipse.microprofile.reactive.messaging.Emitter;
 

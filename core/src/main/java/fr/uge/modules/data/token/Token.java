@@ -1,6 +1,5 @@
 package fr.uge.modules.data.token;
 
-import fr.uge.modules.data.token.Token;
 import fr.uge.modules.data.token.type.TokenType;
 
 public class Token {

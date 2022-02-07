@@ -3,7 +3,6 @@ package fr.uge.modules.api.server.external.insertion;
 import fr.uge.modules.api.server.external.model.Log;
 import io.smallrye.common.annotation.NonBlocking;
 import org.eclipse.microprofile.reactive.messaging.Incoming;
-import org.eclipse.microprofile.reactive.messaging.Outgoing;
 
 import javax.enterprise.context.ApplicationScoped;
 
