@@ -9,6 +9,15 @@
         <option value="$PROJECT_DIR$/RootCauseCore/DB/DBInsertMonitoring/pom.xml" />
         <option value="$PROJECT_DIR$/rootcausecore/backend/pom.xml" />
         <option value="$PROJECT_DIR$/pom.xml" />
+        <option value="$PROJECT_DIR$/rootcausecore/modules/data/pom.xml" />
+        <option value="$PROJECT_DIR$/rootcausecore/modules/tokenization/pom.xml" />
+        <option value="$PROJECT_DIR$/rootcausecore/pom.xml" />
+        <option value="$PROJECT_DIR$/rootcausecore/modules/pom.xml" />
+        <option value="$PROJECT_DIR$/rootcausecore/db/pom.xml" />
+        <option value="$PROJECT_DIR$/rootcausecore/tools/pom.xml" />
+        <option value="$PROJECT_DIR$/rootcausecore/db/dbinsertlogtoken/pom.xml" />
+        <option value="$PROJECT_DIR$/rootcausecore/db/dbinsertmonitoring/pom.xml" />
+        <option value="$PROJECT_DIR$/rootcausecore/tools/benchmark/pom.xml" />
       </list>
     </option>
     <option name="ignoredFiles">

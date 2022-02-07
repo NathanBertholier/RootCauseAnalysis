@@ -7,6 +7,7 @@
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <module name="rootcausefront" />
+        <module name="data" />
         <module name="dbinsertlogtoken" />
         <module name="linking_synthetization" />
         <module name="backend" />
@@ -19,6 +20,7 @@
       <module name="API" target="1.5" />
       <module name="backend" target="11" />
       <module name="benchmark" target="1.7" />
+      <module name="data" target="17" />
       <module name="db" target="17" />
       <module name="dbinsertlogtoken" target="1.7" />
       <module name="dbinsertmonitoring" target="1.7" />
@@ -30,7 +32,7 @@
       <module name="root-cause" target="1.5" />
       <module name="rootcausecore" target="1.5" />
       <module name="rootcausefront" target="1.5" />
-      <module name="tokenization" target="1.7" />
+      <module name="tokenization" target="8" />
       <module name="tools" target="17" />
     </bytecodeTargetLevel>
   </component>
