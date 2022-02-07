@@ -37,7 +37,7 @@ public class Publisher {
                 newchannel.exchangeDeclare(QUEUE_NAME, "fanout");
             }
         } catch (IOException | TimeoutException e) {
-            e.printStackTrace();
+            LOGGER.log(Level.SEVERE,"IOException | TimeoutException",e);
         }
 
     }
@@ -50,7 +50,7 @@ public class Publisher {
                 new AMQP.BasicProperties.Builder().headers(Map.of("id", id)).build(),
                 line.getBytes());
         } catch (IOException e) {
-            e.printStackTrace();
+            LOGGER.log(Level.SEVERE,"IOException",e);
         }
     }
 
@@ -75,7 +75,7 @@ public class Publisher {
             try {
                 printInputStream(new FileInputStream("rootcausecore/modules/queue/src/main/resources/log7450Lines.txt"), channel);
             } catch (FileNotFoundException e) {
-                e.printStackTrace();
+                LOGGER.log(Level.SEVERE,"FileNotFoundException",e);
             }
             LOGGER.log(Level.INFO,"Send 7450 lines.");
         };
@@ -88,7 +88,7 @@ public class Publisher {
 
             readChannel(channel, reader);
         } catch (IOException e) {
-            e.printStackTrace();
+            LOGGER.log(Level.SEVERE,"IOException",e);
         }
     }
 
@@ -102,7 +102,7 @@ public class Publisher {
                         new AMQP.BasicProperties.Builder().headers(Map.of("id", i++)).build(),
                         line.getBytes());
             } catch (IOException e) {
-                e.printStackTrace();
+                LOGGER.log(Level.SEVERE,"IOException",e);
             }
         }
     }
