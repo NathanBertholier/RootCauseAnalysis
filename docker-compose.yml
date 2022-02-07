@@ -37,9 +37,9 @@ services:
       - .DockerVolumes/Grafana/Setup/provisioning:/etc/grafana/provisioning
       - ./DockerVolumes/Grafana/Setup/dashboards:/var/lib/grafana/dashboards
     environment:
-      GF_SECURITY_ALLOW_EMBEDDING: true
-      GF_AUTH_ANONYMOUS_ENABLED: true
-      GF_AUTH_ANONYMOUS_ORG_ROLE: viewer
+      GF_SECURITY_ALLOW_EMBEDDING: "true"
+      GF_AUTH_ANONYMOUS_ENABLED: "true"
+      GF_AUTH_ANONYMOUS_ORG_ROLE: "viewer"
 
   rootcause:
     build: .
