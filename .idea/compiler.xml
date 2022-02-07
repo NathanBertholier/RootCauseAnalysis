@@ -13,6 +13,7 @@
         <module name="dbinsertmonitoring" />
         <module name="tokenization" />
         <module name="benchmark" />
+        <module name="queue" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
@@ -26,6 +27,7 @@
       <module name="InsertionAPI" target="1.7" />
       <module name="linking_synthetization" target="8" />
       <module name="modules" target="17" />
+      <module name="queue" target="17" />
       <module name="ReportAPI" target="1.7" />
       <module name="root-cause" target="1.5" />
       <module name="rootcausecore" target="1.5" />

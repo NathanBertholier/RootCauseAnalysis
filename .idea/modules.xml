@@ -9,6 +9,7 @@
       <module fileurl="file://$PROJECT_DIR$/RootCauseCore/DB/DBInsertMonitoring/dbinsertmonitoring.iml" filepath="$PROJECT_DIR$/RootCauseCore/DB/DBInsertMonitoring/dbinsertmonitoring.iml" />
       <module fileurl="file://$PROJECT_DIR$/rootcausecore/modules/linking_synthetization/linking_synthetization.iml" filepath="$PROJECT_DIR$/rootcausecore/modules/linking_synthetization/linking_synthetization.iml" />
       <module fileurl="file://$PROJECT_DIR$/RootCauseCore/Modules/modules.iml" filepath="$PROJECT_DIR$/RootCauseCore/Modules/modules.iml" />
+      <module fileurl="file://$PROJECT_DIR$/rootcausecore/modules/queue/queue.iml" filepath="$PROJECT_DIR$/rootcausecore/modules/queue/queue.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/root-cause.iml" filepath="$PROJECT_DIR$/.idea/root-cause.iml" />
       <module fileurl="file://$PROJECT_DIR$/RootCauseCore/rootcausecore.iml" filepath="$PROJECT_DIR$/RootCauseCore/rootcausecore.iml" />
       <module fileurl="file://$PROJECT_DIR$/rootcausefront/rootcausefront.iml" filepath="$PROJECT_DIR$/rootcausefront/rootcausefront.iml" />
