@@ -43,7 +43,7 @@ services:
     environment:
       GF_SECURITY_ALLOW_EMBEDDING: "true"
       GF_AUTH_ANONYMOUS_ENABLED: "true"
-      GF_AUTH_ANONYMOUS_ORG_ROLE: viewer
+      GF_AUTH_ANONYMOUS_ORG_ROLE: "viewer"
 
   rootcause:
     build: .

@@ -13,6 +13,7 @@
     <modules>
         <module>tokenization</module>
         <module>linking_synthetization</module>
+        <module>data</module>
     </modules>
     <artifactId>modules</artifactId>
 
