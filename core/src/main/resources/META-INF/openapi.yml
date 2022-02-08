@@ -328,7 +328,7 @@ components:
       type: array
       items:
         type: string
-        example: IP
+        example: [IP, Datetime]
     LinksResponse:
       type: object
       properties:
@@ -337,7 +337,7 @@ components:
           items:
             $ref: '#/components/schemas/Computation'
         proximity:
-          type: integer
+          type: number
           example: 1.97
     TokensRequest:
       type: object
