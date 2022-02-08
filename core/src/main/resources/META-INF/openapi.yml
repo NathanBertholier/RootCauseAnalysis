@@ -328,7 +328,7 @@ components:
       type: array
       items:
         type: string
-        example: IP
+        example: [IP, Datetime]
     LinksResponse:
       type: object
       properties:

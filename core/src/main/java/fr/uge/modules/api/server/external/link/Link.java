@@ -1,8 +1,10 @@
 package fr.uge.modules.api.server.external.link;
 
 import fr.uge.modules.api.server.external.model.Computation;
+import fr.uge.modules.api.server.external.model.LinksResponse;
 import io.smallrye.mutiny.Uni;
 
+import javax.validation.constraints.NotNull;
 import javax.ws.rs.*;
 
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
