@@ -69,7 +69,7 @@
                             <goal>copy-resources</goal>
                         </goals>
                         <configuration>
-                            <outputDirectory>${pom.basedir}/../rootcausecore/backend/src/main/resources/META-INF/resources</outputDirectory>
+                            <outputDirectory>${pom.basedir}/../core/src/main/resources/META-INF/resources</outputDirectory>
                             <resources>
                                 <resource>
                                     <directory>${pom.basedir}/build</directory>
