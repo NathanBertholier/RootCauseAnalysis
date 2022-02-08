@@ -20,7 +20,7 @@ import java.util.logging.Logger;
 import java.util.stream.LongStream;
 
 /**
- * TODO - Update channels, Unis & Multi returned by processors - Waiting for flo's task
+ * TODO - Update channels, Unis & Multi returned by processors
  */
 @Path("/insertlog")
 public class InsertLog {

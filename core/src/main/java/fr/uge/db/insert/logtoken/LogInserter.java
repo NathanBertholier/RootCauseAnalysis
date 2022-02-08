@@ -54,11 +54,11 @@ public class LogInserter {
     @Incoming(value = "logRaw")
     public CompletionStage<Void> processRaw(Message<JsonObject> incoming) {
         var log = incoming.getPayload().mapTo(Rawlog.class);
-        System.out.println(log);
         Optional<IncomingRabbitMQMetadata> metadata = incoming.getMetadata(IncomingRabbitMQMetadata.class);
         var id = metadata.orElseThrow().getHeader("id", Long.class).orElseThrow();
         try {
             this.insertInMonitoring(id, log.getLog());
+            System.out.println("ID in databse : " + id + " <-> " + log.getLog());
         } catch (SQLException e) {
             e.printStackTrace();
         }

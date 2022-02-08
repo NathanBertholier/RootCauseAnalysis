@@ -19,10 +19,9 @@ public class RawlogProcessor {
     @Incoming(value = "logTokenization")
     public CompletionStage<Void> processTokenization(Message<JsonObject> incoming){
         var log = incoming.getPayload().mapTo(Rawlog.class);
-        System.out.println(log);
         Optional<IncomingRabbitMQMetadata> metadata = incoming.getMetadata(IncomingRabbitMQMetadata.class);
         var id = metadata.orElseThrow().getHeader("id", Long.class).orElseThrow();
-        System.out.println(id);
+        System.out.println("Log : " + log + " ID : " + id);
         return CompletableFuture.runAsync(()->{});
     }
 }
