@@ -10,6 +10,7 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.util.Properties;
 import java.util.Random;
 import java.util.concurrent.TimeoutException;
 import java.util.logging.Level;
@@ -22,14 +23,21 @@ import java.util.logging.Logger;
 public class LogInserter
 {
     private static final  String QUEUE_NAME = "log";
-    private static final  String CONN_URL = "jdbc:postgresql://localhost:5432/rootcause?user=root&password=root&stringtype=unspecified";
     private static final  Object signal = new Object();
     private static boolean wasSignalled = false;
     private static final Random rand = new Random();
     private static final Logger LOGGER = Logger.getGlobal();
+    private static final Properties PROPERTIES = new Properties();
+    static {
+        try {
+            PROPERTIES.load(LogInserter.class.getClassLoader().getResourceAsStream("init.properties"));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
     public static void main(String[] args) throws SQLException {
-        var conn = DriverManager.getConnection(CONN_URL);
+        var conn = DriverManager.getConnection("jdbc:postgresql://"+PROPERTIES.getProperty("DBSRV")+":5432/"+PROPERTIES.getProperty("DB")+"?user="+PROPERTIES.getProperty("DBLOGIN")+"&password="+PROPERTIES.getProperty("DBPWD")+"&stringtype=unspecified");
         try {
             getValueFromAPI(conn);
         } catch (IllegalStateException | IOException | TimeoutException error) {
