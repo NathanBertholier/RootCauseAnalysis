@@ -11,6 +11,16 @@ import java.util.List;
 public class TokenType {
     @GET
     public Uni<List<String>> getTokenTypes(){
-        return null;
+        return Uni.createFrom().item(getAllTokenTypes());
+    }
+
+    private static List<String> getAllTokenTypes(){
+        return List.of(
+                "TypeDate",
+                "TypeDatetime",
+                "TypeIPv4",
+                "TypeIPv6",
+                "TypeTime"
+        );
     }
 }
