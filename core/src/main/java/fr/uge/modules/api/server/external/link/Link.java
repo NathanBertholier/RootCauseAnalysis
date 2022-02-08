@@ -11,11 +11,12 @@ import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 
 @Path("/link")
 public class Link {
+    private static final Computation computation = new Computation("type", "value1", "value2", 1);
+
     @GET
     @Consumes(APPLICATION_JSON)
     @Produces(APPLICATION_JSON)
-    public Uni<LinksResponse> getProximity(@NotNull @QueryParam("id1") int id_log_first, @NotNull @QueryParam("id2") int id_log_second, @QueryParam("delta") int delta){
-        return Uni.createFrom().item(new LinksResponse(
-                new Computation[]{new Computation("type", "value1", "value2", 1)}, 1.97F));
+    public Uni<Computation> getProximity(@QueryParam("id1") long id_log_first, @QueryParam("id2") long id_log_second){
+        return Uni.createFrom().item(computation);
     }
 }

@@ -79,7 +79,7 @@ paths:
           description: Proximity limit to be taken into account in the report
           required: false
           schema:
-            type: integer
+            type: number
             default: 80
         - name: network_size
           in: query
@@ -234,7 +234,7 @@ components:
                 type: integer
                 example: 56
               proximity:
-                type: integer
+                type: number
                 example: 91
     ReportResponse:
       type: object
@@ -297,8 +297,8 @@ components:
           type: string
           example: 10.16.27.62.244
         proximity:
-          type: integer
-          example: 1
+          type: number
+          example: 2.50
     LogDemonstrator:
       type: object
       properties:

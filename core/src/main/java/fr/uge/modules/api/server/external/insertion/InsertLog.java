@@ -12,8 +12,10 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.stream.IntStream;
+import java.util.concurrent.atomic.AtomicLong;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.util.stream.LongStream;
 
 /**
  * TODO - Update channels, Unis & Multi returned by processors - Waiting for flo's task
@@ -21,29 +23,31 @@ import java.util.stream.IntStream;
 @Path("/insertlog")
 public class InsertLog {
     @Channel("log-requests") Emitter<Rawlog> emitter;
-    private static AtomicInteger atomicInteger = new AtomicInteger();
+    private static final AtomicLong atomicLong = new AtomicLong();
+    private static final Logger LOGGER = Logger.getLogger(InsertLog.class.getName());
 
     @Path("/single")
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Uni<Integer> insertLog(Rawlog input) {
+    public Uni<Long> insertLog(Rawlog input) {
+        LOGGER.log(Level.INFO, "Received rawlogs: " + input);
         emitter.send(input);
-        return Uni.createFrom().item(atomicInteger.getAndIncrement());
+        return Uni.createFrom().item(atomicLong.getAndIncrement());
     }
 
     @Path("/batch")
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Multi<Integer> insertLog(List<Rawlog> inputs) {
-        var current = atomicInteger.get();
-        System.out.println("Inputs: " + inputs);
+    public Multi<Long> insertLog(List<Rawlog> inputs) {
+        var current = atomicLong.get();
+        LOGGER.log(Level.INFO, "Received rawlogs: " + inputs);
         inputs.forEach(log -> {
             emitter.send(log);
-            atomicInteger.getAndIncrement();
+            atomicLong.getAndIncrement();
         });
-        return Multi.createFrom().items(() -> IntStream.range(current, atomicInteger.get()).boxed());
+        return Multi.createFrom().items(() -> LongStream.range(current, atomicLong.get()).boxed());
     }
 }
 
