@@ -32,11 +32,12 @@ public class Synthetization {
         root.put("id",rootLog.getId());
         root.put("content",rootLog.getBody());
         root.put("datetime",rootLog.getDatetime());
-        report.put("root",root);
-        report.put("tokens",tokens);
-        report.put("logs",logs);
 
-        report.put("proximity",proximity);
+        report.put("tokens",tokens);
+
+        report.put("logs",logs);
+        report.put("proximities",proximity);
+        report.put("root",root);
         return report;
     }
     private JSONArray getTokens(SortedMap<Float,Log> map){
@@ -47,11 +48,13 @@ public class Synthetization {
         });
         var groupByType =  list.stream().
                 collect(Collectors.groupingBy(t->t.getType().getName()));
+        System.out.println(groupByType);
         var numberByToken =groupByType.entrySet().stream()
                 .collect(Collectors.toMap(Map.Entry::getKey, e ->
                 e.getValue().stream().collect(Collectors.groupingBy(Token::getValue,
                         Collectors.counting())).entrySet().stream()
                         .collect(Collectors.toMap(Map.Entry::getKey,Map.Entry::getValue))));
+        System.out.println(numberByToken);
         numberByToken.forEach((k,v)->{
             JSONObject node = new JSONObject();
             node.put("name",k);
@@ -69,9 +72,10 @@ public class Synthetization {
             var sortedlist= value.entrySet().stream()
                     .sorted(Collections.reverseOrder(Map.Entry.comparingByKey())).collect(Collectors.toMap(Map.Entry::getKey,
                             Map.Entry::getValue,(oldValue, newValue) -> oldValue, LinkedHashMap::new));
+            System.out.println(sortedlist);
             Map.Entry<Long,List<String>> entry2 = sortedlist.entrySet().iterator().next();
             node.put("value",entry2.getValue());
-            node.put("count",entry.getValue());
+            node.put("count",entry2.getKey());
             tokens.put(node);
         });
         return tokens;
