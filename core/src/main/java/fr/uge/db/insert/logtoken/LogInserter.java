@@ -58,7 +58,7 @@ public class LogInserter {
         var id = metadata.orElseThrow().getHeader("id", Long.class).orElseThrow();
         try {
             this.insertInMonitoring(id, log.getLog());
-            System.out.println("ID in databse : " + id + " <-> " + log.getLog());
+            LOGGER.log(Level.INFO,() -> "ID in databse : " + id + " <-> " + log.getLog());
         } catch (SQLException e) {
             LOGGER.log(Level.SEVERE,"SQLException",e);
         }
