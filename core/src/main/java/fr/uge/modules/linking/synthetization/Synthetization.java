@@ -3,7 +3,6 @@ package fr.uge.modules.linking.synthetization;
 import fr.uge.modules.data.log.Log;
 import fr.uge.modules.data.report.ReportParameter;
 import fr.uge.modules.data.token.Token;
-import fr.uge.modules.data.token.type.*;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -70,6 +69,12 @@ public class Synthetization {
     }
     private JSONArray getProximity(HashMap<Float,Log> map){
         JSONArray prox = new JSONArray();
+        map.forEach((k,v)->{
+            JSONObject log = new JSONObject();
+            log.put("id",v.getId());
+            log.put("proximity",k);
+            prox.put(log);
+        });
         return prox;
     }
     private JSONArray getLogs(HashMap<Float,Log> map){
