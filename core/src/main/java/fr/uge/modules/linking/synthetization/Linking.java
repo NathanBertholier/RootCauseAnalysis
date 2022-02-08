@@ -10,31 +10,38 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class Linking {
+
+    private static final String TYPE_DATE = "datetime";
+    private static final String TYPE_IPV4 = "IPv4";
+    private static final String IDTOKENTYPE = "idtokentype";
+    private static final String VALUE = "value";
+
+    private final Logger logger = Logger.getLogger(this.getClass().getName());
 
     private final Connection connection;
     DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
     private Log target;
     private List<TokenType> tokenTypes = new ArrayList<>(); //Token Types to considerate
     private List<Log> logs; //Logs coming from target time to target time less delta
-    private TreeMap<Float,Log> tree;
+    private SortedMap<Float,Log> tree;
 
     public Linking(String connUrl, long id, ReportParameter rp) throws SQLException {
         initTokenTypes();
         this.connection = DriverManager.getConnection(connUrl);
-        System.out.println("hi");
         //Get the target log
-        target = fetchLog(connection, id);
-        System.out.println(target);
+        target = fetchLog(id);
+        logger.log(Level.INFO,() -> "Log target : " + target + "\n") ;
 
         //Get the list of logs within the delta
-        logs = fetchListLog(connection, id, target.getDatetime(), rp.getDelta());
-        TreeMap<Float, Log> map = computeProximtyTree(target, logs, rp);
-        //System.out.println(map.toString());
+        logs = fetchListLog(id, target.getDatetime(), rp.getDelta());
+        tree = computeProximtyTree(target, logs, rp);
     }
 
-    public TreeMap<Float, Log> getTree() {
+    public SortedMap<Float, Log> getTree() {
         return tree;
     }
 
@@ -45,10 +52,9 @@ public class Linking {
 
     private Token createToken(String type, String value) {
         TokenType tt;
-        //System.out.println("into create token : " + type);
         switch(type){
-            case "datetime" -> tt = new TypeDatetime();
-            case "IPv4" -> tt = new TypeIPv4();
+            case TYPE_DATE -> {tt = new TypeDatetime();}
+            case TYPE_IPV4 -> {tt = new TypeIPv4();}
             default -> throw new IllegalArgumentException();
         }
         return new Token(value, tt);
@@ -56,77 +62,86 @@ public class Linking {
 
     /**
      * Fetches the target log in database with its infos
-     * @param conn Connection to database
      * @param idlogtarget id of the target log
      * @return the target log with his timestamp and other tokens
      * @throws SQLException
      */
-    private Log fetchLog(Connection conn, long idlogtarget) throws SQLException {
+    private Log fetchLog(long idlogtarget) throws SQLException {
         //Query to fetch the tokens of the logtarget in database
-        PreparedStatement fetchLog = conn.prepareStatement("SELECT * FROM log INNER JOIN token t ON log.id = t.idlog WHERE log.id = ?");
-        //param 1 for the index
-        fetchLog.setLong(1, idlogtarget);
-        ResultSet logTarget = fetchLog.executeQuery();
-        ArrayList<Token> tokenSet = new ArrayList<>();
-        logTarget.next();
-        //fetching data in the the resultset given from query
-        LocalDateTime ldt = logTarget.getTimestamp("datetime").toLocalDateTime();
-        tokenSet.add(createToken(logTarget.getString("type"), logTarget.getString("value")));
-        //while the resultset contains other lignes, fetching data for each type of token inside
-        while(logTarget.next()) {
-            tokenSet.add(createToken(logTarget.getString("type"), logTarget.getString("value")));
+        try(PreparedStatement fetchLog = connection.prepareStatement("SELECT * FROM log INNER JOIN token t ON log.id = t.idlog WHERE log.id = ?")){
+            fetchLog.setLong(1, idlogtarget);
+            ResultSet logTarget = fetchLog.executeQuery();
+
+            ArrayList<Token> tokenSet = new ArrayList<>();
+            logTarget.next();
+            //fetching data in the resultset given from query
+            LocalDateTime ldt = logTarget.getTimestamp(TYPE_DATE).toLocalDateTime();
+            tokenSet.add(createToken(fetchTokenType(logTarget.getInt(IDTOKENTYPE)), logTarget.getString(VALUE)));
+            //while the resultset contains other lignes, fetching data for each type of token inside
+            while(logTarget.next()) {
+                tokenSet.add(createToken(fetchTokenType(logTarget.getInt(IDTOKENTYPE)), logTarget.getString(VALUE)));
+            }
+            return new Log(idlogtarget, true, ldt, tokenSet);
         }
-        return new Log(idlogtarget, true, ldt, tokenSet);
     }
 
     /**
      * Fetches all the logs within the delta given in parameter different from the log target
-     * @param conn to database
      * @param idtarget id of the target log
      * @param datetime datetime of the target log
      * @param delta delta of time to search
      * @return the lists of logs within the delta
      * @throws SQLException
      */
-    private List<Log> fetchListLog(Connection conn, long idtarget, LocalDateTime datetime, int delta) throws SQLException {
+    private List<Log> fetchListLog(long idtarget, LocalDateTime datetime, int delta) throws SQLException {
         LocalDateTime ldtminusdelta = datetime.minus(Duration.ofSeconds(delta));
-        //System.out.println(ldt.toString() + " minus delta : " +  ldtminusdelta);
-        //System.out.println(Timestamp.valueOf(ldtminusdelta.format(formatter)));
-        PreparedStatement fetchListLog = connection.prepareStatement("SELECT * FROM log INNER JOIN token t ON log.id = t.idlog WHERE datetime BETWEEN ? AND ? AND log.id != ?");
-        fetchListLog.setTimestamp(1,Timestamp.valueOf(ldtminusdelta.format(formatter)));
-        fetchListLog.setTimestamp(2,Timestamp.valueOf(datetime.format(formatter)));
-        fetchListLog.setLong(3, idtarget);
-        ResultSet lines = fetchListLog.executeQuery();
-        long id;
-        LocalDateTime ldt;
-        List<Log> lst = new ArrayList<>();
-        List<Token> tokenSet = new ArrayList<>();
-        while(lines.next()) {
-            //init log
-            id = lines.getLong("id");
-            ldt = lines.getTimestamp("datetime").toLocalDateTime();
-            //get tokens
-            tokenSet.add(createToken(lines.getString("type"), lines.getString("value")));
-            lines.next();
-            tokenSet.add(createToken(lines.getString("type"), lines.getString("value")));
-            lst.add(new Log(id, false, ldt, tokenSet));
-            tokenSet.clear();
+        try(PreparedStatement fetchListLog = connection.prepareStatement("SELECT * FROM log INNER JOIN token t ON log.id = t.idlog WHERE datetime BETWEEN ? AND ? AND log.id != ?")) {
+            fetchListLog.setTimestamp(1, Timestamp.valueOf(ldtminusdelta.format(formatter)));
+            fetchListLog.setTimestamp(2, Timestamp.valueOf(datetime.format(formatter)));
+            fetchListLog.setLong(3, idtarget);
+            ResultSet lines = fetchListLog.executeQuery();
+            long id;
+            LocalDateTime ldt;
+            List<Log> lst = new ArrayList<>();
+            List<Token> tokenSet = new ArrayList<>();
+            while (lines.next()) {
+                //init log
+                id = lines.getLong("id");
+                ldt = lines.getTimestamp(TYPE_DATE).toLocalDateTime();
+                //get tokens
+                tokenSet.add(createToken(fetchTokenType(lines.getInt(IDTOKENTYPE)), lines.getString(VALUE)));
+                for (int i = 1; i < tokenTypes.size() - 1; i++) {
+                    lines.next();
+                    tokenSet.add(createToken(fetchTokenType(lines.getInt(IDTOKENTYPE)), lines.getString(VALUE)));
+                }
+                lst.add(new Log(id, false, ldt, tokenSet));
+                tokenSet.clear();
+            }
+            return lst;
         }
-        return lst;
     }
 
-    public TreeMap<Float, Log> computeProximtyTree(Log target, List<Log> logWithinDelta, ReportParameter rp){
-        TreeMap<Float, Log> redBlack = new TreeMap<Float, Log>(Collections.reverseOrder());
+    public String fetchTokenType(int id) throws SQLException {
+        String res;
+        try( PreparedStatement fetchTokenType = connection.prepareStatement("SELECT name FROM tokentype INNER JOIN token t ON tokentype.id = t.id WHERE tokentype.id = ?")) {
+            fetchTokenType.setLong(1, id);
+            ResultSet tokenType = fetchTokenType.executeQuery();
+            tokenType.next();
+
+            res = tokenType.getString("name");
+            return res;
+        }
+    }
+
+    public SortedMap<Float, Log> computeProximtyTree(Log target, List<Log> logWithinDelta, ReportParameter rp){
+        TreeMap<Float, Log> redBlack = new TreeMap<>(Collections.reverseOrder());
         logWithinDelta.forEach(log -> {
             float proximity = 0;
-            for(int i = 0; i < tokenTypes.size(); i++){
-                if(log.getTokens().get(i).getType().getName() == "datetime"){
-                    float tmp = TypeDatetime.computeDateTimeProximity(log.getDatetime(), target.getDatetime(), rp.getDelta());
-                    proximity += tmp;
-                } else {
-                    float tmp = log.getTokens().get(i).getType().computeProximity(log.getTokens().get(i), target.getTokens().get(i));
-                    proximity += tmp;
-                }
+            float tmp = TypeDatetime.computeDateTimeProximity(log.getDatetime(), target.getDatetime(), rp.getDelta());
+            proximity += tmp;
+            for(int i = 0; i < tokenTypes.size() - 1; i++){
+                tmp = log.getTokens().get(i).getType().computeProximity(log.getTokens().get(i), target.getTokens().get(i));
+                proximity += tmp;
             }
             proximity /= tokenTypes.size();
             if(redBlack.size() > rp.getNetworkSize()) {
@@ -142,6 +157,7 @@ public class Linking {
     }
 
     /**
+     * NOT IMPLEMENTED YET
      * Computes proximity between log of id1 and log of id2 for all the tokens in tokenTypes
      * @param id1 target log //A VALIDER
      * @param id2 other log
@@ -149,23 +165,12 @@ public class Linking {
      */
     public String computeLinks(long id1, long id2) {
         StringBuilder sb = new StringBuilder();
-        int size = tokenTypes.size();
         sb.append("{");
         for (TokenType tt : tokenTypes) {
             sb.append(tt.getName()).append(" : ");
         }
         sb.append("}");
         return sb.toString();
-    }
-
-    public static void main(String[] args) throws SQLException {
-
-        int delta = 86400;
-        int id_logtarget = 8;
-        ReportParameter rp = new ReportParameter(delta, 5);
-        Linking l = new Linking("jdbc:postgresql://localhost:5432/rootcause?user=root&password=root&stringtype=unspecified", id_logtarget, rp);
-        System.out.println(l.getTree().toString());
-
     }
 
 }
