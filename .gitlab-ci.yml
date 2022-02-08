@@ -25,9 +25,9 @@ deploy:
   stage: deploy
   script:
     - docker login 192.168.4.102:5050 -u Nathan -p ydht-a2yasET12xdfe2z
-    - docker build -t 192.168.4.102:5050/rootteam/root-cause .
-    - docker tag 192.168.4.102:5050/rootteam/root-cause 192.168.4.102:5050/rootteam/root-cause:${TAG}
-    - docker push 192.168.4.102:5050/rootteam/root-cause:${TAG}
+    - docker build -t 192.168.4.102:5050/rootteam/rootcause .
+    - docker tag 192.168.4.102:5050/rootteam/rootcause 192.168.4.102:5050/rootteam/rootcause:${TAG}
+    - docker push 192.168.4.102:5050/rootteam/rootcause:${TAG}
     - ssh -o StrictHostKeyChecking=no nathan@192.168.4.102 "docker-compose up --force-recreate --build -d > logs/$(date +'%d-%m-%y_%H-%M-%S').txt"
   only:
     - tags
