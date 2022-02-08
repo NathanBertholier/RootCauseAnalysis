@@ -35,6 +35,7 @@ public class Linking {
         //Get the target log
         target = fetchLog(id);
         logger.log(Level.INFO,() -> "Log target : " + target + "\n") ;
+        target.setBody(fetchRawLog(id));
 
         //Get the list of logs within the delta
         logs = fetchListLog(id, target.getDatetime(), rp.getDelta());
@@ -77,7 +78,7 @@ public class Linking {
             //fetching data in the resultset given from query
             LocalDateTime ldt = logTarget.getTimestamp(TYPE_DATE).toLocalDateTime();
             tokenSet.add(createToken(fetchTokenType(logTarget.getInt(IDTOKENTYPE)), logTarget.getString(VALUE)));
-            System.out.println("fdsgfs");
+
             //while the resultset contains other lignes, fetching data for each type of token inside
             while(logTarget.next()) {
                 tokenSet.add(createToken(fetchTokenType(logTarget.getInt(IDTOKENTYPE)), logTarget.getString(VALUE)));
@@ -105,6 +106,7 @@ public class Linking {
             LocalDateTime ldt;
             List<Log> lst = new ArrayList<>();
             List<Token> tokenSet = new ArrayList<>();
+            Log current;
             while (lines.next()) {
                 //init log
                 id = lines.getLong("id");
@@ -115,7 +117,9 @@ public class Linking {
                     lines.next();
                     tokenSet.add(createToken(fetchTokenType(lines.getInt(IDTOKENTYPE)), lines.getString(VALUE)));
                 }
-                lst.add(new Log(id, false, ldt, tokenSet));
+                current = new Log(id, false, ldt, tokenSet);
+                current.setBody(fetchRawLog(id));
+                lst.add(current);
                 tokenSet.clear();
             }
             return lst;
@@ -134,6 +138,17 @@ public class Linking {
         }
     }
 
+    public String fetchRawLog(long id) throws SQLException {
+        String res;
+        try( PreparedStatement fetchTokenType = connection.prepareStatement("SELECT value FROM rawlog WHERE id = ?")) {
+            fetchTokenType.setLong(1, id);
+            ResultSet tokenType = fetchTokenType.executeQuery();
+            tokenType.next();
+            res = tokenType.getString("value");
+            return res;
+        }
+    }
+
     public SortedMap<Float, Log> computeProximtyTree(Log target, List<Log> logWithinDelta, ReportParameter rp){
         TreeMap<Float, Log> redBlack = new TreeMap<>(Collections.reverseOrder());
         logWithinDelta.forEach(log -> {
@@ -145,7 +160,7 @@ public class Linking {
                 proximity += tmp;
             }
             proximity /= tokenTypes.size();
-            if(redBlack.size() > rp.getNetworkSize()) {
+            if(redBlack.size() > rp.getNetworkSize() - 1) {
                 if (proximity > redBlack.lastKey()) {
                     redBlack.pollLastEntry();
                     redBlack.put(proximity, log);

@@ -1,4 +1,5 @@
 CREATE TABLE log(id bigint PRIMARY KEY,datetime timestamp NOT NULL);
+CREATE TABLE rawlogt(id bigint PRIMARY KEY);
 CREATE TABLE rawlog(id bigint PRIMARY KEY,value text NOT NULL);
 CREATE TABLE monitoring(datetime timestamp PRIMARY KEY, ingressRate bigint NOT NULL, egressRate bigint NOT NULL,queuedMessages bigint NOT NULL,messagePoolBytes bigint NOT NULL);
 CREATE TABLE report(id bigint PRIMARY KEY,content text NOT NULL,proximity text NOT NULL);

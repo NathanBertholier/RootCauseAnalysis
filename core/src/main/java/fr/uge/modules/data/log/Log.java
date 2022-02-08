@@ -49,4 +49,8 @@ public class Log {
         sb.append("\nisTarget : ").append(target).append(" }");
         return sb.toString();
     }
+
+    public void setBody(String body) {
+        this.body = body;
+    }
 }

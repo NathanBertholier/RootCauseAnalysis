@@ -20,7 +20,6 @@ public class Synthetization {
     }
 
     public JSONObject getReport() throws SQLException {
-
         Linking l = new Linking("jdbc:postgresql://localhost:5432/rootcause?user=root&password=root&stringtype=unspecified", idroot, params);
         var rootLog = l.getTarget();
         var map = l.getTree();
@@ -48,13 +47,11 @@ public class Synthetization {
         });
         var groupByType =  list.stream().
                 collect(Collectors.groupingBy(t->t.getType().getName()));
-        System.out.println(groupByType);
         var numberByToken =groupByType.entrySet().stream()
                 .collect(Collectors.toMap(Map.Entry::getKey, e ->
                 e.getValue().stream().collect(Collectors.groupingBy(Token::getValue,
                         Collectors.counting())).entrySet().stream()
                         .collect(Collectors.toMap(Map.Entry::getKey,Map.Entry::getValue))));
-        System.out.println(numberByToken);
         numberByToken.forEach((k,v)->{
             JSONObject node = new JSONObject();
             node.put("name",k);
@@ -72,7 +69,6 @@ public class Synthetization {
             var sortedlist= value.entrySet().stream()
                     .sorted(Collections.reverseOrder(Map.Entry.comparingByKey())).collect(Collectors.toMap(Map.Entry::getKey,
                             Map.Entry::getValue,(oldValue, newValue) -> oldValue, LinkedHashMap::new));
-            System.out.println(sortedlist);
             Map.Entry<Long,List<String>> entry2 = sortedlist.entrySet().iterator().next();
             node.put("value",entry2.getValue());
             node.put("count",entry2.getKey());
