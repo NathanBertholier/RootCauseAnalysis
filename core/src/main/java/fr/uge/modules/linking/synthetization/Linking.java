@@ -40,7 +40,7 @@ public class Linking {
         logs = fetchListLog(id, target.getDatetime(), rp.getDelta());
         tree = computeProximtyTree(target, logs, rp);
     }
-
+    public Log getTarget(){return target;}
     public SortedMap<Float, Log> getTree() {
         return tree;
     }
@@ -77,6 +77,7 @@ public class Linking {
             //fetching data in the resultset given from query
             LocalDateTime ldt = logTarget.getTimestamp(TYPE_DATE).toLocalDateTime();
             tokenSet.add(createToken(fetchTokenType(logTarget.getInt(IDTOKENTYPE)), logTarget.getString(VALUE)));
+            System.out.println("fdsgfs");
             //while the resultset contains other lignes, fetching data for each type of token inside
             while(logTarget.next()) {
                 tokenSet.add(createToken(fetchTokenType(logTarget.getInt(IDTOKENTYPE)), logTarget.getString(VALUE)));

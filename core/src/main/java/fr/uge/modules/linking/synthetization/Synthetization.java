@@ -6,31 +6,40 @@ import fr.uge.modules.data.token.Token;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.sql.SQLException;
 import java.util.*;
 import java.util.stream.Collectors;
 
 
 public class Synthetization {
     private ReportParameter params;
+    private int idroot;
+    public Synthetization(int rootlog, ReportParameter reportParameter){
+        idroot = rootlog;
+        params= reportParameter;
+    }
 
-    public JSONObject getReport(HashMap<Float, Log> map, Log rootLog, boolean expanded){
+    public JSONObject getReport() throws SQLException {
+
+        Linking l = new Linking("jdbc:postgresql://localhost:5432/rootcause?user=root&password=root&stringtype=unspecified", idroot, params);
+        var rootLog = l.getTarget();
+        var map = l.getTree();
         JSONObject report = new JSONObject();
         JSONObject root = new JSONObject();
         JSONArray tokens = getTokens(map);
         JSONArray logs = getLogs(map);
+        JSONArray proximity = getProximity(map);
         root.put("id",rootLog.getId());
         root.put("content",rootLog.getBody());
         root.put("datetime",rootLog.getDatetime());
         report.put("root",root);
         report.put("tokens",tokens);
         report.put("logs",logs);
-        if(expanded){
-            JSONArray proximity = getProximity(map);
-            report.put("proximity",proximity);
-        }
+
+        report.put("proximity",proximity);
         return report;
     }
-    private JSONArray getTokens(HashMap<Float,Log> map){
+    private JSONArray getTokens(SortedMap<Float,Log> map){
         ArrayList<Token> list = new ArrayList<>();
         JSONArray tokens = new JSONArray();
         map.forEach((k,v)->{
@@ -67,7 +76,7 @@ public class Synthetization {
         });
         return tokens;
     }
-    private JSONArray getProximity(HashMap<Float,Log> map){
+    private JSONArray getProximity(SortedMap<Float,Log> map){
         JSONArray prox = new JSONArray();
         map.forEach((k,v)->{
             JSONObject log = new JSONObject();
@@ -77,7 +86,7 @@ public class Synthetization {
         });
         return prox;
     }
-    private JSONArray getLogs(HashMap<Float,Log> map){
+    private JSONArray getLogs(SortedMap<Float,Log> map){
         JSONArray logs = new JSONArray();
         map.forEach((k,v)->{
             JSONObject log = new JSONObject();
@@ -89,7 +98,11 @@ public class Synthetization {
         return logs;
     }
 
-    public static void main(String[] args) {
-
+    public static void main(String[] args) throws SQLException {
+        int delta = 86400;
+        int id_logtarget = 8;
+        ReportParameter rp = new ReportParameter(delta, 5);
+        var synth = new Synthetization(id_logtarget,rp);
+        System.out.println(synth.getReport().toString());
     }
 }

@@ -3,21 +3,15 @@ package fr.uge.db.insert.monitoring;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import com.rabbitmq.client.Channel;
-import com.rabbitmq.client.ConnectionFactory;
-import com.rabbitmq.client.DeliverCallback;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.nio.charset.StandardCharsets;
 import java.sql.*;
 import java.time.Instant;
-import java.time.LocalDateTime;
 import java.util.Base64;
-import java.util.Random;
 import java.util.concurrent.TimeoutException;
 
 import com.google.gson.JsonElement;
