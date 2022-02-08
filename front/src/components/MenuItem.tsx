@@ -1,4 +1,3 @@
-import perfLogo from "../res/images/perf.png";
 import {Link} from "react-router-dom";
 import React from "react";
 
