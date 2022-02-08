@@ -131,12 +131,4 @@
             </plugin>
         </plugins>
     </build>
-
-    <dependencies>
-        <dependency>
-            <groupId>io.quarkus</groupId>
-            <artifactId>quarkus-resteasy-jackson</artifactId>
-        </dependency>
-    </dependencies>
-
 </project>
