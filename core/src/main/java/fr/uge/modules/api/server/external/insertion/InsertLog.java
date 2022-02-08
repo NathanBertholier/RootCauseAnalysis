@@ -15,7 +15,7 @@ import java.util.stream.IntStream;
 
 @Path("/insertlog")
 public class InsertLog {
-    @Channel("logs-requests") Emitter<Log> emitter; // Needs to be fixed - waiting for florentin's task
+    @Channel("logs-requests") Emitter<Log> emitter;
     private static int id = 0; // [AtomicInt, Uni] + déplacement dans un processor à prévoir
 
     @Path("/single")
