@@ -2,22 +2,12 @@ package fr.uge.modules.api.server.external.model;
 
 import java.io.Serializable;
 
-public class Log implements Serializable {
-    private int id;
+public class Rawlog implements Serializable {
     private String log;
 
-    public Log(){}
-    public Log(Integer id, String log){
-        this.id = id;
+    public Rawlog(){}
+    public Rawlog(String log){
         this.log = log;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
     }
 
     public String getLog() {
@@ -31,8 +21,7 @@ public class Log implements Serializable {
     @Override
     public String toString() {
         return "Log{" +
-                "id=" + id +
-                ", log='" + log + '\'' +
+                "log='" + log + '\'' +
                 '}';
     }
 }

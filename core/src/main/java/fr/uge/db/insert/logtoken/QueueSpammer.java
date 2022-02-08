@@ -4,19 +4,19 @@ import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
 
-import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
-import java.util.Random;
+import java.security.SecureRandom;
 
 public class QueueSpammer {
 
-    private final static String QUEUE_NAME = "log";
-    private final static Random random = new Random();
+    private static final  String QUEUE_NAME = "log";
+    private static final SecureRandom rand = new SecureRandom();
+    private static final boolean STOP=false;
 
     public static void main(String[] argv) throws Exception {
         ConnectionFactory factory = new ConnectionFactory();
         factory.setHost("localhost");
-        while(true){
+        while(!STOP){
             try (Connection connection = factory.newConnection();
                  Channel channel = connection.createChannel()) {
                 channel.queueDeclare(QUEUE_NAME, false, false, false, null);
@@ -29,10 +29,9 @@ public class QueueSpammer {
     public static String genRandomString(int length) {
         int leftLimit = 48; // numeral '0'
         int rightLimit = 122; // letter 'z'
-        int targetStringLength = length;
-        return random.ints(leftLimit, rightLimit + 1)
+        return rand.ints(leftLimit, rightLimit + 1)
                 .filter(i -> (i <= 57 || i >= 65) && (i <= 90 || i >= 97))
-                .limit(targetStringLength)
+                .limit(length)
                 .collect(StringBuilder::new, StringBuilder::appendCodePoint, StringBuilder::append)
                 .toString();
     }
