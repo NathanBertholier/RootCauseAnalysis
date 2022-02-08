@@ -22,8 +22,8 @@ public class QueueSpammer {
                 channel.queueDeclare(QUEUE_NAME, false, false, false, null);
                 String message = genRandomString(64);
                 channel.basicPublish("", QUEUE_NAME, null, message.getBytes(StandardCharsets.UTF_8));
-                //System.out.println(" [x] Sent '" + message + "'");
             }
+            Thread.sleep(0);
         }
     }
     public static String genRandomString(int length) {
