@@ -3,8 +3,11 @@ package fr.uge.modules.api.server.external.insertion;
 import fr.uge.modules.api.server.external.model.Rawlog;
 import io.smallrye.mutiny.Multi;
 import io.smallrye.mutiny.Uni;
+import io.smallrye.reactive.messaging.rabbitmq.OutgoingRabbitMQMetadata;
 import org.eclipse.microprofile.reactive.messaging.Channel;
 import org.eclipse.microprofile.reactive.messaging.Emitter;
+import org.eclipse.microprofile.reactive.messaging.Message;
+import org.eclipse.microprofile.reactive.messaging.Metadata;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
@@ -13,26 +16,28 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.LongStream;
 
 /**
- * TODO - Update channels, Unis & Multi returned by processors - Waiting for flo's task
+ * TODO - Update channels, Unis & Multi returned by processors
  */
 @Path("/insertlog")
 public class InsertLog {
-    @Channel("log-requests") Emitter<Rawlog> emitter;
-    private static final AtomicLong atomicLong = new AtomicLong();
-    private static final Logger LOGGER = Logger.getLogger(InsertLog.class.getName());
+    private static final Logger logger = Logger.getGlobal();
+
+    @Channel("logs") Emitter<Rawlog> emitter;
+    private static AtomicLong atomicLong = new AtomicLong();
 
     @Path("/single")
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
+    // TODO Change serializable from JSON to byte[]
+    // TODO header or champs in class for ID ?
     public Uni<Long> insertLog(Rawlog input) {
-        LOGGER.log(Level.INFO, "Received rawlogs: " + input);
-        emitter.send(input);
+        emitter.send(Message.of(input, Metadata.of(new OutgoingRabbitMQMetadata.Builder()
+                .withHeader("id", atomicLong.get()).build())));
         return Uni.createFrom().item(atomicLong.getAndIncrement());
     }
 
@@ -42,11 +47,8 @@ public class InsertLog {
     @Produces(MediaType.APPLICATION_JSON)
     public Multi<Long> insertLog(List<Rawlog> inputs) {
         var current = atomicLong.get();
-        LOGGER.log(Level.INFO, "Received rawlogs: " + inputs);
-        inputs.forEach(log -> {
-            emitter.send(log);
-            atomicLong.getAndIncrement();
-        });
+        inputs.forEach(log -> emitter.send(Message.of(log, Metadata.of(new OutgoingRabbitMQMetadata.Builder()
+                .withHeader("id", atomicLong.getAndIncrement()).build()))));
         return Multi.createFrom().items(() -> LongStream.range(current, atomicLong.get()).boxed());
     }
 }
