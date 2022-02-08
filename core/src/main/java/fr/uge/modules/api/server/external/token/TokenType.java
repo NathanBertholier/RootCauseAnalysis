@@ -4,7 +4,6 @@ import io.smallrye.mutiny.Uni;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
-import java.util.Collections;
 import java.util.List;
 
 @Path("/tokentypes")
