@@ -11,6 +11,6 @@ import java.util.List;
 public class TokenType {
     @GET
     public Uni<List<String>> getTokenTypes(){
-        return Uni.createFrom().item(Collections.emptyList()); // TODO - query db
+        return null;
     }
 }

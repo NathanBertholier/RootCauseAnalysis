@@ -157,7 +157,7 @@ paths:
       operationId: getTokens
       parameters:
         - name: TokenRequest
-          in: header
+          in: body
           description: Parameters of the request
           required: true
           schema:
@@ -360,6 +360,7 @@ components:
                 type: string
                 example: IP
               token_value:
+                type: string
                 example: 10.16.27.62.244
         rows:
           type: integer
