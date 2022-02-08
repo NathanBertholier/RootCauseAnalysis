@@ -11,18 +11,22 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.util.List;
+import java.util.logging.Logger;
 import java.util.stream.IntStream;
 
 @Path("/insertlog")
 public class InsertLog {
-    @Channel("logs-requests") Emitter<Log> emitter;
-    private static int id = 0; // [AtomicInt, Uni] + déplacement dans un processor à prévoir
+    private static final Logger logger = Logger.getGlobal();
+
+    @Channel("logs") Emitter<Log> emitter;
+    private int id = 0; // [AtomicInt, Uni] + déplacement dans un processor à prévoir
 
     @Path("/single")
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Integer insertLog(Log input) {
+        logger.info(id + "");
         emitter.send(input);
         return id++;
     }

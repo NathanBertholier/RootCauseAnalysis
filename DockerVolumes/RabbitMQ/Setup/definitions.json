@@ -47,11 +47,22 @@
   ],
   "queues":[
     {
+      "name":"tokens",
+      "vhost":"/",
+      "durable":true,
+      "auto_delete":false,
+      "arguments":{
+        "x-queue-type":"classic"
+      }
+    },
+    {
       "name":"logTokenization",
       "vhost":"/",
       "durable":true,
       "auto_delete":false,
       "arguments":{
+        "x-dead-letter-exchange":"logTokenization",
+        "x-dead-letter-routing-key":"logTokenization",
         "x-queue-type":"classic"
       }
     },
@@ -61,29 +72,46 @@
       "durable":true,
       "auto_delete":false,
       "arguments":{
+        "x-dead-letter-exchange":"logRaw",
+        "x-dead-letter-routing-key":"logRaw",
         "x-queue-type":"classic"
       }
     },
     {
-      "name": "logs",
-      "vhost": "/",
-      "durable": true,
-      "auto_delete": false,
-      "arguments": {
-        "x-queue-type": "classic"
-      }
-    },
-    {
-      "name":"tokens",
+      "name":"logs",
       "vhost":"/",
       "durable":true,
       "auto_delete":false,
       "arguments":{
+        "x-dead-letter-exchange":"logs",
+        "x-dead-letter-routing-key":"logs",
         "x-queue-type":"classic"
       }
     }
   ],
   "exchanges":[
+    {
+      "name":"logRaw",
+      "vhost":"/",
+      "type":"fanout",
+      "durable":true,
+      "auto_delete":false,
+      "internal":false,
+      "arguments":{
+
+      }
+    },
+    {
+      "name":"logTokenization",
+      "vhost":"/",
+      "type":"fanout",
+      "durable":true,
+      "auto_delete":false,
+      "internal":false,
+      "arguments":{
+
+      }
+    },
     {
       "name":"logs",
       "vhost":"/",
@@ -97,6 +125,26 @@
     }
   ],
   "bindings":[
+    {
+      "source":"logRaw",
+      "vhost":"/",
+      "destination":"logRaw",
+      "destination_type":"queue",
+      "routing_key":"#",
+      "arguments":{
+
+      }
+    },
+    {
+      "source":"logTokenization",
+      "vhost":"/",
+      "destination":"logTokenization",
+      "destination_type":"queue",
+      "routing_key":"#",
+      "arguments":{
+
+      }
+    },
     {
       "source":"logs",
       "vhost":"/",
