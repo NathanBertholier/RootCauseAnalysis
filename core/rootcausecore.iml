@@ -5,7 +5,9 @@
       <configuration>
         <setting name="validation-enabled" value="true" />
         <setting name="provider-name" value="Hibernate" />
-        <datasource-mapping />
+        <datasource-mapping>
+          <factory-entry name="rootcausecore" />
+        </datasource-mapping>
         <naming-strategy-map />
       </configuration>
     </facet>
@@ -180,6 +182,7 @@
     <orderEntry type="library" scope="TEST" name="Maven: com.h2database:h2:2.1.210" level="project" />
     <orderEntry type="library" name="Maven: com.rabbitmq:amqp-client:5.14.1" level="project" />
     <orderEntry type="library" name="Maven: org.slf4j:slf4j-api:1.7.30" level="project" />
+    <orderEntry type="library" name="Maven: org.postgresql:postgresql:42.3.2" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: org.junit.jupiter:junit-jupiter:5.8.2" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: org.junit.jupiter:junit-jupiter-api:5.8.1" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: org.opentest4j:opentest4j:1.2.0" level="project" />
