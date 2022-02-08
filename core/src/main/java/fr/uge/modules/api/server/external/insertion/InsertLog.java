@@ -15,6 +15,9 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.IntStream;
 
+/**
+ * TODO - Update channels, Unis & Multi returned by processors - Waiting for flo's task
+ */
 @Path("/insertlog")
 public class InsertLog {
     @Channel("log-requests") Emitter<Rawlog> emitter;
