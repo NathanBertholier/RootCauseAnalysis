@@ -2,10 +2,10 @@ package fr.uge.modules.api.server.external.model;
 
 import java.util.Arrays;
 
-public record LogDemonstrator(int id, String datetime, String content, Token[] tokens) {
+public record LogDemonstrator(long id, String datetime, String content, TokenModel[] tokenModels) {
     @Override
     public int hashCode() {
-        return Integer.hashCode(id) ^ datetime.hashCode() ^ content.hashCode() ^ Arrays.hashCode(tokens);
+        return Long.hashCode(id) ^ datetime.hashCode() ^ content.hashCode() ^ Arrays.hashCode(tokenModels);
     }
 
     @Override
@@ -14,7 +14,7 @@ public record LogDemonstrator(int id, String datetime, String content, Token[] t
         else return logDemonstrator.id == id &&
                 logDemonstrator.datetime.equals(datetime) &&
                 logDemonstrator.content.equals(content) &&
-                Arrays.equals(logDemonstrator.tokens, tokens);
+                Arrays.equals(logDemonstrator.tokenModels, tokenModels);
     }
 
     @Override
@@ -23,7 +23,7 @@ public record LogDemonstrator(int id, String datetime, String content, Token[] t
                 "id=" + id +
                 ", datetime='" + datetime + '\'' +
                 ", content='" + content + '\'' +
-                ", tokens=" + Arrays.toString(tokens) +
+                ", tokens=" + Arrays.toString(tokenModels) +
                 '}';
     }
 }
