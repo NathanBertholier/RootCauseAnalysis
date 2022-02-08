@@ -6,7 +6,7 @@ export const Performance = () => {
     return (
         <Container fluid>
             <Row>
-                <Sidebar />
+                <Sidebar selected="perf" />
                 <div id="content-wrapper" >
                     Perf page
                 </div>

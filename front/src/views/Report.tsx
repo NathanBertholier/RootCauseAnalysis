@@ -6,7 +6,7 @@ export const Report = () => {
     return (
         <Container fluid>
             <Row>
-                <Sidebar />
+                <Sidebar selected="report" />
                 <div id="content-wrapper" >
                     report page
                 </div>

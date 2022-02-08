@@ -50,7 +50,15 @@
   margin-left: 20px;
 }
 
+.item-text.active {
+  color: black;
+}
+
 #content-wrapper {
   width: 80%;
   margin-left: 20%;
+}
+
+.black-icon {
+  filter: brightness(0) saturate(100%);
 }

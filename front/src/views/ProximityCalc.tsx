@@ -6,7 +6,7 @@ export const ProximityCalc = () => {
     return (
         <Container fluid>
             <Row>
-                <Sidebar />
+                <Sidebar selected="proximity" />
                 <div id="content-wrapper" >
                     proximity page
                 </div>
