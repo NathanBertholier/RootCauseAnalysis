@@ -4,3 +4,4 @@ front/node_modules
 front/build
 front/app
 core/src/main/resources/META-INF/resources
+/DockerVolumes/*/Volume

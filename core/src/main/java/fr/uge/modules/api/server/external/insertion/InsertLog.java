@@ -12,14 +12,20 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.util.List;
 import java.util.logging.Logger;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.IntStream;
 
+/**
+ * TODO - Update channels, Unis & Multi returned by processors - Waiting for flo's task
+ */
 @Path("/insertlog")
 public class InsertLog {
     private static final Logger logger = Logger.getGlobal();
 
     @Channel("logs") Emitter<Log> emitter;
     private int id = 0; // [AtomicInt, Uni] + déplacement dans un processor à prévoir
+    @Channel("log-requests") Emitter<Rawlog> emitter;
+    private static AtomicInteger atomicInteger = new AtomicInteger();
 
     @Path("/single")
     @POST
@@ -27,23 +33,23 @@ public class InsertLog {
     @Produces(MediaType.APPLICATION_JSON)
     public Integer insertLog(Log input) {
         logger.info(id + "");
+    public Uni<Integer> insertLog(Rawlog input) {
         emitter.send(input);
-        return id++;
+        return Uni.createFrom().item(atomicInteger.getAndIncrement());
     }
 
     @Path("/batch")
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response insertLog(List<Log> inputs) {
-        int current = id;
+    public Multi<Integer> insertLog(List<Rawlog> inputs) {
+        var current = atomicInteger.get();
+        System.out.println("Inputs: " + inputs);
         inputs.forEach(log -> {
             emitter.send(log);
-            id++;
+            atomicInteger.getAndIncrement();
         });
-        return Response.ok(IntStream.range(current, id).boxed().toList(), MediaType.APPLICATION_JSON)
-                .build();
+        return Multi.createFrom().items(() -> IntStream.range(current, atomicInteger.get()).boxed());
     }
-
 }
 

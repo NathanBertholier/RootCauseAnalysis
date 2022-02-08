@@ -24,10 +24,17 @@ public class RawlogProcessor {
     }
 
     @Incoming(value = "logRaw")
-    public void processRaw(JsonObject input){
+    public void processRaw(JsonObject input) {
         Log log = input.mapTo(Log.class);
 
-        LOGGER.log(Level.INFO,() -> "RAW : Processing log " + log);
+        LOGGER.log(Level.INFO, () -> "RAW : Processing log " + log);
+    }
+
+    @Incoming(value = "logs")
+    //@Outgoing(value = "logs-ids")
+    @NonBlocking
+    public void process(Rawlog input){
+        System.out.println("Processing log " + input.toString());
     }
 }
 

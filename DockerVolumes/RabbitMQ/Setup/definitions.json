@@ -126,26 +126,6 @@
   ],
   "bindings":[
     {
-      "source":"logRaw",
-      "vhost":"/",
-      "destination":"logRaw",
-      "destination_type":"queue",
-      "routing_key":"#",
-      "arguments":{
-
-      }
-    },
-    {
-      "source":"logTokenization",
-      "vhost":"/",
-      "destination":"logTokenization",
-      "destination_type":"queue",
-      "routing_key":"#",
-      "arguments":{
-
-      }
-    },
-    {
       "source":"logs",
       "vhost":"/",
       "destination":"logRaw",
