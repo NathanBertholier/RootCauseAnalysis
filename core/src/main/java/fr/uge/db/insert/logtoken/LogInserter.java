@@ -6,12 +6,12 @@ import com.rabbitmq.client.DeliverCallback;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.security.SecureRandom;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.Properties;
-import java.util.Random;
 import java.util.concurrent.TimeoutException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -25,14 +25,14 @@ public class LogInserter
     private static final  String QUEUE_NAME = "log";
     private static final  Object signal = new Object();
     private static boolean wasSignalled = false;
-    private static final Random rand = new Random();
+    private static final SecureRandom rand = new SecureRandom();
     private static final Logger LOGGER = Logger.getGlobal();
     private static final Properties PROPERTIES = new Properties();
     static {
         try {
             PROPERTIES.load(LogInserter.class.getClassLoader().getResourceAsStream("init.properties"));
         } catch (IOException e) {
-            e.printStackTrace();
+            LOGGER.log(Level.SEVERE,"IOException",e);
         }
     }
 
@@ -41,7 +41,7 @@ public class LogInserter
         try {
             getValueFromAPI(conn);
         } catch (IllegalStateException | IOException | TimeoutException error) {
-            error.printStackTrace();
+            LOGGER.log(Level.SEVERE,"IllegalStateException | IOException | TimeoutException",error);
         }
         synchronized (signal){
             while(!wasSignalled){
@@ -79,7 +79,7 @@ public class LogInserter
                     try {
                         insertInMonitoring(rand.nextInt(0,999999), message, conn);
                     } catch (SQLException e) {
-                        e.printStackTrace();
+                        LOGGER.log(Level.WARNING,"SQLException",e);
                     }
                 };
                 channel.basicConsume(QUEUE_NAME, true, deliverCallback, consumerTag -> { });

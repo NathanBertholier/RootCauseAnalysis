@@ -3,13 +3,14 @@ package fr.uge.db.insert.logtoken;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
+
 import java.nio.charset.StandardCharsets;
-import java.util.Random;
+import java.security.SecureRandom;
 
 public class QueueSpammer {
 
     private static final  String QUEUE_NAME = "log";
-    private static final  Random random = new Random();
+    private static final SecureRandom rand = new SecureRandom();
     private static final boolean STOP=false;
 
     public static void main(String[] argv) throws Exception {
@@ -28,7 +29,7 @@ public class QueueSpammer {
     public static String genRandomString(int length) {
         int leftLimit = 48; // numeral '0'
         int rightLimit = 122; // letter 'z'
-        return random.ints(leftLimit, rightLimit + 1)
+        return rand.ints(leftLimit, rightLimit + 1)
                 .filter(i -> (i <= 57 || i >= 65) && (i <= 90 || i >= 97))
                 .limit(length)
                 .collect(StringBuilder::new, StringBuilder::appendCodePoint, StringBuilder::append)
