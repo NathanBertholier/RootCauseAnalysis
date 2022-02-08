@@ -1,5 +1,6 @@
 import {Sidebar} from "../components/Sidebar";
 import React from "react";
+import {LogList} from "../components/LogList";
 import {Container, Row} from "react-bootstrap";
 
 export const Logs = () => {
@@ -8,7 +9,7 @@ export const Logs = () => {
             <Row>
                 <Sidebar selected="logs" />
                 <div id="content-wrapper" >
-                    Logs page
+                    <LogList />
                 </div>
             </Row>
         </Container>
