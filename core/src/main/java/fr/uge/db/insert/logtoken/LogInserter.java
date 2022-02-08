@@ -12,6 +12,8 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.Random;
 import java.util.concurrent.TimeoutException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Hello world!
@@ -19,10 +21,12 @@ import java.util.concurrent.TimeoutException;
  */
 public class LogInserter
 {
-    private final static String QUEUE_NAME = "log";
-    private final static String CONN_URL = "jdbc:postgresql://localhost:5432/rootcause?user=root&password=root&stringtype=unspecified";
-    private final static Object signal = new Object();
+    private static final  String QUEUE_NAME = "log";
+    private static final  String CONN_URL = "jdbc:postgresql://localhost:5432/rootcause?user=root&password=root&stringtype=unspecified";
+    private static final  Object signal = new Object();
     private static boolean wasSignalled = false;
+    private static final Random rand = new Random();
+    private static final Logger LOGGER = Logger.getGlobal();
 
     public static void main(String[] args) throws SQLException {
         var conn = DriverManager.getConnection(CONN_URL);
@@ -32,11 +36,12 @@ public class LogInserter
             error.printStackTrace();
         }
         synchronized (signal){
-            if(!wasSignalled){
+            while(!wasSignalled){
                 try {
                     signal.wait();
                 } catch (InterruptedException e){
-                    throw new AssertionError();
+                    LOGGER.log(Level.WARNING,"InterruptedException",e);
+                    Thread.currentThread().interrupt();
                 }
             }
         }
@@ -44,32 +49,36 @@ public class LogInserter
 
     private static void insertInMonitoring(int id, String val, Connection conn) throws SQLException {
 
-        PreparedStatement preparedStatement = conn.prepareStatement("INSERT INTO rawlog (id,value) VALUES (?,?)");
-        preparedStatement.setInt(1,id);
-        preparedStatement.setString(2, val);
-        preparedStatement.executeUpdate();
+        try (PreparedStatement preparedStatement = conn.prepareStatement("INSERT INTO rawlog (id,value) VALUES (?,?)")) {
+            preparedStatement.setInt(1, id);
+            preparedStatement.setString(2, val);
+            preparedStatement.executeUpdate();
+        }
     }
 
     private static void getValueFromAPI(Connection conn) throws IOException, TimeoutException {
         ConnectionFactory factory = new ConnectionFactory();
+
         factory.setHost("localhost");
-        com.rabbitmq.client.Connection connection = factory.newConnection();
-        Channel channel = connection.createChannel();
+        try (com.rabbitmq.client.Connection connection = factory.newConnection()) {
+            try (Channel channel = connection.createChannel()) {
+                channel.queueDeclare(QUEUE_NAME, false, false, false, null);
+                LOGGER.log(Level.INFO," [*] Waiting for messages. To exit press CTRL+C");
 
-        channel.queueDeclare(QUEUE_NAME, false, false, false, null);
-        System.out.println(" [*] Waiting for messages. To exit press CTRL+C");
-
-        DeliverCallback deliverCallback = (consumerTag, delivery) -> {
-            String message = new String(delivery.getBody(), StandardCharsets.UTF_8);
-            System.out.println(" [x] Received '" + message + "'");
-            var rand = new Random();
-            try {
-                insertInMonitoring(rand.nextInt(0,999999), message, conn);
-            } catch (SQLException e) {
-                e.printStackTrace();
+                DeliverCallback deliverCallback = (consumerTag, delivery) -> {
+                    String message = new String(delivery.getBody(), StandardCharsets.UTF_8);
+                    LOGGER.log(Level.INFO,() -> " [x] Received '" + message + "'");
+                    try {
+                        insertInMonitoring(rand.nextInt(0,999999), message, conn);
+                    } catch (SQLException e) {
+                        e.printStackTrace();
+                    }
+                };
+                channel.basicConsume(QUEUE_NAME, true, deliverCallback, consumerTag -> { });
             }
-        };
-        channel.basicConsume(QUEUE_NAME, true, deliverCallback, consumerTag -> { });
+        }
+
+
     }
 
 }
