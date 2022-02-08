@@ -1,0 +1,64 @@
+.App {
+  text-align: center;
+}
+
+.sidebar {
+  height: 100%;
+  width: 20%;
+  background-color: #d9dbe0;
+  position: fixed;
+  z-index: 1;
+  top: 0;
+  left: 0;
+  font-size: 20px;
+  transition: .5s ease;
+  overflow-x: hidden;
+  padding-top: 20px;
+  display: flex;
+  flex-direction: column;
+  text-align: left;
+}
+
+.sidebar .projectTitle {
+  margin-bottom: 100px;
+  margin-left: 30px;
+  color: #000000;
+  text-decoration: none;
+}
+
+.sidebar .item {
+  color: #aaaeba;
+  text-decoration: none;
+  padding: 15px 0px;
+}
+
+.item-icon {
+  margin-left: 30px;
+  width: 25px;
+  height: 25px;
+  display: inline-block;
+}
+
+.item-icon img {
+  height: 100%;
+  vertical-align: text-top;
+}
+
+.item-text {
+  font-size: 18px;
+  display: inline-block;
+  margin-left: 20px;
+}
+
+.item-text.active {
+  color: black;
+}
+
+#content-wrapper {
+  width: 80%;
+  margin-left: 20%;
+}
+
+.black-icon {
+  filter: brightness(0) saturate(100%);
+}
