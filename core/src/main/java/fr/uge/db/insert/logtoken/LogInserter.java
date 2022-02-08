@@ -60,7 +60,7 @@ public class LogInserter {
             this.insertInMonitoring(id, log.getLog());
             System.out.println("ID in databse : " + id + " <-> " + log.getLog());
         } catch (SQLException e) {
-            e.printStackTrace();
+            LOGGER.log(Level.SEVERE,"SQLException",e);
         }
         return CompletableFuture.runAsync(()->{});
     }
