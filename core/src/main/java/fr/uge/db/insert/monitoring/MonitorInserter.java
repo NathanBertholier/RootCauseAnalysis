@@ -105,7 +105,7 @@ public class MonitorInserter
                 try {
                     insertInMonitoring(ingressRate,egressRate,queueSize,messagePoolBytes, conn);
                 } catch (SQLException e) {
-                    e.printStackTrace();
+                    LOGGER.log(Level.SEVERE,"SQLException",e);
                 }
 
             }
