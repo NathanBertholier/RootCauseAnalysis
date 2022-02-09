@@ -144,7 +144,7 @@ public class Linking {
             fetchTokenType.setLong(1, id);
             ResultSet tokenType = fetchTokenType.executeQuery();
             tokenType.next();
-            res = tokenType.getString("value");
+            res = tokenType.getString(VALUE);
             return res;
         }
     }
