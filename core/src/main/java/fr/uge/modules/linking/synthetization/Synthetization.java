@@ -3,14 +3,12 @@ package fr.uge.modules.linking.synthetization;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.github.fge.msgsimple.provider.MessageSourceLoader;
-import fr.uge.db.insert.logtoken.LogInserter;
+import fr.uge.db.insert.monitoring.MonitorInserter;
 import fr.uge.modules.data.log.Log;
 import fr.uge.modules.data.report.ReportParameter;
 import fr.uge.modules.data.token.Token;
 
 import java.io.IOException;
-import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.*;
 import java.util.logging.Level;
@@ -19,24 +17,19 @@ import java.util.stream.Collectors;
 
 
 public class Synthetization {
+    private static ObjectMapper mapper = new ObjectMapper();
     private static final Properties PROPERTIES = new Properties();
     private static final Logger LOGGER = Logger.getGlobal();
-    private ReportParameter params;
-    private int idroot;
-    private ObjectMapper mapper = new ObjectMapper();
 
-
-    public Synthetization(int rootlog, ReportParameter reportParameter) {
-        idroot = rootlog;
-        params = reportParameter;
-    }
-
-    public ObjectNode getReport() throws SQLException {
+    static {
         try {
-            PROPERTIES.load(LogInserter.class.getClassLoader().getResourceAsStream("init.properties"));
+            PROPERTIES.load(MonitorInserter.class.getClassLoader().getResourceAsStream("init.properties"));
         } catch (IOException e) {
             LOGGER.log(Level.SEVERE, "IOException", e);
         }
+    }
+
+    public static ObjectNode getReport(int rootlog, ReportParameter reportParameter) throws SQLException {
         Linking l = new Linking("jdbc:postgresql://" +
                 PROPERTIES.getProperty("DBSRV") +
                 ":5432/" +
@@ -45,7 +38,7 @@ public class Synthetization {
                 PROPERTIES.getProperty("DBLOGIN") +
                 "&password=" +
                 PROPERTIES.getProperty("DBPWD") +
-                "&stringtype=unspecified", idroot, params);
+        "&stringtype=unspecified",rootlog, reportParameter);
         var rootLog = l.getTarget();
         var map = l.getTree();
         ObjectNode report = mapper.createObjectNode();
@@ -65,12 +58,10 @@ public class Synthetization {
         return report;
     }
 
-    private ArrayNode getTokens(SortedMap<Float, Log> map) {
+    private static ArrayNode getTokens(SortedMap<Float, Log> map) {
         ArrayList<Token> list = new ArrayList<>();
         ArrayNode tokens = mapper.createArrayNode();
-        map.forEach((k, v) -> {
-            list.addAll(v.getTokens());
-        });
+        map.forEach((k, v) -> list.addAll(v.getTokens()));
         var groupByType = list.stream().
                 collect(Collectors.groupingBy(t -> t.getType().getName()));
         var numberByToken = groupByType.entrySet().stream()
@@ -81,7 +72,6 @@ public class Synthetization {
         numberByToken.forEach((k, v) -> {
             ObjectNode node = mapper.createObjectNode();
             node.put("name", k);
-            Map.Entry<String, Long> entry = v.entrySet().iterator().next();
             Map<Long, List<String>> value = new HashMap<>();
             v.forEach((k2, v2) -> {
                 if (value.containsKey(v2)) {
@@ -103,7 +93,7 @@ public class Synthetization {
         return tokens;
     }
 
-    private ArrayNode getProximity(SortedMap<Float, Log> map) {
+    private static ArrayNode getProximity(SortedMap<Float, Log> map) {
         ArrayNode prox = mapper.createArrayNode();
         map.forEach((k, v) -> {
             ObjectNode log = mapper.createObjectNode();
@@ -114,7 +104,7 @@ public class Synthetization {
         return prox;
     }
 
-    private ArrayNode getLogs(SortedMap<Float, Log> map) {
+    private static ArrayNode getLogs(SortedMap<Float, Log> map) {
         ArrayNode logs = mapper.createArrayNode();
         map.forEach((k, v) -> {
             ObjectNode log = mapper.createObjectNode();
@@ -130,7 +120,6 @@ public class Synthetization {
         int delta = 86400;
         int id_logtarget = 8;
         ReportParameter rp = new ReportParameter(delta, 5);
-        var synth = new Synthetization(id_logtarget, rp);
-        synth.getReport();
+        Synthetization.getReport(id_logtarget, rp);
     }
 }
