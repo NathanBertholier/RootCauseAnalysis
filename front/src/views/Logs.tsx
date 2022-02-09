@@ -9,6 +9,7 @@ export const Logs = () => {
             <Row>
                 <Sidebar selected="logs" />
                 <div id="content-wrapper" >
+                    <h1 className="title" >Logs</h1>
                     <LogList />
                 </div>
             </Row>

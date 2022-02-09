@@ -57,8 +57,20 @@
 #content-wrapper {
   width: 80%;
   margin-left: 20%;
+  padding: 0px;
 }
 
 .black-icon {
   filter: brightness(0) saturate(100%);
+}
+
+.title {
+  text-align: left;
+  margin-left: 20px;
+}
+
+.logTable {
+  margin-bottom: 0px;
+  margin-left: 20px;
+  width: calc(100% - 20px);
 }

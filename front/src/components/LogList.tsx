@@ -7,7 +7,7 @@ export const LogList = () => {
     console.log( Data );
     return (
         <div>
-            <Table striped bordered hover>
+            <Table striped bordered hover className="logTable">
                 <thead>
                 <tr>
                     <th>id</th>
@@ -18,7 +18,7 @@ export const LogList = () => {
                 </thead>
                 <tbody>
                 { Data.map( (log, index ) => {
-                    return  <Row id={ log.id } dateTime={log.datetime} content={log.content} tokens={ log.tokens } />
+                    return  <Row id={ log.id } dateTime={log.datetime} content={log.content} tokens={ log.tokens } key={index} />
                 })}
                 </tbody>
             </Table>

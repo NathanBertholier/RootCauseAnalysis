@@ -1,4 +1,6 @@
 import React from "react";
+import {useState} from "react";
+import { Collapse } from "react-bootstrap"
 
 type Token = {
     token_type : string
@@ -13,14 +15,21 @@ type Log = {
 }
 
 export const Row = ({ id, dateTime, tokens, content } : Log ) => {
+    const [ isUnfold, setIsUnfold ] = useState(false);
+
     return (
-        <tr  >
-            <td>{id}</td>
+        <tr onClick={ () => setIsUnfold( !isUnfold ) } >
+        <td>{id}</td>
             <td>{dateTime}</td>
             <td>
                 <span>{tokens.length}</span>
                 { tokens.map( (token, index ) => {
-                    return <div><span>{token.token_type} : </span><span>{ token.value }</span></div>
+                    return <Collapse in={isUnfold} key={index}>
+                        <div id="example-collapse-text">
+                            {token.token_type} : { token.value }
+                        </div>
+                    </Collapse>
+
                 })}
             </td>
             <td>{content}</td>
