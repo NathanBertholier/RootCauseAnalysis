@@ -52,7 +52,8 @@
       "durable":true,
       "auto_delete":false,
       "arguments":{
-        "x-queue-type":"classic"
+        "x-dead-letter-exchange":"DLX",
+        "x-dead-letter-routing-key":"tokens"
       }
     },
     {
@@ -139,6 +140,16 @@
       "source":"logs",
       "vhost":"/",
       "destination":"logTokenization",
+      "destination_type":"queue",
+      "routing_key":"",
+      "arguments":{
+
+      }
+    },
+    {
+      "source":"tokens",
+      "vhost":"/",
+      "destination":"tokens",
       "destination_type":"queue",
       "routing_key":"",
       "arguments":{
