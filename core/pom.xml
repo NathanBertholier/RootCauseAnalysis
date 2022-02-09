@@ -83,7 +83,6 @@
             <artifactId>amqp-client</artifactId>
             <version>5.14.1</version>
         </dependency>
-        <!-- https://mvnrepository.com/artifact/org.postgresql/postgresql -->
         <dependency>
             <groupId>org.postgresql</groupId>
             <artifactId>postgresql</artifactId>
