@@ -27,7 +27,7 @@ public class LogInserter {
     private final Connection conn;
     private final PreparedStatement insertStatement;
 
-    LogInserter() throws SQLException {
+    public LogInserter() throws SQLException {
         try {
             PROPERTIES.load(LogInserter.class.getClassLoader().getResourceAsStream("init.properties"));
         } catch (IOException e) {
@@ -45,7 +45,7 @@ public class LogInserter {
         this.insertStatement = this.conn.prepareStatement("INSERT INTO rawlog (id,value) VALUES (?,?)");
     }
 
-    private void insertInMonitoring(long id, String val) throws SQLException {
+    public void insertInMonitoring(long id, String val) throws SQLException {
         this.insertStatement.setLong(1, id);
         this.insertStatement.setString(2, val);
         this.insertStatement.executeUpdate();
@@ -64,6 +64,7 @@ public class LogInserter {
         }
         return CompletableFuture.runAsync(()->{});
     }
+
 
     @PreDestroy
     void destroy() throws SQLException {

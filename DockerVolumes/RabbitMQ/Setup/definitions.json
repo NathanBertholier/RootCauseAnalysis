@@ -62,9 +62,8 @@
       "durable":true,
       "auto_delete":false,
       "arguments":{
-        "x-dead-letter-exchange":"logTokenization",
-        "x-dead-letter-routing-key":"logTokenization",
-        "x-queue-type":"classic"
+        "x-dead-letter-exchange":"DLX",
+        "x-dead-letter-routing-key":"logTokenization"
       }
     },
     {
@@ -73,9 +72,8 @@
       "durable":true,
       "auto_delete":false,
       "arguments":{
-        "x-dead-letter-exchange":"logRaw",
-        "x-dead-letter-routing-key":"logRaw",
-        "x-queue-type":"classic"
+        "x-dead-letter-exchange":"DLX",
+        "x-dead-letter-routing-key":"logRaw"
       }
     },
     {
@@ -84,9 +82,8 @@
       "durable":true,
       "auto_delete":false,
       "arguments":{
-        "x-dead-letter-exchange":"logs",
-        "x-dead-letter-routing-key":"logs",
-        "x-queue-type":"classic"
+        "x-dead-letter-exchange":"DLX",
+        "x-dead-letter-routing-key":"logs"
       }
     }
   ],
@@ -117,6 +114,17 @@
       "name":"logs",
       "vhost":"/",
       "type":"fanout",
+      "durable":true,
+      "auto_delete":false,
+      "internal":false,
+      "arguments":{
+
+      }
+    },
+    {
+      "name":"tokens",
+      "vhost":"/",
+      "type":"topic",
       "durable":true,
       "auto_delete":false,
       "internal":false,
