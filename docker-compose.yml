@@ -38,7 +38,7 @@ services:
     networks:
       - root-cause-net
     volumes:
-      - .DockerVolumes/Grafana/Setup/provisioning:/etc/grafana/provisioning
+      - ./DockerVolumes/Grafana/Setup/provisioning:/etc/grafana/provisioning
       - ./DockerVolumes/Grafana/Setup/dashboards:/var/lib/grafana/dashboards
     environment:
       GF_SECURITY_ALLOW_EMBEDDING: "true"

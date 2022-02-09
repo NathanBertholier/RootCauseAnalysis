@@ -1,8 +1,6 @@
 package fr.uge.modules.api.server.external.model;
 
-import java.io.Serializable;
-
-public class Rawlog implements Serializable {
+public class Rawlog {
     private String log;
 
     public Rawlog(){}
