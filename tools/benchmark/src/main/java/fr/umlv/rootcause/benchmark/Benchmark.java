@@ -7,11 +7,11 @@ import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class Benchmark {
     public static void main(String[] args) throws ParseException, IOException {
-        args = new String[]{"-l", "15", "-f", "log.txt"};
 
         final Options firstOptions = configFirstParameters();
         final Options options = configParameters(firstOptions);
@@ -34,12 +34,16 @@ public class Benchmark {
         Path path = Paths.get(line.getOptionValue("file"));
         int lineCount = Integer.parseInt(line.getOptionValue("linesCount"));
 
-        try(Stream<String> lines = Files.lines(path).limit(lineCount))
+        try(Stream<String> lines = Files.lines(path).skip(2).limit(lineCount))
         {
+            Path outputPath;
             if(line.hasOption("output")){
-                System.out.println(line.getOptionValue("output"));
+                outputPath = Path.of(line.getOptionValue("output"));
             }
-            Files.write(path,(Iterable<String>)lines::iterator);
+            else{
+                outputPath = Path.of("out.txt");
+            }
+            Files.write(outputPath,lines.collect(Collectors.toList()));
         }
         catch (NoSuchFileException e){
             System.err.println("File not found, check file path : " + e.getMessage());
@@ -85,10 +89,10 @@ public class Benchmark {
                 .build();
 
         final Option outputOption = Option.builder("o")
-                .longOpt("outputPath")
+                .longOpt("output")
                 .desc("path of Output File (automatically overwrites, be careful !), will be out.txt if left blank")
                 .hasArg(true)
-                .argName("output")
+                .argName("outputPath")
                 .required(false)
                 .build();
 
@@ -99,6 +103,7 @@ public class Benchmark {
         }
         options.addOption(filePathOption);
         options.addOption(linesOption);
+        options.addOption(outputOption);
 
         return options;
     }
