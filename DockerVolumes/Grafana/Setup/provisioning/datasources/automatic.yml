@@ -5,7 +5,7 @@ datasources:
     type: postgres
     url: timescale:5432
     access: proxy
-    user: user
+    user: root
     database: rootcause
     basicAuth: false
     isDefault: true
