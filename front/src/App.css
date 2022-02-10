@@ -58,6 +58,7 @@
   width: 80%;
   margin-left: 20%;
   padding: 0px;
+  height: 100vh;
 }
 
 .black-icon {
@@ -73,4 +74,23 @@
   margin-bottom: 0px;
   margin-left: 20px;
   width: calc(100% - 20px);
+}
+
+.custom-input {
+  width: 60px;
+  display: inline-block;
+  margin-left: 10px;
+}
+
+.custom-filter-btn {
+  margin-left: 10px;
+  vertical-align: baseline;
+}
+
+.logs-filter {
+  margin-bottom: 20px;
+}
+
+#custom-log-dropdown {
+  margin-left: 15px;
 }
