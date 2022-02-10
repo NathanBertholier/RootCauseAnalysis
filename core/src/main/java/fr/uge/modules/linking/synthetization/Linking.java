@@ -1,5 +1,6 @@
 package fr.uge.modules.linking.synthetization;
 
+import fr.uge.modules.api.server.external.model.Rawlog;
 import fr.uge.modules.data.log.DatabaseLog;
 import fr.uge.modules.api.server.external.model.ReportParameter;
 import fr.uge.modules.data.token.Token;
@@ -77,6 +78,7 @@ public class Linking {
             var row = iterator.next();
             return Uni.createFrom().item(() -> {
                 var idLog = row.getLong("id");
+                /*
                 var tokens = getTokens(idLog);
                 try {
                     return new DatabaseLog(idLog, true, LocalDateTime.now(), tokens.subscribeAsCompletionStage().get());
@@ -85,20 +87,13 @@ public class Linking {
                     System.out.println("Error: " + e);
                     return null;
                 }
+                 */
+                return null;
             });
         }
     }
 
-    public Uni<List<Token>> getTokens(long id) {
-        var tokens = client
-                .preparedQuery("SELECT * FROM token LEFT JOIN tokenType ON token.idtokentype = tokentype.id WHERE token.id = '" + id + "'")
-                .mapping(row -> new Token(row.getString("value"), TokenType.fromTokenTypeId(row.getInteger("idtokentype"))))
-                .execute()
-                .onItem().transformToMulti(Multi.createFrom()::iterable)
-                .collect().asList();
-        System.out.println("Tokens: " + tokens);
-        return tokens;
-    }
+
 
     /**
      * Fetches the target log in database with its infos
