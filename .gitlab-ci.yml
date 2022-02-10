@@ -24,10 +24,10 @@ sonarqube:
 deploy:
   stage: deploy
   script:
-    - docker login 192.168.4.102:5050 -u Nathan -p ydht-a2yasET12xdfe2z
+    - docker login 192.168.4.102:5050 -u Nathan -p RJKfzaGjFsyh12z8zG1f
     - docker build -t rootteam/rootcause .
-    - docker tag rootteam/rootcause rootteam/rootcause:${TAG}
-    - docker push rootteam/rootcause:${TAG}
+    - docker tag rootteam/rootcause 192.168.4.102:5050/rootteam/rootcause:${TAG}
+    - docker push 192.168.4.102:5050/rootteam/rootcause:${TAG}
     - ssh -o StrictHostKeyChecking=no nathan@192.168.4.102 "docker-compose up --force-recreate --build -d > logs/$(date +'%d-%m-%y_%H-%M-%S').txt"
   only:
     - tags
