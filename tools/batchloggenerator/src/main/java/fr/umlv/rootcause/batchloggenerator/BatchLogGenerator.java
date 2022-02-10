@@ -10,7 +10,7 @@ import java.nio.file.Paths;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public class Benchmark {
+public class BatchLogGenerator {
     public static void main(String[] args) throws ParseException, IOException {
 
         final Options firstOptions = configFirstParameters();
