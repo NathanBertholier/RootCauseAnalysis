@@ -1,6 +1,7 @@
 package fr.uge.modules.api.server.external.insertion;
 
-import fr.uge.db.insert.logtoken.LogInserter;
+import fr.uge.db.insert.log.LogInserter;
+import fr.uge.db.insert.tokens.LogTokens;
 import fr.uge.modules.api.server.external.model.Rawlog;
 import fr.uge.modules.api.server.external.model.TokenModel;
 import fr.uge.modules.api.server.external.model.Tokens;
@@ -13,7 +14,6 @@ import org.eclipse.microprofile.reactive.messaging.Outgoing;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
-import java.sql.SQLException;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
@@ -28,7 +28,10 @@ public class RawlogProcessor {
     Tokenization tokenization;
 
     @Inject
-    LogInserter inserter;
+    LogInserter logInserter;
+
+    @Inject
+    LogTokens logTokens;
 
     @Incoming(value = "logTokenization")
     @Outgoing(value = "tokens")
@@ -38,30 +41,25 @@ public class RawlogProcessor {
         var tokens = tokenization.tokenizeLog(log.getLog());
         System.out.println("Tokens size " + tokens.size());
         var id = metadata.orElseThrow().getHeader("id", Long.class).orElseThrow();
-        //System.out.println("Log : " + log + " ID : " + id);
         return new Tokens(id, tokens.stream().map(token -> new TokenModel(token.getType().getName(), token.getValue())).toList());
     }
 
     @Incoming(value = "logRaw")
     public CompletionStage<Void> processRaw(Message<JsonObject> incoming) {
-        var log = incoming.getPayload().mapTo(Rawlog.class).getLog();
+        var log = incoming.getPayload().mapTo(Rawlog.class);
         Optional<IncomingRabbitMQMetadata> metadata = incoming.getMetadata(IncomingRabbitMQMetadata.class);
+
         var id = metadata.orElseThrow().getHeader("id", Long.class).orElseThrow();
-        try {
-            inserter.insertInMonitoring(id, log);
-            LOGGER.log(Level.INFO,() -> "ID in databse : " + id + " <-> " + log);
-        } catch (SQLException e) {
-            LOGGER.log(Level.SEVERE,"SQLException",e);
-        }
+        logInserter.insert(id, log.getLog());
+
+        LOGGER.log(Level.INFO,() -> "ID in databse : " + id + " <-> " + log.getLog());
         return CompletableFuture.runAsync(()->{});
     }
-
 
     @Incoming(value = "tokensOut")
     public void process(JsonObject incoming) {
         var tokens = incoming.mapTo(Tokens.class);
-        System.out.println("TOKENS :");
-        tokens.tokens().forEach(System.out::println);
+        logTokens.insertTokens(tokens.id(), null,tokens.tokens());
     }
 }
 

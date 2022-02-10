@@ -1,4 +1,4 @@
-package fr.uge.db.insert.logtoken;
+package fr.uge.db.insert.log;
 
 import javax.annotation.PreDestroy;
 import javax.enterprise.context.ApplicationScoped;
@@ -36,14 +36,22 @@ public class LogInserter {
         this.insertStatement = this.conn.prepareStatement("INSERT INTO rawlog (id,value) VALUES (?,?)");
     }
 
-    public void insertInMonitoring(long id, String val) throws SQLException {
-        this.insertStatement.setLong(1, id);
-        this.insertStatement.setString(2, val);
-        this.insertStatement.executeUpdate();
+    public void insert(long id, String val) {
+        try {
+            this.insertStatement.setLong(1, id);
+            this.insertStatement.setString(2, val);
+            this.insertStatement.executeUpdate();
+        } catch (SQLException e) {
+            LOGGER.severe("Error during insertion in Raw database : " + e);
+        }
     }
 
     @PreDestroy
-    void destroy() throws SQLException {
-        this.conn.close();
+    void destroy() {
+        try {
+            this.conn.close();
+        } catch (SQLException e) {
+            LOGGER.severe("Error while closing the connection :" + e);
+        }
     }
 }

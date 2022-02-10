@@ -1,4 +1,4 @@
-package fr.uge.db.insert.logtoken;
+package fr.uge.db.insert.log;
 
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
