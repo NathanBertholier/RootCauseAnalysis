@@ -1,111 +1,55 @@
 package fr.umlv.rootcause.benchmark;
 
-import org.apache.commons.cli.*;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.NoSuchFileException;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 
 public class Benchmark {
-    public static void main(String[] args) throws ParseException, IOException {
+    private final HttpClient httpClient;
 
-        final Options firstOptions = configFirstParameters();
-        final Options options = configParameters(firstOptions);
+    public Benchmark() {
+        this.httpClient = HttpClient.newBuilder().version(HttpClient.Version.HTTP_2).followRedirects(HttpClient.Redirect.NORMAL).build();
+    }
 
-        final CommandLineParser parser = new DefaultParser();
-        final CommandLine firstLine = parser.parse(firstOptions, args, true);
+    public void sendPost(URI uri) throws IOException, InterruptedException {
+        HttpRequest httpRequest = HttpRequest.newBuilder().uri(uri)
+                .POST(HttpRequest.BodyPublishers.ofString(prepareRequest()))
+                .header("Accept", "application/json").header("Content-Type","application/json").build();
+        this.httpClient.send(httpRequest, HttpResponse.BodyHandlers.ofString());
+    }
 
-        if (firstLine.hasOption("help")) {
-            printHelp(options);
-        }
-
-        CommandLine line = null;
-        try{
-            line = parser.parse(options, args, true);
-        }catch (MissingOptionException e){
-            System.err.println(e.getMessage());
-            printHelp(options);
-        }
-
-        Path path = Paths.get(line.getOptionValue("file"));
-        int lineCount = Integer.parseInt(line.getOptionValue("linesCount"));
-
-        try(Stream<String> lines = Files.lines(path).skip(2).limit(lineCount))
-        {
-            Path outputPath;
-            if(line.hasOption("output")){
-                outputPath = Path.of(line.getOptionValue("output"));
+    private String prepareRequest() throws JsonProcessingException {
+        var values = new HashMap<String, String>() {
+            {
+                put("log", "2021-11-20 00:00:01 10.16.27.62.244 GET index.html");
             }
-            else{
-                outputPath = Path.of("out.txt");
-            }
-            Files.write(outputPath,lines.collect(Collectors.toList()));
+        };
+        List<HashMap<String, String>> list = new ArrayList<>();
+        for (int i = 0; i < 100; i++) {
+            list.add(values);
         }
-        catch (NoSuchFileException e){
-            System.err.println("File not found, check file path : " + e.getMessage());
+        var objectMapper = new ObjectMapper();
+        return objectMapper.writeValueAsString(list);
+    }
+
+    public void sendGet(URI uri) {
+        HttpRequest httpRequest = HttpRequest.newBuilder().uri(uri).GET().build();
+        httpClient.sendAsync(httpRequest, HttpResponse.BodyHandlers.ofString()).thenApply(HttpResponse::body).thenAccept(System.out::println).join();
+    }
+
+    public static void main(String[] args) throws IOException, InterruptedException {
+        Benchmark benchmark = new Benchmark();
+        //benchmark.sendGet(URI.create("http://localhost:8080/external/tokentypes"));
+        while (true) {
+            benchmark.sendPost(URI.create("http://localhost:8080/external/insertlog/batch"));
         }
     }
-
-    private static void printHelp(Options options) {
-        final HelpFormatter formatter = new HelpFormatter();
-        formatter.printHelp("Benchmark", options, true);
-        System.exit(0);
-    }
-
-    private static Options configFirstParameters() {
-
-        final Option helpFileOption = Option.builder("h")
-                .longOpt("help")
-                .desc("Shows help message")
-                .build();
-
-        final Options firstOptions = new Options();
-
-        firstOptions.addOption(helpFileOption);
-
-        return firstOptions;
-    }
-
-    private static Options configParameters(final Options firstOptions) {
-
-        final Option filePathOption = Option.builder("f")
-                .longOpt("file") //
-                .desc("File to read")
-                .hasArg(true)
-                .argName("filePath")
-                .required(true)
-                .build();
-
-        final Option linesOption = Option.builder("l")
-                .longOpt("linesCount")
-                .desc("max number of lines to keep")
-                .hasArg(true)
-                .argName("lines")
-                .required(true)
-                .build();
-
-        final Option outputOption = Option.builder("o")
-                .longOpt("output")
-                .desc("path of Output File (automatically overwrites, be careful !), will be out.txt if left blank")
-                .hasArg(true)
-                .argName("outputPath")
-                .required(false)
-                .build();
-
-        final Options options = new Options();
-
-        for (final Option fo : firstOptions.getOptions()) {
-            options.addOption(fo);
-        }
-        options.addOption(filePathOption);
-        options.addOption(linesOption);
-        options.addOption(outputOption);
-
-        return options;
-    }
-
 }
