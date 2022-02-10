@@ -1,6 +1,7 @@
 package fr.uge.modules.api.server.external.report;
 
 import fr.uge.modules.api.server.external.model.*;
+import fr.uge.modules.linking.synthetization.Synthetization;
 import io.smallrye.mutiny.Uni;
 
 import javax.ws.rs.*;
@@ -23,6 +24,11 @@ public class Report {
     @Produces(APPLICATION_JSON)
     public Uni<ReportResponse> getReport(@PathParam("id") long idLogTarget, ReportParameter reportParameter){
         LOGGER.log(Level.INFO, "Received request for id " +  idLogTarget + " with parameters: " + reportParameter);
+        var response = Uni.createFrom()
+                .item(Synthetization.getReport(idLogTarget, reportParameter))
+                .onItem().transform(/* serialize */)
+                .onFailure().recoverWithNull();
+        var report = Synthetization.getReport(idLogTarget, reportParameter);
         return Uni.createFrom().item(new ReportResponse(log, TOKEN_MODELS, logs));
     }
 }

@@ -4,10 +4,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import fr.uge.db.insert.monitoring.MonitorInserter;
+import fr.uge.modules.api.server.external.model.ReportParameter;
 import fr.uge.modules.data.log.Log;
-import fr.uge.modules.data.report.ReportParameter;
 import fr.uge.modules.data.token.Token;
 
+import javax.inject.Inject;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.*;
@@ -29,7 +30,7 @@ public class Synthetization {
         }
     }
 
-    public static ObjectNode getReport(int rootlog, ReportParameter reportParameter) throws SQLException {
+    public static ObjectNode getReport(long rootlog, ReportParameter reportParameter) {
         Linking l = new Linking("jdbc:postgresql://" +
                 PROPERTIES.getProperty("DBSRV") +
                 ":5432/" +
@@ -119,7 +120,7 @@ public class Synthetization {
     public static void main(String[] args) throws SQLException {
         int delta = 86400;
         int id_logtarget = 8;
-        ReportParameter rp = new ReportParameter(delta, 5);
+        ReportParameter rp = new ReportParameter(true, 1L, true, 1F, 2);
         Synthetization.getReport(id_logtarget, rp);
     }
 }
