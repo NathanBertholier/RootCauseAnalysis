@@ -55,10 +55,6 @@ services:
           - "rabbitmq"
     networks:
       - root-cause-net
-    environment:
-      DELTA: ${DELTA}
-      PROXIMITY_LIMIT: ${PROXIMITY_LIMIT}
-      NETWORK_SIZE: ${NETWORK_SIZE}
 
 networks:
   root-cause-net:
