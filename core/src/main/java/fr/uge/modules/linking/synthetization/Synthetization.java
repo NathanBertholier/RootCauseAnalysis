@@ -4,6 +4,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import fr.uge.db.insert.monitoring.MonitorInserter;
+import fr.uge.modules.api.server.external.model.ReportResponse;
+import fr.uge.modules.api.server.external.model.TokensReport;
 import fr.uge.modules.data.log.Log;
 import fr.uge.modules.data.report.ReportParameter;
 import fr.uge.modules.data.token.Token;
@@ -29,7 +31,7 @@ public class Synthetization {
         }
     }
 
-    public static ObjectNode getReport(int rootlog, ReportParameter reportParameter) throws SQLException {
+    public static ReportResponse getReport(int rootlog, ReportParameter reportParameter) throws SQLException {
         Linking l = new Linking("jdbc:postgresql://" +
                 PROPERTIES.getProperty("DBSRV") +
                 ":5432/" +
@@ -41,26 +43,12 @@ public class Synthetization {
         "&stringtype=unspecified",rootlog, reportParameter);
         var rootLog = l.getTarget();
         var map = l.getTree();
-        ObjectNode report = mapper.createObjectNode();
-        ObjectNode root = mapper.createObjectNode();
-        ArrayNode tokens = getTokens(map);
-        ArrayNode logs = getLogs(map);
-        ArrayNode proximity = getProximity(map);
-        root.put("id", rootLog.getId());
-        root.put("content", rootLog.getBody());
-        root.put("datetime", rootLog.getDatetime().toString());
-        report.set("root", root);
-        report.set("tokens", tokens);
-
-        report.set("logs", logs);
-        report.set("proximities", proximity);
-
-        return report;
+        return new ReportResponse(new fr.uge.modules.api.server.external.model.Log(rootLog.getId(),rootLog.getBody(),rootLog.getDatetime().toString()),getTokens(map),getLogs(map));
     }
 
-    private static ArrayNode getTokens(SortedMap<Float, Log> map) {
+    private static TokensReport[] getTokens(SortedMap<Float, Log> map) {
         ArrayList<Token> list = new ArrayList<>();
-        ArrayNode tokens = mapper.createArrayNode();
+        ArrayList<TokensReport> tokens = new ArrayList<>();
         map.forEach((k, v) -> list.addAll(v.getTokens()));
         var groupByType = list.stream().
                 collect(Collectors.groupingBy(t -> t.getType().getName()));
@@ -70,8 +58,6 @@ public class Synthetization {
                                         Collectors.counting())).entrySet().stream()
                                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue))));
         numberByToken.forEach((k, v) -> {
-            ObjectNode node = mapper.createObjectNode();
-            node.put("name", k);
             Map<Long, List<String>> value = new HashMap<>();
             v.forEach((k2, v2) -> {
                 if (value.containsKey(v2)) {
@@ -86,11 +72,10 @@ public class Synthetization {
                     .sorted(Collections.reverseOrder(Map.Entry.comparingByKey())).collect(Collectors.toMap(Map.Entry::getKey,
                             Map.Entry::getValue, (oldValue, newValue) -> oldValue, LinkedHashMap::new));
             Map.Entry<Long, List<String>> entry2 = sortedlist.entrySet().iterator().next();
-            node.put("value", entry2.getValue().toString());
-            node.put("count", entry2.getKey());
-            tokens.add(node);
+            String[] tabstring = (String[]) entry2.getValue().toArray();
+            tokens.add(new TokensReport(k,tabstring,entry2.getKey()));
         });
-        return tokens;
+        return (TokensReport[]) tokens.toArray();
     }
 
     private static ArrayNode getProximity(SortedMap<Float, Log> map) {
@@ -104,22 +89,18 @@ public class Synthetization {
         return prox;
     }
 
-    private static ArrayNode getLogs(SortedMap<Float, Log> map) {
-        ArrayNode logs = mapper.createArrayNode();
+    private static fr.uge.modules.api.server.external.model.Log[] getLogs(SortedMap<Float, Log> map) {
+        ArrayList<fr.uge.modules.api.server.external.model.Log> logs = new ArrayList<>();
         map.forEach((k, v) -> {
-            ObjectNode log = mapper.createObjectNode();
-            log.put("id", v.getId());
-            log.put("content", v.getBody());
-            log.put("datetime", v.getDatetime().toString());
-            logs.add(log);
+            logs.add(new fr.uge.modules.api.server.external.model.Log(v.getId(),v.getBody(),v.getDatetime().toString()));
         });
-        return logs;
+        return (fr.uge.modules.api.server.external.model.Log[]) logs.toArray();
     }
 
     public static void main(String[] args) throws SQLException {
         int delta = 86400;
         int id_logtarget = 8;
         ReportParameter rp = new ReportParameter(delta, 5);
-        Synthetization.getReport(id_logtarget, rp);
+        System.out.println(Synthetization.getReport(id_logtarget, rp));
     }
 }
