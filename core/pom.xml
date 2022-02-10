@@ -42,6 +42,10 @@
         </dependency>
         <dependency>
             <groupId>io.quarkus</groupId>
+            <artifactId>quarkus-scheduler</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.quarkus</groupId>
             <artifactId>quarkus-resteasy</artifactId>
         </dependency>
         <dependency>
@@ -108,6 +112,7 @@
             <artifactId>smallrye-reactive-messaging-api</artifactId>
             <version>3.13.0</version>
         </dependency>
+
     </dependencies>
     <build>
         <plugins>
