@@ -1,10 +1,9 @@
 package fr.uge.db.insert.monitoring;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-
+import io.quarkus.scheduler.Scheduled;
+import javax.annotation.PreDestroy;
+import javax.enterprise.context.ApplicationScoped;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -14,101 +13,76 @@ import java.sql.*;
 import java.time.Instant;
 import java.util.Base64;
 import java.util.Properties;
-import java.util.concurrent.TimeoutException;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
-/**
- * Hello world!
- *
- */
-public class MonitorInserter
-{
-    private static final  String QUEUE_NAME = "log";
-    private static final  Object signal = new Object();
-    private static boolean wasSignalled = false;
-    private static final Properties PROPERTIES=new Properties();
-    private static final Logger LOGGER = Logger.getGlobal();
-    private static final boolean LOOP=true;
-    static {
-        try {
-            PROPERTIES.load(MonitorInserter.class.getClassLoader().getResourceAsStream("init.properties"));
-        } catch (IOException e) {
-            LOGGER.log(Level.SEVERE,"IOException",e);
-        }
-    }
-    public static void main(String[] args) throws SQLException {
-        try (var conn = DriverManager.getConnection("jdbc:postgresql://" +
-                PROPERTIES.getProperty("DBSRV") +
+
+@ApplicationScoped
+public class MonitorInserter {
+    private static final String QUEUE_NAME = "logs";
+    private final Properties properties = new Properties();
+    private final Logger logger = Logger.getGlobal();
+    private final Connection connection;
+    private final PreparedStatement preparedStatement;
+
+    public MonitorInserter() throws SQLException, IOException {
+        properties.load(MonitorInserter.class.getClassLoader().getResourceAsStream("init.properties"));
+        this.connection = DriverManager.getConnection("jdbc:postgresql://" +
+                properties.getProperty("DBSRV") +
                 ":5432/" +
-                PROPERTIES.getProperty("DB") +
+                properties.getProperty("DB") +
                 "?user=" +
-                PROPERTIES.getProperty("DBLOGIN") +
+                properties.getProperty("DBLOGIN") +
                 "&password=" +
-                PROPERTIES.getProperty("DBPWD") +
-                "&stringtype=unspecified")) {
-            try {
-                while (LOOP) {
-                    getValueFromAPI(conn);
-                    Thread.sleep(5000);
-                }
-            } catch (IllegalStateException | IOException | TimeoutException | InterruptedException error) {
-                LOGGER.log(Level.SEVERE,"IllegalStateException | IOException | TimeoutException | InterruptedException",error);
-                Thread.currentThread().interrupt();
-            }
-        }
-        synchronized (signal){
-            while(!wasSignalled){
-                try {
-                    signal.wait();
-                } catch (InterruptedException e){
-                    LOGGER.log(Level.SEVERE,"InterruptedException",e);
-                    Thread.currentThread().interrupt();
-                }
-            }
-        }
+                properties.getProperty("DBPWD") +
+                "&stringtype=unspecified");
+        this.preparedStatement = connection.prepareStatement("INSERT INTO monitoring (datetime,deliver,publish,avg_rate) VALUES (?,?,?,?)");
     }
 
-    private static void insertInMonitoring(float ingressRate, float egressRate, long queueSize, long messagePoolBytes, Connection conn) throws SQLException {
-
-        try (PreparedStatement preparedStatement = conn.prepareStatement("INSERT INTO monitoring (datetime,ingressRate,egressRate,queuedmessages,messagepoolbytes) VALUES (?,?,?,?,?)")) {
-            preparedStatement.setTimestamp(1, Timestamp.from(Instant.now()));
-            preparedStatement.setFloat(2, ingressRate);
-            preparedStatement.setFloat(3, egressRate);
-            preparedStatement.setLong(4, queueSize);
-            preparedStatement.setLong(5, messagePoolBytes);
-            preparedStatement.executeUpdate();
-        }
-    }
-
-    private static void getValueFromAPI(Connection conn) throws IOException, TimeoutException {
-        String sURL = "http://"+PROPERTIES.getProperty("MQMONITORINGSRV")+":15672/api/queues";
-        URL url = new URL(sURL);
-        String userPass = "guest" + ":" + "guest";
-        String basicAuth = "Basic " + Base64.getEncoder().encodeToString(userPass.getBytes());//or
-        HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
-        urlConnection.setRequestProperty("Authorization", basicAuth);
+    private void insertInMonitoring(long confirm, long publish, float avg) {
         try {
-            urlConnection.connect();
-        } catch (IOException e) {
-            throw new IllegalStateException("RabbitMQ WebServer not started");
+            this.preparedStatement.setTimestamp(1, Timestamp.from(Instant.now()));
+            this.preparedStatement.setLong(2, confirm);
+            this.preparedStatement.setLong(3, publish);
+            this.preparedStatement.setFloat(4, avg);
+            this.preparedStatement.executeUpdate();
+        } catch (SQLException e) {
+            logger.severe("Error while inserting in monitor database" + e);
         }
-        JsonElement jsonElement = JsonParser.parseReader(new InputStreamReader((InputStream) urlConnection.getContent()));
-        JsonArray array = jsonElement.getAsJsonArray();
-        array.forEach(element -> {
-            if(element.getAsJsonObject().get("name").getAsString().equals(QUEUE_NAME)){
-                long messagePoolBytes = element.getAsJsonObject().get("message_bytes").getAsLong();
-                JsonObject backingQueueStatus = element.getAsJsonObject().get("backing_queue_status").getAsJsonObject();
-                float ingressRate = backingQueueStatus.get("avg_ingress_rate").getAsFloat();
-                float egressRate = backingQueueStatus.get("avg_egress_rate").getAsFloat();
-                long queueSize = backingQueueStatus.get("len").getAsLong();
-                try {
-                    insertInMonitoring(ingressRate,egressRate,queueSize,messagePoolBytes, conn);
-                } catch (SQLException e) {
-                    LOGGER.log(Level.SEVERE,"SQLException",e);
-                }
+    }
 
-            }
-        });
+    @Scheduled(every="5s")
+    public void getValueFromAPI() {
+        String sURL = "http://"
+                + properties.getProperty("MQMONITORINGSRV")
+                + ":15672/api/exchanges/%2f/"
+                + QUEUE_NAME
+                + "?msg_rates_age=60&msg_rates_incr=5";
+
+        try {
+            URL url = new URL(sURL);
+            String userPass = "guest" + ":" + "guest";
+            String basicAuth = "Basic " + Base64.getEncoder().encodeToString(userPass.getBytes());//or
+            HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
+            urlConnection.setRequestProperty("Authorization", basicAuth);
+            urlConnection.connect();
+
+            var json = JsonParser.parseReader(new InputStreamReader((InputStream) urlConnection.getContent())).getAsJsonObject();
+            var jsonTmp = json.get("incoming").getAsJsonArray().get(0).getAsJsonObject().get("stats").getAsJsonObject();
+            var confirm = jsonTmp.get("confirm").getAsLong();
+            var publish = jsonTmp.get("publish").getAsLong();
+            var avg = jsonTmp.get("confirm_details").getAsJsonObject().get("avg_rate").getAsFloat();
+
+            insertInMonitoring(confirm, publish, avg);
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (IndexOutOfBoundsException i) {
+            logger.warning("Incorrect json schema, no data send yet.");
+        }
+    }
+
+    @PreDestroy
+    public void close() throws SQLException {
+        this.connection.close();
     }
 }
