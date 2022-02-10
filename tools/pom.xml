@@ -10,20 +10,12 @@
     <packaging>pom</packaging>
     <modelVersion>4.0.0</modelVersion>
 
-    <dependencies>
-        <dependency>
-            <groupId>com.rabbitmq</groupId>
-            <artifactId>amqp-client</artifactId>
-            <version>5.14.1</version>
-        </dependency>
-    </dependencies>
-
-
     <artifactId>tools</artifactId>
 
     <modules>
         <module>rabbitmq</module>
         <module>benchmark</module>
+        <module>batchloggenerator</module>
     </modules>
 
     <properties>
