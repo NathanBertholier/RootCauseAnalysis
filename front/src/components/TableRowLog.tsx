@@ -1,32 +1,21 @@
 import React from "react";
 import {useState} from "react";
 import { Collapse } from "react-bootstrap"
+import {Log} from "../types/token.type";
 
-type Token = {
-    token_type : string
-    value: string[]
-}
-
-type Log = {
-    id: number
-    dateTime: string
-    tokens: Token[]
-    content: string
-}
-
-export const Row = ({ id, dateTime, tokens, content } : Log ) => {
+export const Row = ({ id, datetime, tokenModels, content } : Log ) => {
     const [ isUnfold, setIsUnfold ] = useState(false);
 
     return (
         <tr onClick={ () => setIsUnfold( !isUnfold ) } >
         <td>{id}</td>
-            <td>{dateTime}</td>
+            <td>{datetime}</td>
             <td>
-                <span>{tokens.length}</span>
-                { tokens.map( (token, index ) => {
+                <span>{tokenModels.length}</span>
+                { tokenModels.map( (token, index ) => {
                     return <Collapse in={isUnfold} key={index}>
                         <div id="example-collapse-text">
-                            {token.token_type} : { token.value }
+                            {token.token_type} : { token.token_value }
                         </div>
                     </Collapse>
 
