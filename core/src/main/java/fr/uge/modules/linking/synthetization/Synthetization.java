@@ -5,10 +5,9 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import fr.uge.db.insert.monitoring.MonitorInserter;
 import fr.uge.modules.api.server.external.model.ReportParameter;
-import fr.uge.modules.data.log.Log;
+import fr.uge.modules.data.log.DatabaseLog;
 import fr.uge.modules.data.token.Token;
 
-import javax.inject.Inject;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.*;
@@ -30,7 +29,7 @@ public class Synthetization {
         }
     }
 
-    public static ObjectNode getReport(long rootlog, ReportParameter reportParameter) {
+    public static ObjectNode getReport(long rootlog, ReportParameter reportParameter) throws SQLException {
         Linking l = new Linking("jdbc:postgresql://" +
                 PROPERTIES.getProperty("DBSRV") +
                 ":5432/" +
@@ -59,7 +58,7 @@ public class Synthetization {
         return report;
     }
 
-    private static ArrayNode getTokens(SortedMap<Float, Log> map) {
+    private static ArrayNode getTokens(SortedMap<Float, DatabaseLog> map) {
         ArrayList<Token> list = new ArrayList<>();
         ArrayNode tokens = mapper.createArrayNode();
         map.forEach((k, v) -> list.addAll(v.getTokens()));
@@ -94,7 +93,7 @@ public class Synthetization {
         return tokens;
     }
 
-    private static ArrayNode getProximity(SortedMap<Float, Log> map) {
+    private static ArrayNode getProximity(SortedMap<Float, DatabaseLog> map) {
         ArrayNode prox = mapper.createArrayNode();
         map.forEach((k, v) -> {
             ObjectNode log = mapper.createObjectNode();
@@ -105,7 +104,7 @@ public class Synthetization {
         return prox;
     }
 
-    private static ArrayNode getLogs(SortedMap<Float, Log> map) {
+    private static ArrayNode getLogs(SortedMap<Float, DatabaseLog> map) {
         ArrayNode logs = mapper.createArrayNode();
         map.forEach((k, v) -> {
             ObjectNode log = mapper.createObjectNode();

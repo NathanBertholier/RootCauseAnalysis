@@ -6,6 +6,7 @@ import io.smallrye.mutiny.Uni;
 
 import javax.ws.rs.*;
 
+import java.sql.SQLException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -22,12 +23,8 @@ public class Report {
     @GET
     @Consumes(APPLICATION_JSON)
     @Produces(APPLICATION_JSON)
-    public Uni<ReportResponse> getReport(@PathParam("id") long idLogTarget, ReportParameter reportParameter){
+    public Uni<ReportResponse> getReport(@PathParam("id") long idLogTarget, ReportParameter reportParameter) throws SQLException {
         LOGGER.log(Level.INFO, "Received request for id " +  idLogTarget + " with parameters: " + reportParameter);
-        var response = Uni.createFrom()
-                .item(Synthetization.getReport(idLogTarget, reportParameter))
-                .onItem().transform(/* serialize */)
-                .onFailure().recoverWithNull();
         var report = Synthetization.getReport(idLogTarget, reportParameter);
         return Uni.createFrom().item(new ReportResponse(log, TOKEN_MODELS, logs));
     }

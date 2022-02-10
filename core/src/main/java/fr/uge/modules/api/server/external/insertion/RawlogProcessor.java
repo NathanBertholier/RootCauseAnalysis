@@ -6,6 +6,7 @@ import fr.uge.modules.api.server.external.model.Rawlog;
 import fr.uge.modules.api.server.external.model.TokenModel;
 import fr.uge.modules.api.server.external.model.Tokens;
 import fr.uge.modules.tokenization.Tokenization;
+import io.smallrye.reactive.messaging.annotations.Broadcast;
 import io.smallrye.reactive.messaging.rabbitmq.IncomingRabbitMQMetadata;
 import io.vertx.core.json.JsonObject;
 import org.eclipse.microprofile.reactive.messaging.Incoming;
@@ -44,6 +45,7 @@ public class RawlogProcessor {
         return new Tokens(id, tokens.stream().map(token -> new TokenModel(token.getType().getName(), token.getValue())).toList());
     }
 
+    @Broadcast
     @Incoming(value = "logRaw")
     public CompletionStage<Void> processRaw(Message<JsonObject> incoming) {
         var log = incoming.getPayload().mapTo(Rawlog.class);
