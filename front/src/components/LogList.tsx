@@ -4,19 +4,9 @@ import {Table} from "react-bootstrap";
 import {Row} from "./TableRowLog";
 import DataService from "../services/DataService";
 
-type LogsProps = {
-}
-
-type LogsState = {
-    list : Log[]
-}
-
-export class LogList extends Component<LogsProps, LogsState>{
-    constructor(props: LogsProps) {
-        super( props );
-        this.state = {
-            list: []
-        }
+export class LogList extends Component{
+    state = {
+        list: Array<Log>()
     }
 
     componentDidMount() {
