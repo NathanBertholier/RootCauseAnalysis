@@ -75,7 +75,7 @@ public class MonitorInserter {
             insertInMonitoring(confirm, publish, avg);
 
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.warning("Error monitoring " + e);
         } catch (IndexOutOfBoundsException i) {
             logger.warning("Incorrect json schema, no data send yet.");
         }
