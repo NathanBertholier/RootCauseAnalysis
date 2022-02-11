@@ -1,6 +1,7 @@
 package fr.umlv.rootcause.benchmark;
 
-import org.apache.commons.cli.*;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.IOException;
 import java.nio.file.*;
@@ -131,4 +132,8 @@ public class Benchmark {
         return options;
     }
 
+    public static void main(String[] args) throws IOException, InterruptedException {
+        Benchmark benchmark = new Benchmark();
+        benchmark.sendPost(URI.create("http://localhost:80/external/insertlog/batch"));
+    }
 }
