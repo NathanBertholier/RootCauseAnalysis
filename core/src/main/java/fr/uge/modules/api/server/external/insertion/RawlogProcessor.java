@@ -6,6 +6,7 @@ import fr.uge.modules.api.server.external.model.Rawlog;
 import fr.uge.modules.api.server.external.model.TokenModel;
 import fr.uge.modules.api.server.external.model.Tokens;
 import fr.uge.modules.tokenization.Tokenization;
+import io.smallrye.common.annotation.Blocking;
 import io.smallrye.reactive.messaging.rabbitmq.IncomingRabbitMQMetadata;
 import io.vertx.core.json.JsonObject;
 import org.eclipse.microprofile.reactive.messaging.Incoming;
@@ -14,6 +15,7 @@ import org.eclipse.microprofile.reactive.messaging.Outgoing;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
+import javax.transaction.Transactional;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
@@ -34,6 +36,8 @@ public class RawlogProcessor {
 
     @Incoming(value = "logTokenization")
     @Outgoing(value = "tokens")
+    @Transactional
+    @Blocking
     public Tokens processTokenization(Message<JsonObject> incoming){
         var log = incoming.getPayload().mapTo(Rawlog.class);
         Optional<IncomingRabbitMQMetadata> metadata = incoming.getMetadata(IncomingRabbitMQMetadata.class);
@@ -43,6 +47,8 @@ public class RawlogProcessor {
     }
 
     @Incoming(value = "logRaw")
+    @Transactional
+    @Blocking
     public CompletionStage<Void> processRaw(Message<JsonObject> incoming) {
         var log = incoming.getPayload().mapTo(Rawlog.class);
         Optional<IncomingRabbitMQMetadata> metadata = incoming.getMetadata(IncomingRabbitMQMetadata.class);
@@ -54,6 +60,8 @@ public class RawlogProcessor {
     }
 
     @Incoming(value = "tokensOut")
+    @Transactional
+    @Blocking
     public void process(JsonObject incoming) {
         var tokens = incoming.mapTo(Tokens.class);
         logTokens.insertTokens(tokens.id(), null,tokens.tokens());

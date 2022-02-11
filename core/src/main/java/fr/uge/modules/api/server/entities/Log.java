@@ -10,6 +10,7 @@ public class Log {
     private Long id;
     private Timestamp datetime;
 
+
     public Long getId() {
         return id;
     }
@@ -18,9 +19,11 @@ public class Log {
         return datetime;
     }
 
-    public void setDatetime(Timestamp from) {
+    public void setDatetime(Timestamp datetime) {
+        this.datetime = datetime;
     }
 
     public void setId(long id) {
+        this.id = id;
     }
 }

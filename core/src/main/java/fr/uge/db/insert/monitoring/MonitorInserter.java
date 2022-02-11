@@ -29,7 +29,6 @@ public class MonitorInserter {
     @Inject
     EntityManager entityManager;
 
-    @Transactional
     @Scheduled(every="5s")
     public void getValueFromAPI() {
         String sURL = "http://"
