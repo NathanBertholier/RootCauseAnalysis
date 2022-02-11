@@ -1,4 +1,6 @@
 package fr.uge.modules.api.server.external.model;
 
-public record TokenModel(String token_type, String token_value) {
+import fr.uge.modules.data.token.type.TokenType;
+
+public record TokenModel(TokenType token_type, String token_value) {
 }

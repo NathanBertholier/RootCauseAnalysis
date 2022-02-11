@@ -1,19 +1,30 @@
 package fr.uge.modules.linking.synthetization;
 
-import fr.uge.modules.data.log.Log;
-import fr.uge.modules.data.report.ReportParameter;
+import fr.uge.modules.api.server.external.model.Rawlog;
+import fr.uge.modules.data.log.DatabaseLog;
+import fr.uge.modules.api.server.external.model.ReportParameter;
 import fr.uge.modules.data.token.Token;
 import fr.uge.modules.data.token.type.*;
+import io.smallrye.mutiny.Multi;
+import io.smallrye.mutiny.Uni;
+import io.vertx.mutiny.pgclient.PgPool;
+import io.vertx.mutiny.sqlclient.Row;
+import io.vertx.mutiny.sqlclient.RowIterator;
+import io.vertx.mutiny.sqlclient.RowSet;
 
+import javax.inject.Inject;
 import java.sql.*;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.concurrent.ExecutionException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class Linking {
+    @Inject
+    PgPool client;
 
     private static final String TYPE_DATE = "datetime";
     private static final String TYPE_IPV4 = "IPv4";
@@ -24,10 +35,10 @@ public class Linking {
 
     private final Connection connection;
     DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-    private Log target;
+    private DatabaseLog target;
     private List<TokenType> tokenTypes = new ArrayList<>(); //Token Types to considerate
-    private List<Log> logs; //Logs coming from target time to target time less delta
-    private SortedMap<Float,Log> tree;
+    private List<DatabaseLog> logs; //Logs coming from target time to target time less delta
+    private SortedMap<Float, DatabaseLog> tree;
 
     public Linking(String connUrl, long id, ReportParameter rp) throws SQLException {
         initTokenTypes();
@@ -38,11 +49,11 @@ public class Linking {
         target.setBody(fetchRawLog(id));
 
         //Get the list of logs within the delta
-        logs = fetchListLog(id, target.getDatetime(), rp.getDelta());
+        logs = fetchListLog(id, target.getDatetime(), rp.delta());
         tree = computeProximtyTree(target, logs, rp);
     }
-    public Log getTarget(){return target;}
-    public SortedMap<Float, Log> getTree() {
+    public DatabaseLog getTarget(){return target;}
+    public SortedMap<Float, DatabaseLog> getTree() {
         return tree;
     }
 
@@ -54,12 +65,35 @@ public class Linking {
     private Token createToken(String type, String value) {
         TokenType tt;
         switch(type){
-            case TYPE_DATE -> {tt = new TypeDatetime();}
-            case TYPE_IPV4 -> {tt = new TypeIPv4();}
+            case TYPE_DATE -> tt = new TypeDatetime();
+            case TYPE_IPV4 -> tt = new TypeIPv4();
             default -> throw new IllegalArgumentException();
         }
         return new Token(value, tt);
     }
+
+    private Uni<DatabaseLog> rowToLog(RowIterator<Row> iterator) {
+        if(!iterator.hasNext()) return Uni.createFrom().nullItem();
+        else {
+            var row = iterator.next();
+            return Uni.createFrom().item(() -> {
+                var idLog = row.getLong("id");
+                /*
+                var tokens = getTokens(idLog);
+                try {
+                    return new DatabaseLog(idLog, true, LocalDateTime.now(), tokens.subscribeAsCompletionStage().get());
+                } catch (InterruptedException | ExecutionException e) {
+                    logger.log(Level.SEVERE, e.getMessage());
+                    System.out.println("Error: " + e);
+                    return null;
+                }
+                 */
+                return null;
+            });
+        }
+    }
+
+
 
     /**
      * Fetches the target log in database with its infos
@@ -67,7 +101,8 @@ public class Linking {
      * @return the target log with his timestamp and other tokens
      * @throws SQLException
      */
-    private Log fetchLog(long idlogtarget) throws SQLException {
+    // INNER JOIN token t ON log.id = t.idlog
+    private DatabaseLog fetchLog(long idlogtarget) throws SQLException {
         //Query to fetch the tokens of the logtarget in database
         try(PreparedStatement fetchLog = connection.prepareStatement("SELECT * FROM log INNER JOIN token t ON log.id = t.idlog WHERE log.id = ?")){
             fetchLog.setLong(1, idlogtarget);
@@ -83,9 +118,11 @@ public class Linking {
             while(logTarget.next()) {
                 tokenSet.add(createToken(fetchTokenType(logTarget.getInt(IDTOKENTYPE)), logTarget.getString(VALUE)));
             }
-            return new Log(idlogtarget, true, ldt, tokenSet);
+            return new DatabaseLog(idlogtarget, true, ldt, tokenSet);
         }
     }
+
+
 
     /**
      * Fetches all the logs within the delta given in parameter different from the log target
@@ -95,7 +132,7 @@ public class Linking {
      * @return the lists of logs within the delta
      * @throws SQLException
      */
-    private List<Log> fetchListLog(long idtarget, LocalDateTime datetime, int delta) throws SQLException {
+    private List<DatabaseLog> fetchListLog(long idtarget, LocalDateTime datetime, long delta) throws SQLException {
         LocalDateTime ldtminusdelta = datetime.minus(Duration.ofSeconds(delta));
         try(PreparedStatement fetchListLog = connection.prepareStatement("SELECT * FROM log INNER JOIN token t ON log.id = t.idlog WHERE datetime BETWEEN ? AND ? AND log.id != ?")) {
             fetchListLog.setTimestamp(1, Timestamp.valueOf(ldtminusdelta.format(formatter)));
@@ -104,9 +141,9 @@ public class Linking {
             ResultSet lines = fetchListLog.executeQuery();
             long id;
             LocalDateTime ldt;
-            List<Log> lst = new ArrayList<>();
+            List<DatabaseLog> lst = new ArrayList<>();
             List<Token> tokenSet = new ArrayList<>();
-            Log current;
+            DatabaseLog current;
             while (lines.next()) {
                 //init log
                 id = lines.getLong("id");
@@ -117,7 +154,7 @@ public class Linking {
                     lines.next();
                     tokenSet.add(createToken(fetchTokenType(lines.getInt(IDTOKENTYPE)), lines.getString(VALUE)));
                 }
-                current = new Log(id, false, ldt, tokenSet);
+                current = new DatabaseLog(id, false, ldt, tokenSet);
                 current.setBody(fetchRawLog(id));
                 lst.add(current);
                 tokenSet.clear();
@@ -149,18 +186,18 @@ public class Linking {
         }
     }
 
-    public SortedMap<Float, Log> computeProximtyTree(Log target, List<Log> logWithinDelta, ReportParameter rp){
-        TreeMap<Float, Log> redBlack = new TreeMap<>(Collections.reverseOrder());
+    public SortedMap<Float, DatabaseLog> computeProximtyTree(DatabaseLog target, List<DatabaseLog> logWithinDelta, ReportParameter rp){
+        TreeMap<Float, DatabaseLog> redBlack = new TreeMap<>(Collections.reverseOrder());
         logWithinDelta.forEach(log -> {
             float proximity = 0;
-            float tmp = TypeDatetime.computeDateTimeProximity(log.getDatetime(), target.getDatetime(), rp.getDelta());
+            float tmp = TypeDatetime.computeDateTimeProximity(log.getDatetime(), target.getDatetime(), rp.delta());
             proximity += tmp;
             for(int i = 0; i < tokenTypes.size() - 1; i++){
                 tmp = log.getTokens().get(i).getType().computeProximity(log.getTokens().get(i), target.getTokens().get(i));
                 proximity += tmp;
             }
             proximity /= tokenTypes.size();
-            if(redBlack.size() > rp.getNetworkSize() - 1) {
+            if(redBlack.size() > rp.network_size() - 1) {
                 if (proximity > redBlack.lastKey()) {
                     redBlack.pollLastEntry();
                     redBlack.put(proximity, log);

@@ -7,14 +7,14 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Log {
+public class DatabaseLog {
     private final long id;
     private final LocalDateTime datetime;
     private final ArrayList<Token> tokens = new ArrayList<>();
     private String body;
     private boolean target = false;
 
-    public Log(long id, boolean isTarget, LocalDateTime ldt, List<Token> tokenSet) {
+    public DatabaseLog(long id, boolean isTarget, LocalDateTime ldt, List<Token> tokenSet) {
         this.id = id;
         this.datetime = ldt;
         this.target = isTarget;

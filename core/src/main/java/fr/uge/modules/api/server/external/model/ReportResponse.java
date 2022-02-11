@@ -2,23 +2,23 @@ package fr.uge.modules.api.server.external.model;
 
 import java.util.Arrays;
 
-public record ReportResponse(Log log, TokenModel[] tokenModels, Log[] logs) {
+public record ReportResponse(Log log, TokensReport[] tokensReports, Log[] logs) {
     @Override
     public boolean equals(Object obj) {
         if(!(obj instanceof ReportResponse reportResponse)) return false;
-        else return reportResponse.log.equals(log) && Arrays.equals(reportResponse.tokenModels, tokenModels) && Arrays.equals(reportResponse.logs, logs);
+        else return reportResponse.log.equals(log) && Arrays.equals(reportResponse.tokensReports, tokensReports) && Arrays.equals(reportResponse.logs, logs);
     }
 
     @Override
     public int hashCode() {
-        return log.hashCode() ^ Arrays.hashCode(tokenModels) ^ Arrays.hashCode(logs);
+        return log.hashCode() ^ Arrays.hashCode(tokensReports) ^ Arrays.hashCode(logs);
     }
 
     @Override
     public String toString() {
         return "ReportResponse{" +
                 "log=" + log +
-                ", tokens=" + Arrays.toString(tokenModels) +
+                ", tokens=" + Arrays.toString(tokensReports) +
                 ", logs=" + Arrays.toString(logs) +
                 '}';
     }
