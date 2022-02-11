@@ -38,7 +38,7 @@ services:
     volumes:
       - ./DockerVolumes/Grafana/Setup/provisioning:/etc/grafana/provisioning
       - ./DockerVolumes/Grafana/Setup/dashboards:/var/lib/grafana/dashboards
-
+      - ./DockerVolumes/Grafana/Setup/grafana.ini:/etc/grafana/grafana.ini
 
   rootcause:
     build: .
