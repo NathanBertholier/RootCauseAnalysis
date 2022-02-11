@@ -2,7 +2,7 @@ FROM maven:3.8.4-openjdk-17
 
 COPY . .
 
-RUN mvn package
+RUN mvn clean package
 
 EXPOSE 8080
 

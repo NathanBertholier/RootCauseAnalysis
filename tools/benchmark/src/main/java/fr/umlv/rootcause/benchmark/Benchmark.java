@@ -16,10 +16,23 @@ public class Benchmark {
     private final HttpClient httpClient;
     private static String BODY = "";
 
-    static {
+    public Benchmark() {
+        this.httpClient = HttpClient.newBuilder().version(HttpClient.Version.HTTP_2).followRedirects(HttpClient.Redirect.NORMAL).build();
+    }
+
+    public void sendPost(URI uri) throws IOException, InterruptedException {
+        HttpRequest httpRequest = HttpRequest.newBuilder().uri(uri)
+                .POST(HttpRequest.BodyPublishers.ofString(prepareRequest()))
+                .header("Accept", "application/json").header("Content-Type","application/json").build();
+        HttpResponse<String> send = this.httpClient.send(httpRequest, HttpResponse.BodyHandlers.ofString());
+        System.out.println(send.statusCode());
+
+    }
+
+    private String prepareRequest() throws JsonProcessingException {
         var values = new HashMap<String, String>() {
             {
-                put("log", "2020-06-15	12:47:50	CDG50-C1	6542	82.255.169.186	GET     d2l739nh5t756g.cloudfront.net	/wp-includes/css/dist/block-library/style.min.css.gzip	200	https://www.centreon.com/blog/tuto-deployer-sa-supervision-rapidement-avec-les-plugin-packs/    Mozilla/5.0%20(Android%208.0.0;%20Mobile;%20rv:68.0)%20Gecputko/68.0%20Firefox/68.0	x97250&ver=5.3.3	-	Hit	axywzFh5wHuHwTX14cKd2NiDu95YLfUvPhDhzy1XDMS6-sTTT-RNRw==	static.centreon.com	https	281	0.003	-	TLSv1.2	ECDHE-RSA-AES128-GCM-SHA256	Hit	HTTP/2.0	-	-	52780	0.003	Hit	text/css	6163	-	-");
+                put("log", "2021-11-20 00:00:01\t10.16.27.62.244\tGET\tindex.html");
             }
         };
         List<HashMap<String, String>> list = new ArrayList<>();

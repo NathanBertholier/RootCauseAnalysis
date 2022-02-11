@@ -16,10 +16,12 @@ public class Tokenization {
         TypeTime patternTime = new TypeTime();
         TypeDatetime patternDatetime = new TypeDatetime();
         TypeIPv4 patternIP = new TypeIPv4();
+        TypeHTTPStatus patternStatus = new TypeHTTPStatus();
         // Containing the token values
         Token tokenDatetime = new Token(patternDatetime);
         Token tokenIP = new Token(patternIP);
-        ArrayList<Token> tokens = new ArrayList<>(Arrays.asList(tokenDatetime,tokenIP));
+        Token tokenStatus = new Token(patternStatus);
+        ArrayList<Token> tokens = new ArrayList<>(Arrays.asList(tokenDatetime,tokenIP, tokenStatus));
 
         StringBuilder datetime = new StringBuilder();
         for(String word : body.split("\t")){
@@ -29,6 +31,8 @@ public class Tokenization {
                 datetime.append(" ").append(word);
             } else if(word.matches(patternIP.getRegex())) {
                 tokenIP.setValue(word);
+            } else if(word.matches(patternStatus.getRegex())){
+                tokenStatus.setValue(word);
             }
         }
         tokenDatetime.setValue(datetime.toString());

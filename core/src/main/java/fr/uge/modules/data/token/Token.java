@@ -3,7 +3,7 @@ package fr.uge.modules.data.token;
 import fr.uge.modules.data.token.type.TokenType;
 
 public class Token {
-    private String value;
+    private String value = null;
     private final TokenType type;
 
     public Token(String token, TokenType type) {
