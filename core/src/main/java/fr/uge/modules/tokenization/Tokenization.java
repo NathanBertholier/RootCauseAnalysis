@@ -1,41 +1,68 @@
 package fr.uge.modules.tokenization;
 
-import fr.uge.modules.data.token.Token;
-import fr.uge.modules.data.token.type.*;
+import fr.uge.modules.api.model.TokenModel;
+import fr.uge.modules.api.model.Tokens;
+import fr.uge.modules.linking.token.Token;
+import fr.uge.modules.linking.token.type.*;
 
 import javax.enterprise.context.ApplicationScoped;
+import java.sql.Timestamp;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.logging.Logger;
 
 @ApplicationScoped
 public class Tokenization {
+    private final TypeDate patternDate = new TypeDate();
+    private final TypeTime patternTime = new TypeTime();
+    private final TypeDatetime patternDatetime = new TypeDatetime();
+    private final TypeIPv4 patternIP = new TypeIPv4();
+    private final TypeHTTPStatus patternStatus = new TypeHTTPStatus();
+    private static final Logger LOGGER = Logger.getGlobal();
 
-    public ArrayList<Token> tokenizeLog(String body){
+    // TODO Transform to field
+
+    public Tokens tokenizeLog(long id, String body){
         Objects.requireNonNull(body);
         // Containing the regex
-        TypeDate patternDate = new TypeDate();
-        TypeTime patternTime = new TypeTime();
-        TypeDatetime patternDatetime = new TypeDatetime();
-        TypeIPv4 patternIP = new TypeIPv4();
-        TypeHTTPStatus patternStatus = new TypeHTTPStatus();
+
         // Containing the token values
-        Token tokenDatetime = new Token(patternDatetime);
-        Token tokenIP = new Token(patternIP);
-        Token tokenStatus = new Token(patternStatus);
-        ArrayList<Token> tokens = new ArrayList<>(Arrays.asList(tokenDatetime,tokenIP, tokenStatus));
+        Token tokenDatetime = new Token(this.patternDatetime);
+        Token tokenIP = new Token(this.patternIP);
+        Token tokenStatus = new Token(this.patternStatus);
+        ArrayList<Token> tokens = new ArrayList<>();
+        tokens.add(tokenIP);
+        tokens.add(tokenStatus);
 
         StringBuilder datetime = new StringBuilder();
         for(String word : body.split("\t")){
-            if(word.matches(patternDate.getRegex())) {
+            if(word.matches(this.patternDate.getRegex())) {
                 datetime.append(word);
-            } else if(word.matches(patternTime.getRegex())) {
+            } else if(word.matches(this.patternTime.getRegex())) {
                 datetime.append(" ").append(word);
-            } else if(word.matches(patternIP.getRegex())) {
+            } else if(word.matches(this.patternIP.getRegex())) {
                 tokenIP.setValue(word);
             } else if(word.matches(patternStatus.getRegex())){
                 tokenStatus.setValue(word);
             }
         }
-        tokenDatetime.setValue(datetime.toString());
-        return tokens;
+
+        return new Tokens(id,
+                convertStringToTimestamp(datetime.toString(), "yyyy-MM-dd"),
+                tokens.stream()
+                        .map(token -> new TokenModel(token.getType().getName() + "",
+                        token.getValue() + "")).toList());
+    }
+
+    public static Timestamp convertStringToTimestamp(String strDate, String pattern) {
+        try {
+            SimpleDateFormat formatter = new SimpleDateFormat(pattern);
+            Date date = formatter.parse(strDate);
+            return new Timestamp(date.getTime());
+        } catch (ParseException e) {
+            LOGGER.severe("Incorrect value of datetime while parsing " + e);
+            return null;
+        }
     }
 }
