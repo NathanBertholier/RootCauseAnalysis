@@ -1,5 +1,11 @@
 package fr.uge.db.insert.log;
 
+import fr.uge.modules.api.model.RawLog;
+import io.smallrye.reactive.messaging.rabbitmq.IncomingRabbitMQMetadata;
+import io.vertx.core.json.JsonObject;
+import org.eclipse.microprofile.reactive.messaging.Incoming;
+import org.eclipse.microprofile.reactive.messaging.Message;
+
 import javax.annotation.PreDestroy;
 import javax.enterprise.context.ApplicationScoped;
 import java.io.IOException;
@@ -7,7 +13,10 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.util.Optional;
 import java.util.Properties;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionStage;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -45,6 +54,18 @@ public class LogInserter {
             LOGGER.severe("Error during insertion in Raw database : " + e);
         }
     }
+
+    @Incoming(value = "logRaw")
+    public CompletionStage<Void> processRaw(Message<JsonObject> incoming) {
+        var log = incoming.getPayload().mapTo(RawLog.class);
+        Optional<IncomingRabbitMQMetadata> metadata = incoming.getMetadata(IncomingRabbitMQMetadata.class);
+
+        var id = metadata.orElseThrow().getHeader("id", Long.class).orElseThrow();
+        this.insert(id, log.getLog());
+
+        return CompletableFuture.runAsync(()->{});
+    }
+
 
     @PreDestroy
     void destroy() {

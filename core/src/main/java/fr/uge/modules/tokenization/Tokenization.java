@@ -1,13 +1,14 @@
 package fr.uge.modules.tokenization;
 
-import fr.uge.modules.data.token.Token;
-import fr.uge.modules.data.token.type.*;
+import fr.uge.modules.linking.token.Token;
+import fr.uge.modules.linking.token.type.*;
 
 import javax.enterprise.context.ApplicationScoped;
 import java.util.*;
 
 @ApplicationScoped
 public class Tokenization {
+    // TODO Transform to field
 
     public ArrayList<Token> tokenizeLog(String body){
         Objects.requireNonNull(body);
