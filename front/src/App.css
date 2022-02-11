@@ -90,3 +90,8 @@
 .add-filter-btn, .filter-container {
   margin-bottom: 20px;
 }
+
+.input-labels {
+  text-align: right;
+  margin-top: 7px;
+}
