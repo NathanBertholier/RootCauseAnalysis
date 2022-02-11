@@ -7,6 +7,7 @@ import fr.uge.modules.api.server.external.model.TokenModel;
 import fr.uge.modules.api.server.external.model.Tokens;
 import fr.uge.modules.tokenization.Tokenization;
 import io.smallrye.common.annotation.Blocking;
+import io.smallrye.reactive.messaging.annotations.Broadcast;
 import io.smallrye.reactive.messaging.rabbitmq.IncomingRabbitMQMetadata;
 import io.vertx.core.json.JsonObject;
 import org.eclipse.microprofile.reactive.messaging.Incoming;
@@ -43,7 +44,7 @@ public class RawlogProcessor {
         Optional<IncomingRabbitMQMetadata> metadata = incoming.getMetadata(IncomingRabbitMQMetadata.class);
         var tokens = tokenization.tokenizeLog(log.getLog());
         var id = metadata.orElseThrow().getHeader("id", Long.class).orElseThrow();
-        return new Tokens(id, tokens.stream().map(token -> new TokenModel(token.getType().getName(), token.getValue())).toList());
+        return new Tokens(id, tokens.stream().map(token -> new TokenModel(token.getType(), token.getValue())).toList());
     }
 
     @Incoming(value = "logRaw")
