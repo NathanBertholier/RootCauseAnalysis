@@ -23,13 +23,15 @@ public class Benchmark {
         HttpRequest httpRequest = HttpRequest.newBuilder().uri(uri)
                 .POST(HttpRequest.BodyPublishers.ofString(prepareRequest()))
                 .header("Accept", "application/json").header("Content-Type","application/json").build();
-        this.httpClient.send(httpRequest, HttpResponse.BodyHandlers.ofString());
+        HttpResponse<String> send = this.httpClient.send(httpRequest, HttpResponse.BodyHandlers.ofString());
+        System.out.println(send.statusCode());
+
     }
 
     private String prepareRequest() throws JsonProcessingException {
         var values = new HashMap<String, String>() {
             {
-                put("log", "2021-11-20 00:00:01 10.16.27.62.244 GET index.html");
+                put("log", "2021-11-20 00:00:01\t10.16.27.62.244\tGET\tindex.html");
             }
         };
         List<HashMap<String, String>> list = new ArrayList<>();
@@ -49,7 +51,8 @@ public class Benchmark {
         Benchmark benchmark = new Benchmark();
         //benchmark.sendGet(URI.create("http://localhost:8080/external/tokentypes"));
         while (true) {
-            benchmark.sendPost(URI.create("http://localhost:8080/external/insertlog/batch"));
+            benchmark.sendPost(URI.create("http://localhost:80/external/insertlog/batch"));
+            Thread.sleep(500);
         }
     }
 }
