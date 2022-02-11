@@ -12,6 +12,7 @@ type Item = {
 }
 
 type Field = {
+    label: string
     option: "start_date" | "end_date" | "token_ip" | "status" | "log_id"
     type: string
     placeholder: string
@@ -61,19 +62,19 @@ export const Logs = () => {
 
         switch ( e ) {
             case "start_date":
-                addField( { type: "text", placeholder: "YYYY-MM-DD::mm", option: e } )
+                addField( { label: "date de début", type: "text", placeholder: "YYYY-MM-DD::mm", option: e } )
                 break;
             case "end_date":
-                addField( { type: "text", placeholder: "YYYY-MM-DD::mm", option: e } )
+                addField( { label: "date de fin", type: "text", placeholder: "YYYY-MM-DD::mm", option: e } )
                 break;
             case "token_ip":
-                addField( { type: "text", placeholder: "ajouter une IP", option: e } )
+                addField( { label: "Adresse IP", type: "text", placeholder: "ajouter une IP", option: e } )
                 break;
             case "status":
-                addField( { type: "number", placeholder: "", option: e } )
+                addField( { label: "Status", type: "number", placeholder: "", option: e } )
                 break;
             case "log_id":
-                addField( { type: "number", placeholder: "", option: e } )
+                addField( { label: "Log ID", type: "number", placeholder: "", option: e } )
                 break;
             default:
                 break;
@@ -139,7 +140,10 @@ export const Logs = () => {
                                                 {
                                                     field.map( ( field, index ) => {
                                                         return <Row key={index}>
-                                                            <Col sm={11} className="filter-container">
+                                                            <Col sm={2} className="input-labels" >
+                                                                { field.label }
+                                                            </Col>
+                                                            <Col sm={9} className="filter-container">
                                                                 <FormControl ref={ getInputRef( field ) } type={ field.type } placeholder={field.placeholder} />
                                                             </Col>
                                                             <Col sm={1}>
