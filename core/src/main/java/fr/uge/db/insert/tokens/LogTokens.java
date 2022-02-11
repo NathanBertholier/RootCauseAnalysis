@@ -10,7 +10,6 @@ import javax.annotation.PreDestroy;
 import javax.enterprise.context.ApplicationScoped;
 import java.io.IOException;
 import java.sql.*;
-import java.time.Instant;
 import java.util.List;
 import java.util.Properties;
 import java.util.logging.Level;
@@ -47,27 +46,26 @@ public class LogTokens {
     public void insertTokens(long id, Timestamp date, List<TokenModel> tokens) {
         try {
             this.logStatement.setLong(1, id);
-            this.logStatement.setTimestamp(2, Timestamp.from(Instant.now()));
+            this.logStatement.setTimestamp(2, date);
             tokens.forEach(token -> {
                 try {
                     var tokenId = switch (token.token_type()) {
-                        case "IPV4"-> 1;
-                        case "IPV6" -> 2;
-                        case "Statut" -> 3;
-                        case "Datetime" -> 4;
-                        case "EdgeResponse" -> 5;
+                        case "ipv4"-> 1;
+                        case "ipv6" -> 2;
+                        case "status" -> 3;
+                        case "datetime" -> 4;
+                        case "edgeResponse" -> 5;
                         default -> 1;
                     };
                     this.tokenStatement.setLong(1, id);
                     this.tokenStatement.setLong(2, tokenId);
                     this.tokenStatement.setString(3, token.token_value());
-                    this.tokenStatement.addBatch();
+                    this.tokenStatement.execute();
                 } catch (SQLException e) {
                     LOGGER.severe("Error during insertion in log and token database : " + e);
                 }
             });
             this.logStatement.execute();
-            this.tokenStatement.execute();
         } catch (SQLException e) {
             LOGGER.severe("Error during insertion in log and token database : " + e);
         }
@@ -76,9 +74,8 @@ public class LogTokens {
 
     @Incoming(value = "tokensOut")
     public void process(JsonObject incoming) {
-        System.out.println(incoming);
         var tokens = incoming.mapTo(Tokens.class);
-        this.insertTokens(tokens.id(), null,tokens.tokens());
+        this.insertTokens(tokens.id(), tokens.timestamp(),tokens.tokens());
     }
 
     @PreDestroy

@@ -30,9 +30,9 @@ public class Linking {
     private final Logger logger = Logger.getLogger(this.getClass().getName());
 
     private final Connection connection;
-    private DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+    private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
     private CompleteLog target;
-    private List<TokenType> tokenTypes = new ArrayList<>(); //Token Types to considerate
+    private final List<TokenType> tokenTypes = new ArrayList<>(); //Token Types to considerate
     private List<CompleteLog> logs; //Logs coming from target time to target time less delta
     private SortedMap<Float, CompleteLog> tree;
 

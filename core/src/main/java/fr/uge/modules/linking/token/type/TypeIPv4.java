@@ -2,7 +2,7 @@ package fr.uge.modules.linking.token.type;
 
 import fr.uge.modules.linking.token.Token;
 
-public class TypeIPv4 implements TokenType{
+public class TypeIPv4 implements TokenType {
 
     private final String name = "ipv4";
     private final String regex = "(([01]?[0-9]{1,2}|2[0-4][0-9]|25[0-5]).){3}([01]?[0-9]{1,2}|2[0-4][0-9]|25[0-5])";

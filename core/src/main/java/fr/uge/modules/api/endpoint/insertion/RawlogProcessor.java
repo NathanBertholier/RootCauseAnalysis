@@ -1,6 +1,5 @@
 package fr.uge.modules.api.endpoint.insertion;
 
-import fr.uge.modules.api.model.TokenModel;
 import fr.uge.modules.api.model.Tokens;
 import fr.uge.modules.api.model.RawLog;
 import fr.uge.modules.tokenization.Tokenization;
@@ -27,9 +26,8 @@ public class RawlogProcessor {
     public Tokens processTokenization(Message<JsonObject> incoming){
         var log = incoming.getPayload().mapTo(RawLog.class);
         Optional<IncomingRabbitMQMetadata> metadata = incoming.getMetadata(IncomingRabbitMQMetadata.class);
-        var tokens = tokenization.tokenizeLog(log.getLog());
-        var id = metadata.orElseThrow().getHeader("id", Long.class).orElseThrow();
-        return new Tokens(id, tokens.stream().map(token -> new TokenModel(token.getType().getName(), token.getValue())).toList());
+        return tokenization.tokenizeLog(metadata.orElseThrow().getHeader("id", Long.class).orElseThrow(),
+                log.getLog());
     }
 }
 
