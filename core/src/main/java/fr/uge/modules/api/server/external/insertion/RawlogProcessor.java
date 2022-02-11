@@ -40,7 +40,7 @@ public class RawlogProcessor {
         Optional<IncomingRabbitMQMetadata> metadata = incoming.getMetadata(IncomingRabbitMQMetadata.class);
         var tokens = tokenization.tokenizeLog(log.getLog());
         var id = metadata.orElseThrow().getHeader("id", Long.class).orElseThrow();
-        return new Tokens(id, tokens.stream().map(token -> new TokenModel(token.getType().getName(), token.getValue())).toList());
+        return new Tokens(id, tokens.stream().map(token -> new TokenModel(token.getType(), token.getValue())).toList());
     }
 
     @Incoming(value = "logRaw")

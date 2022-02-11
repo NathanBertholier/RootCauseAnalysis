@@ -48,7 +48,7 @@ public class LogTokens {
             this.logStatement.setTimestamp(2, Timestamp.from(Instant.now()));
             tokens.forEach(token -> {
                 try {
-                    var tokenId = switch (token.token_type()) {
+                    var tokenId = switch (token.token_type().getName()) {
                         case "IPV4"-> 1;
                         case "IPV6" -> 2;
                         case "Statut" -> 3;
