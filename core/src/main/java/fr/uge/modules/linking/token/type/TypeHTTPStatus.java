@@ -18,6 +18,11 @@ public class TypeHTTPStatus implements TokenType{
     }
 
     @Override
+    public Integer getTokenTypeId() {
+        return 3;
+    }
+
+    @Override
     public float computeProximity(Token t1, Token t2) {
         if(t1.getValue().equals(t2.getValue())){
             return 100;

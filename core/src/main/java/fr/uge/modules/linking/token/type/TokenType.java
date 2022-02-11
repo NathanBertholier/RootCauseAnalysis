@@ -8,6 +8,8 @@ public interface TokenType {
 
     String getName();
     String getRegex();
+    Integer getTokenTypeId();
+    
     float computeProximity(Token t1, Token t2);
 
     static Optional<TokenType> fromTokenTypeId(int tokentypeId){

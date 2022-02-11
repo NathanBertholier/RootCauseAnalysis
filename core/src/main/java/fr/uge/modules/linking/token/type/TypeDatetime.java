@@ -21,6 +21,11 @@ public class TypeDatetime implements TokenType{
     }
 
     @Override
+    public Integer getTokenTypeId() {
+        return 4;
+    }
+
+    @Override
     public float computeProximity(Token t1, Token t2) {
         return 0;
     }

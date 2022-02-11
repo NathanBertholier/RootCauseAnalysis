@@ -16,6 +16,11 @@ public class TypeIPv6 implements TokenType{
     @Override
     public String getRegex() { return regex; }
 
+    @Override
+    public Integer getTokenTypeId() {
+        return 2;
+    }
+
     public static float cardBetween(String t1, String t2){
         int res = 0;
         for(int i = 0; i < Math.min(t1.length(),t2.length()); i++){

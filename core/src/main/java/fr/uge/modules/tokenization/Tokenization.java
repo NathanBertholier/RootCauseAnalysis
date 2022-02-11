@@ -21,7 +21,7 @@ public class Tokenization {
     private final TypeHTTPStatus patternStatus = new TypeHTTPStatus();
     private static final Logger LOGGER = Logger.getGlobal();
 
-    // TODO Transform to field
+
 
     public Tokens tokenizeLog(long id, String body){
         Objects.requireNonNull(body);
@@ -51,8 +51,8 @@ public class Tokenization {
         return new Tokens(id,
                 convertStringToTimestamp(datetime.toString(), "yyyy-MM-dd"),
                 tokens.stream()
-                        .map(token -> new TokenModel(token.getType().getName() + "",
-                        token.getValue() + "")).toList());
+                        .map(token -> new TokenModel(token.getType().getTokenTypeId(),
+                        token.getValue())).toList());
     }
 
     public static Timestamp convertStringToTimestamp(String strDate, String pattern) {
