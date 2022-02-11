@@ -87,10 +87,6 @@
   vertical-align: baseline;
 }
 
-.logs-filter {
+.add-filter-btn, .filter-container {
   margin-bottom: 20px;
-}
-
-#custom-log-dropdown {
-  margin-left: 15px;
 }

@@ -3,6 +3,7 @@ import {Log} from "../types/token.type"
 import {Table} from "react-bootstrap";
 import {Row} from "./TableRowLog";
 import DataService from "../services/DataService";
+import {toast} from "../tools/ToastManager";
 
 export class LogList extends Component{
     state = {
@@ -30,6 +31,11 @@ export class LogList extends Component{
             this.setState( {
                 list: obj
             })
+        }).catch((e: Error) => {
+            toast.show({
+                content: "un problème est survenue",
+                duration: 3000,
+            });
         });
     }
 
