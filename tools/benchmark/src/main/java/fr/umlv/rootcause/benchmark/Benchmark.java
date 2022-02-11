@@ -14,6 +14,7 @@ import java.util.List;
 
 public class Benchmark {
     private final HttpClient httpClient;
+    private static String BODY = "";
 
     public Benchmark() {
         this.httpClient = HttpClient.newBuilder().version(HttpClient.Version.HTTP_2).followRedirects(HttpClient.Redirect.NORMAL).build();
@@ -35,11 +36,28 @@ public class Benchmark {
             }
         };
         List<HashMap<String, String>> list = new ArrayList<>();
-        for (int i = 0; i < 100; i++) {
+        for (int i = 0; i < 7450; i++) {
+
             list.add(values);
         }
         var objectMapper = new ObjectMapper();
-        return objectMapper.writeValueAsString(list);
+        try {
+            BODY = objectMapper.writeValueAsString(list);
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public Benchmark() {
+        this.httpClient = HttpClient.newBuilder().version(HttpClient.Version.HTTP_2).followRedirects(HttpClient.Redirect.NORMAL).build();
+    }
+
+    public void sendPost(URI uri) throws IOException, InterruptedException {
+        HttpRequest httpRequest = HttpRequest.newBuilder().uri(uri).version(HttpClient.Version.HTTP_1_1)
+                .POST(HttpRequest.BodyPublishers.ofString(BODY))
+                .header("Accept", "application/json").header("Content-Type", "application/json").build();
+        HttpResponse<String> send = this.httpClient.send(httpRequest, HttpResponse.BodyHandlers.ofString());
+        //System.out.println(send.body());
     }
 
     public void sendGet(URI uri) {
@@ -49,10 +67,6 @@ public class Benchmark {
 
     public static void main(String[] args) throws IOException, InterruptedException {
         Benchmark benchmark = new Benchmark();
-        //benchmark.sendGet(URI.create("http://localhost:8080/external/tokentypes"));
-        while (true) {
-            benchmark.sendPost(URI.create("http://localhost:80/external/insertlog/batch"));
-            Thread.sleep(500);
-        }
+        benchmark.sendPost(URI.create("http://localhost:80/external/insertlog/batch"));
     }
 }
