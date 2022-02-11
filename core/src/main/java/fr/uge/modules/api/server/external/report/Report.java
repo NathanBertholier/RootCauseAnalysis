@@ -26,6 +26,6 @@ public class Report {
     public Uni<ReportResponse> getReport(@PathParam("id") long idLogTarget, ReportParameter reportParameter) throws SQLException {
         LOGGER.log(Level.INFO, "Received request for id " +  idLogTarget + " with parameters: " + reportParameter);
         var report = Synthetization.getReport(idLogTarget, reportParameter);
-        return Uni.createFrom().item(new ReportResponse(log, TOKEN_MODELS, logs));
+        return Uni.createFrom().item(report);
     }
 }
