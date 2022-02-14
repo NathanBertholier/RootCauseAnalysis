@@ -1,20 +1,21 @@
-package fr.uge.modules.api.server.entities;
+package fr.uge.modules.api.model.entities;
+
+import io.quarkus.hibernate.reactive.panache.PanacheEntityBase;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import java.sql.Timestamp;
-import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-public class Log {
+public class Log extends PanacheEntityBase {
     @Id
-    private Long id;
-    private Timestamp datetime;
+    public Long id;
+    public Timestamp datetime;
 
     @OneToMany
-    private ArrayList<TokenModel> tokens;
+    public List<TokenModel> tokens;
 
     public Long getId() {
         return id;

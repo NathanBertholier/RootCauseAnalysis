@@ -6,8 +6,6 @@ import io.vertx.core.json.JsonObject;
 import org.eclipse.microprofile.reactive.messaging.Incoming;
 
 import javax.enterprise.context.ApplicationScoped;
-import java.sql.Timestamp;
-import java.util.List;
 import java.util.Properties;
 import java.util.logging.Logger;
 

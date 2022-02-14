@@ -1,6 +1,6 @@
 package fr.uge.modules.api.endpoint.token;
 
-import fr.uge.modules.api.model.TokenType;
+import fr.uge.modules.api.model.entities.TokenType;
 import io.smallrye.mutiny.Uni;
 
 import javax.ws.rs.GET;

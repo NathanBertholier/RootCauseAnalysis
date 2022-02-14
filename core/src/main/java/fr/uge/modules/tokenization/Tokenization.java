@@ -51,7 +51,7 @@ public class Tokenization {
         newTokens.id = id;
         newTokens.timestamp = convertStringToTimestamp(datetime.toString(), "yyyy-MM-dd");
         newTokens.tokens = tokens.stream()
-                .map(token -> new TokenModel(token.getType().getName() + "", token.getValue() + ""))
+                .map(token -> new TokenModel(token.getType().getTokenTypeId(), token.getValue() + ""))
                 .toList();
         return newTokens;
     }

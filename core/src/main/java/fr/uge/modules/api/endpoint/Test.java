@@ -1,6 +1,6 @@
 package fr.uge.modules.api.endpoint;
 
-import fr.uge.modules.api.model.RawLog;
+import fr.uge.modules.api.model.entities.RawLog;
 import fr.uge.modules.api.model.TokenModel;
 import fr.uge.modules.linking.token.type.TokenType;
 import io.smallrye.mutiny.Multi;
@@ -10,7 +10,6 @@ import io.vertx.mutiny.pgclient.PgPool;
 import javax.inject.Inject;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
-import java.util.Collections;
 import java.util.List;
 
 @Path("/test/{id}")
@@ -38,7 +37,7 @@ public class Test {
         var tokens = client
                 .preparedQuery("SELECT * FROM token LEFT JOIN tokenType ON token.idtokentype = tokentype.id WHERE token.id = '" + id + "'")
                 .mapping(row -> new TokenModel(
-                        TokenType.fromTokenTypeId(row.getInteger("tokentypeid")).orElseThrow().getName(),
+                        TokenType.fromTokenTypeId(row.getInteger("tokentypeid")).orElseThrow().getTokenTypeId(),
                         row.getString("value"))
                 )
                 .execute()

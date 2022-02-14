@@ -1,4 +1,6 @@
-package fr.uge.modules.api.server.entities;
+package fr.uge.modules.api.model.entities;
+
+import io.quarkus.hibernate.reactive.panache.PanacheEntityBase;
 
 import javax.inject.Inject;
 import javax.persistence.Entity;
@@ -6,7 +8,7 @@ import javax.persistence.Id;
 import java.sql.Timestamp;
 
 @Entity
-public class Monitoring {
+public class Monitoring extends PanacheEntityBase {
     @Id
     private Timestamp datetime;
 
