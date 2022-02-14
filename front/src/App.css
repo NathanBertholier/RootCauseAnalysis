@@ -87,7 +87,7 @@
   vertical-align: baseline;
 }
 
-.add-filter-btn, .filter-container {
+.add-filter-btn, .filter-container, .number-row-filter-container {
   margin-bottom: 20px;
 }
 
@@ -99,4 +99,13 @@
 .disabled {
   color: #aaaeba !important;
   border-color: #aaaeba;
+}
+
+.error {
+  color: red;
+}
+
+.form-error {
+  padding-top: 10px;
+  text-align: left;
 }
