@@ -25,9 +25,10 @@ public class RawlogProcessor {
     @Outgoing(value = "tokens")
     public Tokens processTokenization(Message<JsonObject> incoming){
         var log = incoming.getPayload().mapTo(RawLog.class);
+        log.persistAndFlush();
         Optional<IncomingRabbitMQMetadata> metadata = incoming.getMetadata(IncomingRabbitMQMetadata.class);
         return tokenization.tokenizeLog(metadata.orElseThrow().getHeader("id", Long.class).orElseThrow(),
-                log.getLog());
+                log.log);
     }
 }
 
