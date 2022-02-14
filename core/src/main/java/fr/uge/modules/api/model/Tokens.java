@@ -1,5 +1,6 @@
 package fr.uge.modules.api.model;
 
+
 import io.quarkus.hibernate.reactive.panache.PanacheEntity;
 
 import java.sql.Timestamp;

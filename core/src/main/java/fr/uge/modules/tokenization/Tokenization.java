@@ -48,7 +48,7 @@ public class Tokenization {
         }
 
         var newTokens = new Tokens();
-        newTokens.id = id;
+        newTokens.typeId = id;
         newTokens.timestamp = convertStringToTimestamp(datetime.toString(), "yyyy-MM-dd");
         newTokens.tokens = tokens.stream()
                 .map(token -> new TokenModel(token.getType().getName() + "", token.getValue() + ""))
