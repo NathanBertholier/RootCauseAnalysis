@@ -46,9 +46,9 @@ public class LogTokens {
     public void insertTokens(long id, Timestamp date, List<TokenModel> tokens) {
         try {
             this.logStatement.setLong(1, id);
-            System.out.println(date);
             this.logStatement.setTimestamp(2, date);
             tokens.forEach(token -> {
+                System.out.println(token);
                 try {
                     var tokenId = switch (token.token_type()) {
                         case "IPv4"-> 1;
