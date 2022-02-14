@@ -23,15 +23,8 @@ class TokenizationTest {
         PreparedStatement preparedStatement = connection.prepareStatement("SELECT * FROM rawlog");
         final ResultSet resultSet = preparedStatement.executeQuery();
         while (resultSet.next()) {
-            //assertEquals(tokenization.tokenizeLog(resultSet.getString(1)).toString(), resultSet.getString(2));
+            assertEquals(resultSet.getString(2), tokenization.tokenizeLog(0, resultSet.getString(1)).toString());
         }
-    }
-
-    @Test
-    void shouldThrowNullPointerException(){
-        assertThrows(NullPointerException.class, () -> {
-            //tokenization.tokenizeLog(null);
-        });
     }
 
 }
