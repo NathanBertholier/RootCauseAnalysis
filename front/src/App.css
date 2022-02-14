@@ -95,3 +95,8 @@
   text-align: right;
   margin-top: 7px;
 }
+
+.disabled {
+  color: #aaaeba !important;
+  border-color: #aaaeba;
+}

@@ -1,8 +1,10 @@
 import {Sidebar} from "../components/Sidebar";
 import React, {useRef, useState} from "react";
-import {LogList} from "../components/LogList";
+import {LogList, default_request} from "../components/LogList";
 import {Button, Col, Container, Dropdown, DropdownButton, Form, FormControl, Row} from "react-bootstrap";
 import { AiOutlineCloseCircle } from "react-icons/ai";
+import {RequestData} from "../types/token.type"
+import {toast} from "../tools/ToastManager";
 
 type Item = {
     id: number
@@ -18,15 +20,6 @@ type Field = {
     placeholder: string
 }
 
-/*type FilterValuesState = {
-    start_date: string
-    end_date: string
-    token_ip: string
-    status: number
-    log_id: number
-    rows: number
-}*/
-
 const default_filter: Item[] = [
     { id: 1, option: "start_date", text: "date début",     alone: false },
     { id: 2, option: "end_date",   text: "date fin",       alone: false },
@@ -36,9 +29,15 @@ const default_filter: Item[] = [
 ];
 
 export const Logs = () => {
+    // ui
     const [ isLogIDFilter, setIsLogIDFilter ]   = useState( false );
-    const [ field, setField ]                   = useState<Field[]>( [] );
+    const [ isBtnDisabled, setIsBtnDisabled ]         = useState( false );
+    const [ fieldUI, setFieldUI ]                   = useState<Field[]>( [] );
     const [ filters, setFilters ]               = useState<Item[]>( default_filter );
+
+    // event
+    const [ sendFilter, setSendFilter ]         = useState( false );
+    const [ requestData, setRequestData ]       = useState<RequestData>( default_request );
 
     const startDateInput    = useRef<HTMLInputElement>(null!);
     const endDateInput      = useRef<HTMLInputElement>(null!);
@@ -82,7 +81,7 @@ export const Logs = () => {
     }
 
     const handleDeleteField = ( e: string ) => {
-        setField( prevState => prevState.filter( f => f.option !== e ) )
+        setFieldUI( prevState => prevState.filter( f => f.option !== e ) )
         let item = default_filter.find( item => item.option === e )
         setFilters( prevState => {
             let newArray = [ item as Item,...prevState ]
@@ -91,11 +90,11 @@ export const Logs = () => {
     }
 
     const addField = ( field: Field ) => {
-        setField( prevState => [...prevState, field ] )
+        setFieldUI( prevState => [...prevState, field ] )
     }
 
     const resetFilters = ( logIDFilter: boolean ) => {
-        setField( _ => [] as Field[] )
+        setFieldUI( _ => [] as Field[] )
         setIsLogIDFilter( logIDFilter );
     }
 
@@ -116,12 +115,51 @@ export const Logs = () => {
         }
     }
 
-    const filterLogs = () => {
-        console.log( startDateInput.current.value );
+    const filterLogs = (event : React.MouseEvent<HTMLButtonElement> ) => {
+        setIsBtnDisabled( true );
+        /*console.log( startDateInput.current.value );
         console.log( endDateInput.current.value );
         console.log( tokenIPInput.current.value );
         console.log( statusInput.current.value );
         console.log( rowsNumberInput.current.value );
+        console.log( "validity" );
+        console.log( statusInput.current.validity.valid );*/
+
+        //check input
+
+        if ( !handleValidation() ) {
+            toast.show({
+                content: "Le formulaire contient une ou plusieurs erreurs",
+                duration: 3000,
+            });
+        }
+
+        let start_datetime : string = startDateInput.current !== null ? startDateInput.current.value : ""
+        let end_datetime : string   = endDateInput.current !== null ? endDateInput.current.value : ""
+        let id_log : number         = logIDInput.current !== null ? parseInt( logIDInput.current.value ) : 0
+        let rowsNumber : number     = rowsNumberInput.current !== null ? parseInt( rowsNumberInput.current.value ) : 0
+
+        let obj : RequestData = {
+            init_datetime: start_datetime,
+            end_datetime: end_datetime,
+            id: id_log,
+            tokens: [
+                {
+                    token_type: "IP",
+                    token_value: "10.16.27.62.244"
+                }
+            ],
+            rows: rowsNumber
+        }
+
+        setRequestData( obj )
+        setSendFilter( true );
+    }
+    
+    const handleValidation = () => {
+        let formIsValid = true;
+        
+        return formIsValid;
     }
 
     return (
@@ -138,13 +176,13 @@ export const Logs = () => {
                                         <Col lg={10}>
                                             <Container fluid className="p-0">
                                                 {
-                                                    field.map( ( field, index ) => {
+                                                    fieldUI.map( ( field, index ) => {
                                                         return <Row key={index}>
                                                             <Col sm={2} className="input-labels" >
                                                                 { field.label }
                                                             </Col>
                                                             <Col sm={9} className="filter-container">
-                                                                <FormControl ref={ getInputRef( field ) } type={ field.type } placeholder={field.placeholder} />
+                                                                <FormControl ref={ getInputRef( field ) } type="date" pattern="[0-9]*" placeholder={field.placeholder} />
                                                             </Col>
                                                             <Col sm={1}>
                                                                 <Button variant="outline-danger" key={index} onClick={ () => handleDeleteField( field.option ) }><AiOutlineCloseCircle /></Button>
@@ -178,11 +216,17 @@ export const Logs = () => {
                             <Col sm={4}>
                                 <Form.Text className="text-muted">Nombre de ligne :</Form.Text>
                                 <Form.Control ref={rowsNumberInput} type="number" className="custom-input"  min="1" />
-                                <Button className="custom-filter-btn" variant="outline-primary" onClick={ () => filterLogs() }>Valider</Button>
+                                <Button className={`custom-filter-btn ${isBtnDisabled ? "disabled" : ""}`} variant="outline-primary" onClick={ event => filterLogs( event ) } disabled={ isBtnDisabled } >Valider</Button>
                             </Col>
                         </Row>
                     </Container>
-                    <LogList />
+                    <LogList ref={ logList => {
+                        if ( sendFilter && logList !== null ) {
+                            logList.filter( requestData );
+                            setSendFilter( false );
+                            setIsBtnDisabled( false );
+                        }
+                    } } />
                 </div>
             </Row>
         </Container>
