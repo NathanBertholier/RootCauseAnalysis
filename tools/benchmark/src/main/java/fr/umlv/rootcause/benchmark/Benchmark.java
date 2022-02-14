@@ -20,8 +20,8 @@ import java.util.stream.Stream;
 public class Benchmark {
 
     public static void main(String[] args) throws ParseException, IOException {
-        args = new String[]{"-l", "10000000", "-F", "../logs/"};
-        //args = new String[]{"-l", "10000", "-f", "in.txt"};
+        //args = new String[]{"-l", "10000000", "-F", "../logs/"};
+        args = new String[]{"-l", "10000", "-f", "in.txt"};
         final Options firstOptions = configFirstParameters();
         final Options options = configParameters(firstOptions);
 
@@ -52,6 +52,9 @@ public class Benchmark {
         }
         int lineCount = Integer.parseInt(line.getOptionValue("linesCount"));
 
+        List<String> stringList = stream
+                .limit(lineLimit(line))
+                .collect(Collectors.toList());
         try {
             Path outputPath;
             if (line.hasOption("output")) {
@@ -60,11 +63,26 @@ public class Benchmark {
                 outputPath = Path.of("out.txt");
             }
             System.out.println("Writing to file...");
-            Files.write(outputPath, stream
-                    .limit(lineLimit(line))
-                    .collect(Collectors.toList()));
+            Files.write(outputPath,stringList);
         } catch (NoSuchFileException e) {
             System.err.println("File not found, check file path : " + e.getMessage());
+        }
+        var logSender = new BenchHTTPClient();
+        //sendToServer(stringList, 8, false);
+        logSender.sendToServer();
+    }
+
+    private static void sendToServer(List<String> stringSource, int threadCount, boolean looping) {
+
+        Thread[] threads = new Thread[threadCount];
+        ArrayList<List<String>> subLists = new ArrayList<>();
+        for (int i = 0; i < threadCount; i++){
+            int offset = stringSource.size()/threadCount;
+            subLists.add(stringSource.subList(offset*i,offset*(i+1)));
+            threads[i] = new Thread(() -> {
+                BenchHTTPClient client = new BenchHTTPClient();
+                client.sendToServer();
+            });
         }
     }
 
@@ -167,7 +185,7 @@ class BenchHTTPClient{
     private String prepareRequest() throws JsonProcessingException {
         var values = new HashMap<String, String>() {
             {
-                put("log", "2021-11-20 00:00:01\t10.16.27.62.244\tGET\tindex.html");
+                put("log", "2020-08-25\t12:20:19\tLHR62-C4\t997\t88.217.152.130\tGET\td2l739nh5t756g.cloudfront.net\t/wp-content/plugins/easy-twitter-feed-widget/js/twitter-widgets.js\t200\t-\tMozilla/5.0%20(Windows%20NT%2010.0;%20Win64;%20x64)%20AppleWebKit/537.36%20(KHTML,%20like%20Gecko)%20Chrome/83.0.4103.61%20Safari/537.36\tx56322&ver=1.0\t-\tHit\terS8nLIX1EwugGs0W_f3E-tu4O7noesqVdNE49TGeRQ5PdgbLUJ4Ig==\tstatic.centreon.com\thttps\t354\t0.001\t-\tTLSv1.2\tECDHE-RSA-AES128-GCM-SHA256\tHit\tHTTP/1.1\t-\t-\t37457\t0.001\tHit\tapplication/x-javascript\t486\t-\t-\n");
             }
         };
         List<HashMap<String, String>> list = new ArrayList<>();
@@ -179,7 +197,7 @@ class BenchHTTPClient{
     }
 
     public void sendToServer(){
-        this.sendGet(URI.create("http://localhost:8080/external/tokentypes"));
+        this.sendGet(URI.create("http://localhost:80/external/tokentypes"));
         while (true) {
             try {
                 this.sendPost(URI.create("http://localhost:80/external/insertlog/batch"));
