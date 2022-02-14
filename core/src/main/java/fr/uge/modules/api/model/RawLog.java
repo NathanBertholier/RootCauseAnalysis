@@ -1,25 +1,19 @@
 package fr.uge.modules.api.model;
 
-public class RawLog {
-    private String log;
+import io.quarkus.hibernate.reactive.panache.PanacheEntity;
+import io.quarkus.hibernate.reactive.panache.PanacheEntityBase;
 
-    public RawLog(){}
-    public RawLog(String log){
-        this.log = log;
-    }
+import javax.persistence.*;
+import java.util.List;
 
-    public String getLog() {
-        return log;
-    }
-
-    public void setLog(String log) {
-        this.log = log;
-    }
+@Entity(name = "rawlog")
+public class RawLog extends PanacheEntity {
+    public String log;
 
     @Override
     public String toString() {
-        return "Log{" +
-                "log='" + log + '\'' +
+        return "RawLog{" +
+                "value='" + log + '\'' +
                 '}';
     }
 }

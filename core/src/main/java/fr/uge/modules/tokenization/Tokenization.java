@@ -28,7 +28,6 @@ public class Tokenization {
         // Containing the regex
 
         // Containing the token values
-        Token tokenDatetime = new Token(this.patternDatetime);
         Token tokenIP = new Token(this.patternIP);
         Token tokenStatus = new Token(this.patternStatus);
         ArrayList<Token> tokens = new ArrayList<>();
@@ -48,11 +47,13 @@ public class Tokenization {
             }
         }
 
-        return new Tokens(id,
-                convertStringToTimestamp(datetime.toString(), "yyyy-MM-dd"),
-                tokens.stream()
-                        .map(token -> new TokenModel(token.getType().getName() + "",
-                        token.getValue() + "")).toList());
+        var newTokens = new Tokens();
+        newTokens.id = id;
+        newTokens.timestamp = convertStringToTimestamp(datetime.toString(), "yyyy-MM-dd");
+        newTokens.tokens = tokens.stream()
+                .map(token -> new TokenModel(token.getType().getName() + "", token.getValue() + ""))
+                .toList();
+        return newTokens;
     }
 
     public static Timestamp convertStringToTimestamp(String strDate, String pattern) {
