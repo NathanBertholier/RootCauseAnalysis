@@ -18,6 +18,8 @@ type Field = {
     option: "start_date" | "end_date" | "token_ip" | "status" | "log_id"
     type: string
     placeholder: string
+    patern: string
+    error?: string
 }
 
 const default_filter: Item[] = [
@@ -30,14 +32,15 @@ const default_filter: Item[] = [
 
 export const Logs = () => {
     // ui
-    const [ isLogIDFilter, setIsLogIDFilter ]   = useState( false );
-    const [ isBtnDisabled, setIsBtnDisabled ]         = useState( false );
-    const [ fieldUI, setFieldUI ]                   = useState<Field[]>( [] );
-    const [ filters, setFilters ]               = useState<Item[]>( default_filter );
+    const [ isLogIDFilter, setIsLogIDFilter ]               = useState( false );
+    const [ isBtnDisabled, setIsBtnDisabled ]               = useState( false );
+    const [ hasNumberOfRowError, setHasNumberOfRowError ]   = useState( false );
+    const [ uiFields, setUiFields ]                         = useState<Field[]>( [] );
+    const [ filters, setFilters ]                           = useState<Item[]>( default_filter );
 
     // event
-    const [ sendFilter, setSendFilter ]         = useState( false );
-    const [ requestData, setRequestData ]       = useState<RequestData>( default_request );
+    const [ sendFilter, setSendFilter ]                     = useState( false );
+    const [ requestData, setRequestData ]                   = useState<RequestData>( default_request );
 
     const startDateInput    = useRef<HTMLInputElement>(null!);
     const endDateInput      = useRef<HTMLInputElement>(null!);
@@ -61,19 +64,19 @@ export const Logs = () => {
 
         switch ( e ) {
             case "start_date":
-                addField( { label: "date de début", type: "text", placeholder: "YYYY-MM-DD::mm", option: e } )
+                addField( { label: "date de début", type: "text", placeholder: "YYYY-MM-DD::mm", option: e, patern: "[0-9]*" } )
                 break;
             case "end_date":
-                addField( { label: "date de fin", type: "text", placeholder: "YYYY-MM-DD::mm", option: e } )
+                addField( { label: "date de fin", type: "text", placeholder: "YYYY-MM-DD::mm", option: e, patern: "[0-9]*" } )
                 break;
             case "token_ip":
-                addField( { label: "Adresse IP", type: "text", placeholder: "ajouter une IP", option: e } )
+                addField( { label: "Adresse IP", type: "text", placeholder: "ajouter une IP", option: e, patern: "[0-9]*" } )
                 break;
             case "status":
-                addField( { label: "Status", type: "number", placeholder: "", option: e } )
+                addField( { label: "Status", type: "number", placeholder: "", option: e, patern: "[0-9]*" } )
                 break;
             case "log_id":
-                addField( { label: "Log ID", type: "number", placeholder: "", option: e } )
+                addField( { label: "Log ID", type: "number", placeholder: "", option: e, patern: "[0-9]*" } )
                 break;
             default:
                 break;
@@ -81,7 +84,7 @@ export const Logs = () => {
     }
 
     const handleDeleteField = ( e: string ) => {
-        setFieldUI( prevState => prevState.filter( f => f.option !== e ) )
+        setUiFields( prevState => prevState.filter( f => f.option !== e ) )
         let item = default_filter.find( item => item.option === e )
         setFilters( prevState => {
             let newArray = [ item as Item,...prevState ]
@@ -90,11 +93,11 @@ export const Logs = () => {
     }
 
     const addField = ( field: Field ) => {
-        setFieldUI( prevState => [...prevState, field ] )
+        setUiFields( prevState => [...prevState, field ] )
     }
 
     const resetFilters = ( logIDFilter: boolean ) => {
-        setFieldUI( _ => [] as Field[] )
+        setUiFields( _ => [] as Field[] )
         setIsLogIDFilter( logIDFilter );
     }
 
@@ -117,27 +120,20 @@ export const Logs = () => {
 
     const filterLogs = (event : React.MouseEvent<HTMLButtonElement> ) => {
         setIsBtnDisabled( true );
-        /*console.log( startDateInput.current.value );
-        console.log( endDateInput.current.value );
-        console.log( tokenIPInput.current.value );
-        console.log( statusInput.current.value );
-        console.log( rowsNumberInput.current.value );
-        console.log( "validity" );
-        console.log( statusInput.current.validity.valid );*/
-
-        //check input
 
         if ( !handleValidation() ) {
             toast.show({
                 content: "Le formulaire contient une ou plusieurs erreurs",
                 duration: 3000,
             });
+            setIsBtnDisabled( false );
+            return;
         }
 
-        let start_datetime : string = startDateInput.current !== null ? startDateInput.current.value : ""
-        let end_datetime : string   = endDateInput.current !== null ? endDateInput.current.value : ""
-        let id_log : number         = logIDInput.current !== null ? parseInt( logIDInput.current.value ) : 0
-        let rowsNumber : number     = rowsNumberInput.current !== null ? parseInt( rowsNumberInput.current.value ) : 0
+        let start_datetime : string = startDateInput.current !== null ? startDateInput.current.value : "";
+        let end_datetime : string   = endDateInput.current !== null ? endDateInput.current.value : "";
+        let id_log : number         = logIDInput.current !== null ? parseInt( logIDInput.current.value ) : 0;
+        let rowsNumber : number     = rowsNumberInput.current !== null ? parseInt( rowsNumberInput.current.value ) : 0;
 
         let obj : RequestData = {
             init_datetime: start_datetime,
@@ -152,14 +148,41 @@ export const Logs = () => {
             rows: rowsNumber
         }
 
-        setRequestData( obj )
+        setRequestData( obj );
         setSendFilter( true );
     }
     
     const handleValidation = () => {
+        if ( uiFields.length === 0 ) return false;
         let formIsValid = true;
+
+        if ( isLogIDFilter ) {
+            if ( logIDInput.current === null || logIDInput.current.value === "" ) {
+                formIsValid = false;
+                setErrorMessage( "log_id", "* Le champ 'Log ID' doit contenir une valeur" );
+            }
+            else if ( !logIDInput.current.validity.valid ) {
+                formIsValid = false;
+                setErrorMessage( "log_id", "* Le champ 'Log ID' ne prend que des nombres" );
+            }
+        }
+        else {
+
+        }
+
+        if ( rowsNumberInput.current !== null && ( !rowsNumberInput.current.validity.valid || parseInt(rowsNumberInput.current.value) <= 0) ) {
+            formIsValid = false;
+            setHasNumberOfRowError( true );
+        }
+        else {
+            setHasNumberOfRowError( false );
+        }
         
         return formIsValid;
+    }
+
+    const setErrorMessage = ( filter: string, message: string ) => {
+        uiFields.map( field => field.error = field.option === filter ? message : field.error )
     }
 
     return (
@@ -176,13 +199,20 @@ export const Logs = () => {
                                         <Col lg={10}>
                                             <Container fluid className="p-0">
                                                 {
-                                                    fieldUI.map( ( field, index ) => {
+                                                    uiFields.map( ( field, index ) => {
                                                         return <Row key={index}>
                                                             <Col sm={2} className="input-labels" >
                                                                 { field.label }
                                                             </Col>
                                                             <Col sm={9} className="filter-container">
-                                                                <FormControl ref={ getInputRef( field ) } type="date" pattern="[0-9]*" placeholder={field.placeholder} />
+                                                                <Container fluid className="p-0">
+                                                                    <Row>
+                                                                        <FormControl ref={ getInputRef( field ) } type={ field.type } pattern={ field.patern } placeholder={field.placeholder} />
+                                                                    </Row>
+                                                                    <Row className={ `${ field.error === "" ? "d-none": "" }` } >
+                                                                        <div className="error form-error">{ field.error }</div>
+                                                                    </Row>
+                                                                </Container>
                                                             </Col>
                                                             <Col sm={1}>
                                                                 <Button variant="outline-danger" key={index} onClick={ () => handleDeleteField( field.option ) }><AiOutlineCloseCircle /></Button>
@@ -214,9 +244,18 @@ export const Logs = () => {
                                 </Container>
                             </Col>
                             <Col sm={4}>
-                                <Form.Text className="text-muted">Nombre de ligne :</Form.Text>
-                                <Form.Control ref={rowsNumberInput} type="number" className="custom-input"  min="1" />
-                                <Button className={`custom-filter-btn ${isBtnDisabled ? "disabled" : ""}`} variant="outline-primary" onClick={ event => filterLogs( event ) } disabled={ isBtnDisabled } >Valider</Button>
+                                <Container fluid className="p-0 number-row-filter-container">
+                                    <Row>
+                                        <Col>
+                                            <Form.Text className="text-muted">Nombre de ligne :</Form.Text>
+                                            <Form.Control ref={rowsNumberInput} type="number" className="custom-input"  min="1" />
+                                            <Button className={`custom-filter-btn ${isBtnDisabled ? "disabled" : ""}`} variant="outline-primary" onClick={ event => filterLogs( event ) } disabled={ isBtnDisabled } >Valider</Button>
+                                        </Col>
+                                    </Row>
+                                    <Row className={ hasNumberOfRowError ? "" : "d-none" } >
+                                        <div className="error" >* Le champ 'Log ID' ne prend que des nombres</div>
+                                    </Row>
+                                </Container>
                             </Col>
                         </Row>
                     </Container>
