@@ -1,7 +1,6 @@
 package fr.uge.modules.tokenization;
 
-import fr.uge.modules.api.model.TokenModel;
-import fr.uge.modules.api.model.Tokens;
+import fr.uge.modules.api.model.entities.Log;
 import fr.uge.modules.linking.token.Token;
 import fr.uge.modules.linking.token.type.*;
 
@@ -21,9 +20,7 @@ public class Tokenization {
     private final TypeHTTPStatus patternStatus = new TypeHTTPStatus();
     private static final Logger LOGGER = Logger.getGlobal();
 
-    // TODO Transform to field
-
-    public Tokens tokenizeLog(long id, String body){
+    public Log tokenizeLog(long id, String body){
         Objects.requireNonNull(body);
         // Containing the regex
 
@@ -47,13 +44,17 @@ public class Tokenization {
             }
         }
 
-        var newTokens = new Tokens();
-        newTokens.id = id;
-        newTokens.timestamp = convertStringToTimestamp(datetime.toString(), "yyyy-MM-dd");
-        newTokens.tokens = tokens.stream()
-                .map(token -> new TokenModel(token.getType().getTokenTypeId(), token.getValue() + ""))
-                .toList();
-        return newTokens;
+        var log = new Log();
+        log.id = id;
+        log.datetime = convertStringToTimestamp(datetime.toString(), "yyyy-MM-dd");
+        log.tokens = tokens.stream()
+                .map(token -> {
+                    var tokenConstruct = new fr.uge.modules.api.model.entities.Token();
+                    tokenConstruct.idtokentype = token.getType().getTokenTypeId();
+                    tokenConstruct.value = token.getValue() + "";
+                    return tokenConstruct;
+                }).toList();
+        return log;
     }
 
     public static Timestamp convertStringToTimestamp(String strDate, String pattern) {

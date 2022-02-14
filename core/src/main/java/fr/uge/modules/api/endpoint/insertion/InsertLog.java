@@ -1,6 +1,9 @@
 package fr.uge.modules.api.endpoint.insertion;
 
 import fr.uge.modules.api.model.entities.RawLog;
+import io.quarkus.hibernate.reactive.panache.Panache;
+import io.quarkus.hibernate.reactive.panache.PanacheEntityBase;
+import io.smallrye.mutiny.Uni;
 import org.eclipse.microprofile.reactive.messaging.Channel;
 import org.eclipse.microprofile.reactive.messaging.Emitter;
 
@@ -9,6 +12,8 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+import java.net.URI;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -25,20 +30,22 @@ public class InsertLog {
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public long insertLog(RawLog input) {
+    public Uni<Long> insertLog(RawLog input) {
         System.out.println(input);
         System.out.println(input.getId());
         emitter.send(input);
-        return input.getId();
+        return PanacheEntityBase.count();
     }
+
 
     @Path("/batch")
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    // Ne fonctionne pas pour le moment, simple test
-    public long[] insertLog(List<RawLog> inputs) {
-        return inputs.stream().mapToLong(this::insertLog).toArray();
+    public Uni<Long> insertLog(List<RawLog> inputs) {
+        inputs.forEach(this::insertLog);
+        return PanacheEntityBase.count();
     }
+
 }
 

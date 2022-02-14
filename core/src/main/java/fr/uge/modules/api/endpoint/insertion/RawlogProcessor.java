@@ -1,6 +1,6 @@
 package fr.uge.modules.api.endpoint.insertion;
 
-import fr.uge.modules.api.model.Tokens;
+import fr.uge.modules.api.model.entities.Log;
 import fr.uge.modules.api.model.entities.RawLog;
 import fr.uge.modules.tokenization.Tokenization;
 import io.vertx.core.json.JsonObject;
@@ -20,12 +20,12 @@ public class RawlogProcessor {
 
     @Incoming(value = "logTokenization")
     @Outgoing(value = "tokens")
-    public Tokens processTokenization(JsonObject incoming){
+    public Log processTokenization(JsonObject incoming){
         var log = incoming.mapTo(RawLog.class);
         System.out.println(log);
         //log.persistAndFlush();
         return tokenization.tokenizeLog(log.getId(),
-                log.log);
+                log.getValue());
     }
 }
 
