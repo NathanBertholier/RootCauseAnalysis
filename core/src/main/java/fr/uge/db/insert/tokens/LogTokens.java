@@ -46,6 +46,7 @@ public class LogTokens {
     public void insertTokens(long id, Timestamp date, List<TokenModel> tokens) {
         try {
             this.logStatement.setLong(1, id);
+            System.out.println(date);
             this.logStatement.setTimestamp(2, date);
             tokens.forEach(token -> {
                 try {
@@ -55,7 +56,7 @@ public class LogTokens {
                         case "status" -> 3;
                         case "datetime" -> 4;
                         case "edgeResponse" -> 5;
-                        default -> 1;
+                        default -> {throw new IllegalArgumentException(token.token_type()+" not recognized");}
                     };
                     this.tokenStatement.setLong(1, id);
                     this.tokenStatement.setLong(2, tokenId);
@@ -63,6 +64,8 @@ public class LogTokens {
                     this.tokenStatement.execute();
                 } catch (SQLException e) {
                     LOGGER.severe("Error during insertion in log and token database : " + e);
+                }catch (IllegalArgumentException e){
+                    LOGGER.log(Level.WARNING,"IllegalToken",e);
                 }
             });
             this.logStatement.execute();
