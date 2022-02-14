@@ -51,8 +51,8 @@ public class LogTokens {
             tokens.forEach(token -> {
                 try {
                     var tokenId = switch (token.token_type()) {
-                        case "ipv4"-> 1;
-                        case "ipv6" -> 2;
+                        case "IPv4"-> 1;
+                        case "IPv6" -> 2;
                         case "status" -> 3;
                         case "datetime" -> 4;
                         case "edgeResponse" -> 5;
