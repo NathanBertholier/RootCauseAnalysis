@@ -1,31 +1,39 @@
 package fr.uge.modules.api.endpoint.insertion;
 
-import fr.uge.modules.api.model.entities.Log;
 import fr.uge.modules.api.model.entities.RawLog;
-import fr.uge.modules.api.model.entities.Token;
 import fr.uge.modules.tokenization.Tokenization;
+import io.quarkus.hibernate.reactive.panache.Panache;
+import io.smallrye.mutiny.Uni;
 import io.vertx.core.json.JsonObject;
 import org.eclipse.microprofile.reactive.messaging.Incoming;
-import org.eclipse.microprofile.reactive.messaging.Outgoing;
+import org.eclipse.microprofile.reactive.messaging.Message;
 
 import javax.enterprise.context.ApplicationScoped;
-import javax.inject.Inject;
+import javax.ws.rs.core.Response;
+import java.net.URI;
 import java.util.logging.Logger;
 
 @ApplicationScoped
 public class RawlogProcessor {
     private final Logger LOGGER = Logger.getGlobal();
-
-    @Inject
-    Tokenization tokenization;
+    private final Tokenization tokenization = new Tokenization();
+    //@Inject
+    //Tokenization tokenization;
 
     @Incoming(value = "logTokenization")
-    @Outgoing(value = "tokens")
-    public Token processTokenization(JsonObject incoming){
-        var log = incoming.mapTo(RawLog.class);
-        System.out.println(log);
-        //log.persistAndFlush();
-        return tokenization.tokenizeLog(log.id, log.log);
+    public Uni<Response> processTokenization(Message<JsonObject> incoming){
+        System.out.println(incoming);
+        var rawlog = incoming.getPayload().mapTo(RawLog.class);
+        var log = tokenization.tokenizeLog(rawlog.getId(),
+                rawlog.getValue());
+
+        incoming.ack();
+        return Panache.withTransaction(log::persist)
+                .map(item -> Response
+                        .created(URI.create("/insertlog/single/"))
+                        .entity(item)
+                        .build()
+                );
     }
 }
 

@@ -7,7 +7,6 @@ import fr.uge.db.insert.monitoring.MonitorInserter;
 import fr.uge.modules.api.model.ReportResponse;
 import fr.uge.modules.api.model.TokensMostSeen;
 import fr.uge.modules.api.model.CompleteLog;
-import fr.uge.modules.api.model.entities.Token;
 import fr.uge.modules.api.model.report.ReportParameter;
 
 import java.io.IOException;
@@ -15,7 +14,6 @@ import java.sql.SQLException;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.stream.Collectors;
 
 public class Synthetization {
     private static ObjectMapper mapper = new ObjectMapper();

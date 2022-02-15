@@ -19,7 +19,7 @@ public class Log extends PanacheEntityBase {
     @Column(name = "datetime")
     public Timestamp datetime;
 
-    @OneToMany(fetch = FetchType.EAGER)
+    @OneToMany(cascade = CascadeType.ALL)
     @JoinColumn(name = "idlog")
     public List<Token> tokens;
 
@@ -41,6 +41,19 @@ public class Log extends PanacheEntityBase {
 
     public void setDatetime(Timestamp datetime) {
         this.datetime = datetime;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Log logEntity = (Log) o;
+        return id == logEntity.id && Objects.equals(datetime, logEntity.datetime);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, datetime);
     }
 
     @Override

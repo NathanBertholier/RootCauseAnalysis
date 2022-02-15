@@ -6,9 +6,7 @@ import java.sql.Timestamp;
 import java.util.Objects;
 
 @Entity
-@Table(name = "monitoring", schema = "public", catalog = "rootcause")
 public class Monitoring extends PanacheEntityBase {
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Id
     @Column(name = "datetime")
     private Timestamp datetime;

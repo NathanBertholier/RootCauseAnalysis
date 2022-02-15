@@ -132,4 +132,12 @@ public class Benchmark {
 
         return options;
     }
+    private List<List<String>> cutList(List<String> originalList, int partitionSize) {
+        List<List<String>> partitions = new ArrayList<>();
+        for (int i = 0; i < originalList.size(); i += partitionSize) {
+            partitions.add(originalList.subList(i,
+                    Math.min(i + partitionSize, originalList.size())));
+        }
+        return partitions;
+    }
 }

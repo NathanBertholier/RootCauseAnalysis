@@ -1,10 +1,10 @@
 package fr.uge.modules.linking.token.type;
 
-import fr.uge.modules.api.model.entities.Token;
+import fr.uge.modules.linking.token.Token;
 
 public class TypeIPv6 implements TokenType{
 
-    private final String name = "IPv6";
+    private final String name = "ipv6";
     //format sans compression : "^(?:[0-9a-fA-F]{1,4}:){7}[0-9a-fA-F]{1,4}$"
     private final String regex = "^((?:[0-9A-Fa-f]{1,4}(?::[0-9A-Fa-f]{1,4})*)?)::((?:[0-9A-Fa-f]{1,4}(?::[0-9A-Fa-f]{1,4})*)?)$";
 
