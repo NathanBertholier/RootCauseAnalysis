@@ -17,32 +17,12 @@ import java.net.URI;
 import java.util.List;
 import java.util.logging.Logger;
 
-@Path("/insertlog")
-public class InsertLog {
+@Path("/insert/batch")
+public class InsertBatchLog {
 
     private static final Logger logger = Logger.getGlobal();
     @Channel("logs") Emitter<RawLog> emitter;
 
-    @Path("/single")
-    @POST
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.APPLICATION_JSON)
-    public Uni<Response> insertLog(RawLog input) {
-        System.out.println("ICI : " + input);
-        logger.info("ICI : " + input);
-        return Panache.<RawLog>withTransaction(input::persist)
-                .map(item -> {
-                    emitter.send(item);
-                    return Response
-                                .created(URI.create("/insertlog/single/"))
-                                .entity(item.id)
-                                .build();
-                        }
-                );
-    }
-
-
-    @Path("/batch")
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
@@ -63,4 +43,3 @@ public class InsertLog {
     }
 
 }
-

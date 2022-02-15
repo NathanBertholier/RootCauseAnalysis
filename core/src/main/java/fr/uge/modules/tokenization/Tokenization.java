@@ -4,12 +4,12 @@ import fr.uge.modules.api.model.entities.Log;
 import fr.uge.modules.linking.token.Token;
 import fr.uge.modules.linking.token.type.*;
 
-import javax.persistence.criteria.CriteriaBuilder;
 import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.util.*;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 //@ApplicationScoped
@@ -63,7 +63,7 @@ public class Tokenization {
             Date date = formatter.parse(strDate);
             return new Timestamp(date.getTime());
         } catch (ParseException e) {
-            e.printStackTrace();
+            LOGGER.log(Level.WARNING, "Incorrect timestamp ",e);
         }
         return Timestamp.from(Instant.now());
     }
