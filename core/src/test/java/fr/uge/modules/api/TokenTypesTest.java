@@ -11,9 +11,9 @@ public class TokenTypesTest {
     @Test
     public void tokenTypesShouldReturnCorrectList() {
         given()
-                .when().get("http://localhost:8080/external/tokentypes")
+                .when().get("http://localhost:8083/tokentypes")
                 .then()
                 .statusCode(200)
-                .body(is("[\"TypeDate\",\"TypeDatetime\",\"TypeIPv4\",\"TypeIPv6\",\"TypeTime\"]"));
+                .body(is("[\"IPV4\",\"IPV6\",\"Statut\",\"Datetime\",\"EdgeResponse\"]"));
     }
 }

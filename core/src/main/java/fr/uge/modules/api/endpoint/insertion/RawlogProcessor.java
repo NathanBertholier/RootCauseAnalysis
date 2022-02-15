@@ -25,7 +25,7 @@ public class RawlogProcessor {
         System.out.println(incoming);
         var rawlog = incoming.getPayload().mapTo(RawLog.class);
         var log = tokenization.tokenizeLog(rawlog.getId(),
-                rawlog.getValue());
+                rawlog.getLog());
 
         incoming.ack();
         return Panache.withTransaction(log::persist)
