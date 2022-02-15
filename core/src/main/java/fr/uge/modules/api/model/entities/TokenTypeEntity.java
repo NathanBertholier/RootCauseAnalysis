@@ -7,7 +7,7 @@ import java.util.Objects;
 
 @Entity
 @Table(name = "tokentype", schema = "public", catalog = "rootcause")
-public class TokenType extends PanacheEntityBase {
+public class TokenTypeEntity extends PanacheEntityBase {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Id
     @Column(name = "id")
@@ -36,7 +36,7 @@ public class TokenType extends PanacheEntityBase {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        TokenType that = (TokenType) o;
+        TokenTypeEntity that = (TokenTypeEntity) o;
         return id == that.id && Objects.equals(name, that.name);
     }
 

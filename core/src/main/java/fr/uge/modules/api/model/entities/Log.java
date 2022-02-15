@@ -1,6 +1,7 @@
 package fr.uge.modules.api.model.entities;
 
 import io.quarkus.hibernate.reactive.panache.PanacheEntityBase;
+import io.smallrye.mutiny.Uni;
 
 import javax.persistence.*;
 import java.sql.Timestamp;
@@ -18,7 +19,7 @@ public class Log extends PanacheEntityBase {
     @Column(name = "datetime")
     public Timestamp datetime;
 
-    @OneToMany
+    @OneToMany(fetch = FetchType.EAGER)
     @JoinColumn(name = "idlog")
     public List<Token> tokens;
 
@@ -43,15 +44,19 @@ public class Log extends PanacheEntityBase {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Log logEntity = (Log) o;
-        return id == logEntity.id && Objects.equals(datetime, logEntity.datetime);
+    public String toString() {
+        return "Log{" +
+                "id=" + id +
+                ", datetime=" + datetime +
+                ", tokens=" + tokens +
+                '}';
     }
 
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, datetime);
+    // Partiel pour le moment
+    public static Uni<List<Log>> retrieveLogs(long logId, Timestamp start, Timestamp end, int rows){
+        return Log
+                .find("id = ?1 and datetime between ?2 and ?3", logId, start, end)
+                .range(0, rows).list();
     }
+
 }

@@ -1,7 +1,7 @@
 package fr.uge.modules.tokenization;
 
 import fr.uge.modules.api.model.entities.Log;
-import fr.uge.modules.linking.token.Token;
+import fr.uge.modules.api.model.entities.Token;
 import fr.uge.modules.linking.token.type.*;
 
 import javax.enterprise.context.ApplicationScoped;
@@ -21,6 +21,7 @@ public class Tokenization {
     private static final Logger LOGGER = Logger.getGlobal();
 
     public Log tokenizeLog(long id, String body){
+        /*
         Objects.requireNonNull(body);
         // Containing the regex
 
@@ -55,6 +56,8 @@ public class Tokenization {
                     return tokenConstruct;
                 }).toList();
         return log;
+         */
+        return new Log();
     }
 
     public static Timestamp convertStringToTimestamp(String strDate, String pattern) {
