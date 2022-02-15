@@ -18,7 +18,7 @@ import java.util.*;
 public class Tokenization {
 
     public Tokens tokenizeLog(long id, String body) {
-        Objects.requireNonNull(body);
+/*        Objects.requireNonNull(body);
         // Containing the regex
         List<TokenType> tokenTypes = new ArrayList<>();
         TypeDate typeDate = new TypeDate();
@@ -67,7 +67,7 @@ public class Tokenization {
         SimpleDateFormat formatter = new SimpleDateFormat(pattern);
         Date date = formatter.parse(strDate);
         return new Timestamp(date.getTime());
-    }
+        */    }
 
     public static Timestamp convertStringToTimestamp(String strDate) throws ParseException {
         SimpleDateFormat formatter = new SimpleDateFormat();
