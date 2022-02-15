@@ -30,7 +30,8 @@ public class InsertLog {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Uni<Response> insertLog(RawLog input) {
-        return Panache.<RawLog>withTransaction(input::persist)
+        System.out.println(input);
+        /*return Panache.<RawLog>withTransaction(input::persist)
                 .map(item -> {
                     emitter.send(item);
                     return Response
@@ -38,7 +39,8 @@ public class InsertLog {
                                 .entity(item.id)
                                 .build();
                         }
-                );
+                );*/
+        return Uni.createFrom().item(Response.ok().build());
     }
 
 
@@ -49,7 +51,7 @@ public class InsertLog {
     public Uni<Response> insertLog(List<RawLog> inputs) {
         inputs.forEach(input -> Panache.<RawLog>withTransaction(input::persist)
                 .onFailure().invoke(() -> logger.severe("ERROR while inserting in database Rawlog"))
-                .await().indefinitely());
+                .await());
 
         var response = Response
                 .created(URI.create("/insertlog/batch"));

@@ -9,7 +9,6 @@ import org.eclipse.microprofile.reactive.messaging.Incoming;
 import org.eclipse.microprofile.reactive.messaging.Message;
 
 import javax.enterprise.context.ApplicationScoped;
-import javax.inject.Inject;
 import javax.ws.rs.core.Response;
 import java.net.URI;
 import java.util.logging.Logger;
@@ -17,12 +16,13 @@ import java.util.logging.Logger;
 @ApplicationScoped
 public class RawlogProcessor {
     private final Logger LOGGER = Logger.getGlobal();
-
-    @Inject
-    Tokenization tokenization;
+    private final Tokenization tokenization = new Tokenization();
+    //@Inject
+    //Tokenization tokenization;
 
     @Incoming(value = "logTokenization")
     public Uni<Response> processTokenization(Message<JsonObject> incoming){
+        System.out.println(incoming);
         var rawlog = incoming.getPayload().mapTo(RawLog.class);
         var log = tokenization.tokenizeLog(rawlog.getId(),
                 rawlog.getValue());

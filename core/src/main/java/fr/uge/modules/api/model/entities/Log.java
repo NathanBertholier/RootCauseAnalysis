@@ -1,6 +1,7 @@
 package fr.uge.modules.api.model.entities;
 
 import io.quarkus.hibernate.reactive.panache.PanacheEntityBase;
+import io.smallrye.mutiny.Uni;
 
 import javax.persistence.*;
 import java.sql.Timestamp;
@@ -54,4 +55,21 @@ public class Log extends PanacheEntityBase {
     public int hashCode() {
         return Objects.hash(id, datetime);
     }
+
+    @Override
+    public String toString() {
+        return "Log{" +
+                "id=" + id +
+                ", datetime=" + datetime +
+                ", tokens=" + tokens +
+                '}';
+    }
+
+    // Partiel pour le moment
+    public static Uni<List<Log>> retrieveLogs(long logId, Timestamp start, Timestamp end, int rows){
+        return Log
+                .find("id = ?1 and datetime between ?2 and ?3", logId, start, end)
+                .range(0, rows).list();
+    }
+
 }

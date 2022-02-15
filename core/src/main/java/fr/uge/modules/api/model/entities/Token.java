@@ -1,5 +1,6 @@
 package fr.uge.modules.api.model.entities;
 
+import fr.uge.modules.linking.token.type.TokenType;
 import io.quarkus.hibernate.reactive.panache.PanacheEntityBase;
 
 import javax.persistence.*;
@@ -52,18 +53,5 @@ public class Token extends PanacheEntityBase {
 
     public void setValue(String value) {
         this.value = value;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Token that = (Token) o;
-        return id == that.id && idlog == that.idlog && idtokentype == that.idtokentype && Objects.equals(value, that.value);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, idlog, idtokentype, value);
     }
 }

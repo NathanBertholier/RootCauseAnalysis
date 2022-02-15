@@ -17,7 +17,7 @@ public class TypeIPv4 implements TokenType {
 
     @Override
     public Integer getTokenTypeId() {
-        return 1;
+        return null;
     }
 
     public static float cardBetween(String t1, String t2){

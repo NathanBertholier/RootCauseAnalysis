@@ -8,14 +8,12 @@ import fr.uge.modules.api.model.ReportResponse;
 import fr.uge.modules.api.model.TokensMostSeen;
 import fr.uge.modules.api.model.CompleteLog;
 import fr.uge.modules.api.model.report.ReportParameter;
-import fr.uge.modules.linking.token.Token;
 
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.stream.Collectors;
 
 public class Synthetization {
     private static ObjectMapper mapper = new ObjectMapper();
@@ -49,6 +47,7 @@ public class Synthetization {
     }
 
     private static TokensMostSeen[] getTokens(SortedMap<Float, CompleteLog> map) {
+        /*
         ArrayList<Token> list = new ArrayList<>();
         ArrayList<TokensMostSeen> tokens = new ArrayList<>();
         map.forEach((k, v) -> list.addAll(v.getTokens()));
@@ -77,7 +76,8 @@ public class Synthetization {
             String[] tabstring = entry2.getValue().toArray(String[]::new);
             tokens.add(new TokensMostSeen(k,tabstring,entry2.getKey()));
         });
-        return tokens.toArray(TokensMostSeen[]::new);
+         */
+        return new TokensMostSeen[]{};
     }
 
     private static ArrayNode getProximity(SortedMap<Float, CompleteLog> map) {

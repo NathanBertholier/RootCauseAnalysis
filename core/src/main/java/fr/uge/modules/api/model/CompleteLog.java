@@ -1,7 +1,7 @@
 package fr.uge.modules.api.model;
 
+import fr.uge.modules.api.model.entities.Token;
 
-import fr.uge.modules.linking.token.Token;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;

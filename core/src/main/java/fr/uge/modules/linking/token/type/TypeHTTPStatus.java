@@ -19,7 +19,7 @@ public class TypeHTTPStatus implements TokenType{
 
     @Override
     public Integer getTokenTypeId() {
-        return 3;
+        return null;
     }
 
     @Override

@@ -18,7 +18,7 @@ public class TypeIPv6 implements TokenType{
 
     @Override
     public Integer getTokenTypeId() {
-        return 2;
+        return null;
     }
 
     public static float cardBetween(String t1, String t2){

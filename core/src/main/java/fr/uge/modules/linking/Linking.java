@@ -1,10 +1,11 @@
 package fr.uge.modules.linking;
 
 import fr.uge.modules.api.model.CompleteLog;
+import fr.uge.modules.api.model.entities.Token;
 import fr.uge.modules.api.model.report.ReportParameter;
-import fr.uge.modules.linking.token.Token;
 import fr.uge.modules.linking.token.type.TokenType;
 import fr.uge.modules.linking.token.type.TypeDatetime;
+import fr.uge.modules.linking.token.type.TypeHTTPStatus;
 import fr.uge.modules.linking.token.type.TypeIPv4;
 import io.smallrye.mutiny.Uni;
 import io.vertx.mutiny.pgclient.PgPool;
@@ -22,8 +23,9 @@ import java.util.logging.Logger;
 
 public class Linking {
 
-    private static final String TYPE_DATE = "datetime";
+    private static final String TYPE_DATE = "Datetime";
     private static final String TYPE_IPV4 = "IPv4";
+    private static final String TYPE_STATUT = "Statut";
     private static final String IDTOKENTYPE = "idtokentype";
     private static final String VALUE = "value";
 
@@ -66,13 +68,16 @@ public class Linking {
     }
 
     private Token createToken(String type, String value) {
+        /*
         TokenType tt;
-        switch(type){
-            case TYPE_DATE -> tt = new TypeDatetime();
+        return switch(type){
+            case TYPE_DATE -> new TypeDatetime();
             case TYPE_IPV4 -> tt = new TypeIPv4();
-            default -> throw new IllegalArgumentException();
+            case TYPE_STATUT -> tt = new TypeHTTPStatus();
+            default -> throw new IllegalArgumentException("TokenType: "+type);
         }
-        return new Token(value, tt);
+         */
+        return null;
     }
 
     private Uni<CompleteLog> rowToLog(RowIterator<Row> iterator) {
@@ -190,6 +195,7 @@ public class Linking {
     }
 
     public SortedMap<Float, CompleteLog> computeProximityTree(CompleteLog target, List<CompleteLog> logWithinDelta, ReportParameter rp){
+        /*
         TreeMap<Float, CompleteLog> redBlack = new TreeMap<>(Collections.reverseOrder());
         logWithinDelta.forEach(log -> {
             float proximity = 0;
@@ -210,6 +216,8 @@ public class Linking {
             }
         });
         return redBlack;
+         */
+        return new TreeMap<>();
     }
 
     /**

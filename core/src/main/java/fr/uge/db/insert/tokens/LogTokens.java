@@ -17,7 +17,7 @@ public class LogTokens {
     private static final Logger LOGGER = Logger.getGlobal();
     private static final Properties PROPERTIES = new Properties();
 
-    @Incoming(value = "tokensOut")
+    /*@Incoming(value = "tokensOut")
     public Uni<Response> process(JsonObject incoming) {
         var log = incoming.mapTo(Log.class);
         System.out.println(log);
@@ -28,5 +28,5 @@ public class LogTokens {
                         .entity(item)
                         .build()
                 );
-    }
+    }*/
 }
