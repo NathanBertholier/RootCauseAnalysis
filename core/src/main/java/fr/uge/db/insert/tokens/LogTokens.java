@@ -20,6 +20,7 @@ public class LogTokens {
     @Incoming(value = "tokensOut")
     public Uni<Response> process(JsonObject incoming) {
         var log = incoming.mapTo(Log.class);
+        System.out.println(log);
         log.getTokens().forEach(System.out::println);
         return Panache.withTransaction(log::persist)
                 .map(item -> Response

@@ -1,7 +1,7 @@
 package fr.uge.modules.api.endpoint.insertion;
 
 import fr.uge.modules.api.model.entities.RawLog;
-import io.quarkus.hibernate.reactive.panache.PanacheEntityBase;
+import io.quarkus.hibernate.reactive.panache.Panache;
 import io.smallrye.mutiny.Uni;
 import org.eclipse.microprofile.reactive.messaging.Channel;
 import org.eclipse.microprofile.reactive.messaging.Emitter;
@@ -11,6 +11,8 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+import java.net.URI;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -27,11 +29,16 @@ public class InsertLog {
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Uni<Long> insertLog(RawLog input) {
-        System.out.println(input);
-        System.out.println(input.getId());
-        emitter.send(input);
-        return Uni.createFrom().item(input.getId());
+    public Uni<Response> insertLog(RawLog input) {
+        return Panache.<RawLog>withTransaction(input::persist)
+                .map(item -> {
+                    emitter.send(item);
+                    return Response
+                                .created(URI.create("/insertlog/single/"))
+                                .entity(item.id)
+                                .build();
+                        }
+                );
     }
 
 
@@ -39,9 +46,18 @@ public class InsertLog {
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Uni<Long> insertLog(List<RawLog> inputs) {
-        inputs.forEach(this::insertLog);
-        return Uni.createFrom().item(inputs.get(0).getId());
+    public Uni<Response> insertLog(List<RawLog> inputs) {
+        inputs.forEach(input -> Panache.<RawLog>withTransaction(input::persist)
+                .onFailure().invoke(() -> logger.severe("ERROR while inserting in database Rawlog"))
+                .await().indefinitely());
+
+        var response = Response
+                .created(URI.create("/insertlog/batch"));
+        inputs.forEach(input -> {
+            response.entity(input);
+            emitter.send(input);
+        });
+        return Uni.createFrom().item(response.build());
     }
 
 }

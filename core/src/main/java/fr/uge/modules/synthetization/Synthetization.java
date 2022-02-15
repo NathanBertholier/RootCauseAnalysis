@@ -8,7 +8,6 @@ import fr.uge.modules.api.model.ReportResponse;
 import fr.uge.modules.api.model.TokensMostSeen;
 import fr.uge.modules.api.model.CompleteLog;
 import fr.uge.modules.api.model.report.ReportParameter;
-import fr.uge.modules.linking.Linking;
 import fr.uge.modules.linking.token.Token;
 
 import java.io.IOException;
