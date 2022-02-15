@@ -20,13 +20,9 @@ public class Tokenization {
     public Tokens tokenizeLog(long id, String body) {
         Objects.requireNonNull(body);
         // Containing the regex
-        List<TokenType> tokenTypes = new ArrayList<>();
         TypeDate typeDate = new TypeDate();
         TypeTime typeTime = new TypeTime();
-        tokenTypes.add(typeDate);
-        tokenTypes.add(typeTime);
-        tokenTypes.add(new TypeIPv4());
-        tokenTypes.add(new TypeHTTPStatus());
+        List<TokenType> tokenTypes = List.of(typeDate,typeTime,new TypeIPv4(),new TypeHTTPStatus(),new TypeEdgeResponse());
         // Containing the token values
         List<Token> tokens = new ArrayList<>();
 
