@@ -13,8 +13,6 @@ services:
       - "15672:15672"
     volumes:
       - ./DockerVolumes/RabbitMQ/Setup/:/etc/rabbitmq/
-      - ./DockerVolumes/RabbitMQ/Volume/:/var/lib/rabbitmq/
-      - ./DockerVolumes/RabbitMQ/Volume/:/var/log/rabbitmq/
 
   timescale:
     image: timescale/timescaledb:latest-pg12
@@ -40,10 +38,7 @@ services:
     volumes:
       - ./DockerVolumes/Grafana/Setup/provisioning:/etc/grafana/provisioning
       - ./DockerVolumes/Grafana/Setup/dashboards:/var/lib/grafana/dashboards
-    environment:
-      GF_SECURITY_ALLOW_EMBEDDING: "true"
-      GF_AUTH_ANONYMOUS_ENABLED: "true"
-      GF_AUTH_ANONYMOUS_ORG_ROLE: "viewer"
+      - ./DockerVolumes/Grafana/Setup/grafana.ini:/etc/grafana/grafana.ini
 
   rootcause:
     build: .
