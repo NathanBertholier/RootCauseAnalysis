@@ -2,6 +2,7 @@ package fr.uge.modules.api.endpoint.insertion;
 
 import fr.uge.modules.api.model.entities.RawLog;
 import io.quarkus.hibernate.reactive.panache.Panache;
+import io.smallrye.common.annotation.Blocking;
 import io.smallrye.mutiny.Uni;
 import org.eclipse.microprofile.reactive.messaging.Channel;
 import org.eclipse.microprofile.reactive.messaging.Emitter;
@@ -16,9 +17,6 @@ import java.net.URI;
 import java.util.List;
 import java.util.logging.Logger;
 
-/**
- * TODO - Update channels, Unis & Multi returned by processors
- */
 @Path("/insertlog")
 public class InsertLog {
 
@@ -30,8 +28,9 @@ public class InsertLog {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Uni<Response> insertLog(RawLog input) {
-        System.out.println(input);
-        /*return Panache.<RawLog>withTransaction(input::persist)
+        System.out.println("ICI : " + input);
+        logger.info("ICI : " + input);
+        return Panache.<RawLog>withTransaction(input::persist)
                 .map(item -> {
                     emitter.send(item);
                     return Response
@@ -39,8 +38,7 @@ public class InsertLog {
                                 .entity(item.id)
                                 .build();
                         }
-                );*/
-        return Uni.createFrom().item(Response.ok().build());
+                );
     }
 
 
@@ -48,11 +46,13 @@ public class InsertLog {
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
+    @Blocking
     public Uni<Response> insertLog(List<RawLog> inputs) {
         inputs.forEach(input -> Panache.<RawLog>withTransaction(input::persist)
                 .onFailure().invoke(() -> logger.severe("ERROR while inserting in database Rawlog"))
-                .await());
+                .await().indefinitely());
 
+        inputs.forEach(System.out::println);
         var response = Response
                 .created(URI.create("/insertlog/batch"));
         inputs.forEach(input -> {

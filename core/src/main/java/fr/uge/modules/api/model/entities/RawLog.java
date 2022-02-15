@@ -11,6 +11,7 @@ public class RawLog extends PanacheEntityBase {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     public long id;
+
     @Basic
     @Column(name = "value")
     public String log;
