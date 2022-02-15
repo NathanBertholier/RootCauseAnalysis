@@ -18,7 +18,8 @@ public class Report {
     @GET
     @Consumes(APPLICATION_JSON)
     @Produces(APPLICATION_JSON)
-    public Uni<ReportResponse> getReport(@PathParam("id") long idLogTarget, ReportParameter reportParameter) throws SQLException {
+    public Uni<ReportResponse> getReport(@PathParam("id")long idLogTarget,@QueryParam("expanded") boolean expanded,@QueryParam("delta") long delta,@QueryParam("cache") boolean cache,@QueryParam("proximity_limit") float proximity_limit,@QueryParam("network_size") int network_size) throws SQLException {
+        ReportParameter reportParameter = new ReportParameter(expanded, delta, cache, proximity_limit, network_size);
         LOGGER.log(Level.INFO, "Received request for id " +  idLogTarget + " with parameters: " + reportParameter);
         var report = Synthetization.getReport(idLogTarget, reportParameter);
         return Uni.createFrom().item(report);

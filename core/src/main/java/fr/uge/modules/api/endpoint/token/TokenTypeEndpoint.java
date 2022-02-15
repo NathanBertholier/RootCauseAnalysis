@@ -13,14 +13,4 @@ public class TokenTypeEndpoint {
     public Uni<List<TokenTypeEntity>> getTokenTypes() {
         return TokenTypeEntity.listAll();
     }
-
-    private static List<String> getAllTokenTypes(){
-        return List.of(
-                "TypeDate",
-                "TypeDatetime",
-                "TypeIPv4",
-                "TypeIPv6",
-                "TypeTime"
-        );
-    }
 }
