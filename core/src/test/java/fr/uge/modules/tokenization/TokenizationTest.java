@@ -1,14 +1,18 @@
 package fr.uge.modules.tokenization;
 
 import org.junit.jupiter.api.Test;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.sql.*;
 
-class TokenizationTest {
+import static org.junit.jupiter.api.Assertions.*;
 
-    /* private static Connection connection;
+class TokenizationTest {
+    @Test
+    void test() {
+        assertTrue(true);
+    }
+    /*
+    private static Connection connection;
     private Tokenization tokenization = new Tokenization();
    
     static {
@@ -25,7 +29,7 @@ class TokenizationTest {
         PreparedStatement preparedStatement = connection.prepareStatement("SELECT * FROM rawlog");
         final ResultSet resultSet = preparedStatement.executeQuery();
         while (resultSet.next()) {
-            //assertEquals(tokenization.tokenizeLog(resultSet.getString(1)).toString(), resultSet.getString(2));
+            assertEquals(resultSet.getString(2),tokenization.tokenizeLog(1,resultSet.getString(1)).toString());
         }
     }
 
@@ -35,5 +39,5 @@ class TokenizationTest {
             //tokenization.tokenizeLog(null);
         });
     }
-     */
+ */
 }
