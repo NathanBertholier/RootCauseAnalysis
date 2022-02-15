@@ -1,7 +1,6 @@
 package fr.uge.modules.api.endpoint.insertion;
 
 import fr.uge.modules.api.model.entities.RawLog;
-import io.quarkus.hibernate.reactive.panache.Panache;
 import io.quarkus.hibernate.reactive.panache.PanacheEntityBase;
 import io.smallrye.mutiny.Uni;
 import org.eclipse.microprofile.reactive.messaging.Channel;
@@ -12,8 +11,6 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-import java.net.URI;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -34,7 +31,7 @@ public class InsertLog {
         System.out.println(input);
         System.out.println(input.getId());
         emitter.send(input);
-        return PanacheEntityBase.count();
+        return Uni.createFrom().item(input.getId());
     }
 
 
@@ -44,7 +41,7 @@ public class InsertLog {
     @Produces(MediaType.APPLICATION_JSON)
     public Uni<Long> insertLog(List<RawLog> inputs) {
         inputs.forEach(this::insertLog);
-        return PanacheEntityBase.count();
+        return Uni.createFrom().item(inputs.get(0).getId());
     }
 
 }
