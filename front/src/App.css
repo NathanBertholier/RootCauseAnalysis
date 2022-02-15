@@ -29,7 +29,7 @@
 .sidebar .item {
   color: #aaaeba;
   text-decoration: none;
-  padding: 15px 0px;
+  padding: 15px 0;
 }
 
 .item-icon {
@@ -57,7 +57,7 @@
 #content-wrapper {
   width: 80%;
   margin-left: 20%;
-  padding: 0px;
+  padding: 0;
   height: 100vh;
 }
 
@@ -71,7 +71,7 @@
 }
 
 .logTable {
-  margin-bottom: 0px;
+  margin-bottom: 0;
   margin-left: 20px;
   width: calc(100% - 20px);
 }
@@ -108,4 +108,13 @@
 .form-error {
   padding-top: 10px;
   text-align: left;
+}
+
+.react-datetime-picker {
+  padding: 0;
+}
+
+.react-datetime-picker .react-datetime-picker__wrapper {
+  border-radius: 0.25rem;
+  padding: 5px;
 }

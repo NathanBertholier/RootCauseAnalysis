@@ -1,9 +1,9 @@
 import {Sidebar} from "../components/Sidebar";
-import React, {useRef, useState} from "react";
+import React, {useEffect, useRef, useState} from "react";
 import {LogList, default_request} from "../components/LogList";
 import {Button, Col, Container, Dropdown, DropdownButton, Form, FormControl, Row} from "react-bootstrap";
 import { AiOutlineCloseCircle } from "react-icons/ai";
-import {RequestData} from "../types/token.type"
+import {RequestData, Token} from "../types/token.type"
 import {toast} from "../tools/ToastManager";
 import DateTimePicker from 'react-datetime-picker';
 
@@ -14,7 +14,6 @@ type Item = {
     alone: boolean
 }
 
-
 enum Filter {
     START_DATE,
     END_DATE,
@@ -22,7 +21,6 @@ enum Filter {
     STATUS,
     LOG_ID
 }
-
 
 type DateTimeInput = {
     id: number
@@ -40,22 +38,21 @@ type Input = {
     placeholder: string
     patern: string
     error?: string
+    validator: ( field: Field[] ) => void
 }
 
 type Field = DateTimeInput | Input
 
 const default_filter: Item[] = [
-    { id: 1, option: "start_date", text: "date début",     alone: false },
-    { id: 2, option: "end_date",   text: "date fin",       alone: false },
-    { id: 3, option: "token_ip",   text: "ID du token",    alone: false },
-    { id: 4, option: "status",     text: "Status",         alone: false },
-    { id: 5, option: "log_id",     text: "ID du log",      alone: true }
+    { id: Filter.START_DATE,    option: "start_date", text: "date début",     alone: false },
+    { id: Filter.END_DATE,      option: "end_date",   text: "date fin",       alone: false },
+    { id: Filter.TOKEN_IP,      option: "token_ip",   text: "IP du token",    alone: false },
+    { id: Filter.STATUS,        option: "status",     text: "Status",         alone: false },
+    { id: Filter.LOG_ID,        option: "log_id",     text: "ID du log",      alone: true }
 ];
 
 export const Logs = () => {
     // ui
-    const [ startDate, setStartDate]                        = useState(new Date());
-    const [ endDate, setEndDate]                            = useState(new Date());
     const [ isLogIDFilter, setIsLogIDFilter ]               = useState( false );
     const [ isBtnDisabled, setIsBtnDisabled ]               = useState( false );
     const [ hasNumberOfRowError, setHasNumberOfRowError ]   = useState( false );
@@ -66,13 +63,19 @@ export const Logs = () => {
     const [ shouldApplyFilters, setShouldApplyFilters ]     = useState( false );
     const [ requestData, setRequestData ]                   = useState<RequestData>( default_request );
 
-    //const startDateInput    = useRef<HTMLInputElement>(null!);
-    //const endDateInput      = useRef<HTMLInputElement>(null!);
-    const tokenIPInput      = useRef<HTMLInputElement>(null!);
-    const statusInput       = useRef<HTMLInputElement>(null!);
-    const logIDInput        = useRef<HTMLInputElement>(null!);
-    const rowsNumberInput   = useRef<HTMLInputElement>(null!);
+    // input value
+    const [ startDate, setStartDate]    = useState(new Date());
+    const [ endDate, setEndDate]        = useState(new Date());
+    const tokenIPInput                  = useRef<HTMLInputElement>(null!);
+    const statusInput                   = useRef<HTMLInputElement>(null!);
+    const logIDInput                    = useRef<HTMLInputElement>(null!);
+    const rowsNumberInput               = useRef<HTMLInputElement>(null!);
 
+    /******************************************************
+     | Event
+     *****************************************************/
+
+    // Select le mode de filtrage et retire dans la liste de selection de filtre et ajoute sur la list de champs
     const handleSelect = (e:string | null) => {
         setFilters( prevState => {
             if ( e === "log_id" && !isLogIDFilter ) {
@@ -94,29 +97,95 @@ export const Logs = () => {
                 addField( {id: Filter.END_DATE, type: "datetime", label: "date de fin", value: endDate, setter: (date: Date) => setEndDate( date ) } )
                 break;
             case "token_ip":
-                addField( {id: Filter.TOKEN_IP, type: "text", label: "Adresse IP", placeholder: "ajouter une IP", patern: "[0-9]*" } )
+                addField( {id: Filter.TOKEN_IP, type: "text", label: "Adresse IP", placeholder: "ajouter une IP", patern: "\\b((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)(\\.|$)){4}\\b", validator: data => {
+                    let message = "";
+                    if ( tokenIPInput.current !== null && tokenIPInput.current.value === "" ) {
+                        message = "* Le champ 'Adresse IP' est vide";
+                    }
+                    else if (tokenIPInput.current !== null && !tokenIPInput.current.validity.valid) {
+                        message = "* Le champ 'Adresse IP' est incorrect";
+                    }
+                    setErrorMessage( data, Filter.TOKEN_IP, message );
+                }});
                 break;
             case "status":
-                addField( {id: Filter.STATUS, type: "number", label: "Status", placeholder: "", patern: "[0-9]{3}" } )
+                addField( {id: Filter.STATUS, type: "text", label: "Status", placeholder: "", patern: "[0-9][0-9][0-9]", validator: data => {
+                        let message = "";
+                        if ( statusInput.current !== null && statusInput.current.value === "" ) {
+                            message = "* Le champ 'Status' est vide";
+                        }
+                        else if (statusInput.current !== null && !statusInput.current.validity.valid) {
+                            message = "* Le champ 'Status' est incorrect";
+                        }
+                        setErrorMessage( data, Filter.STATUS, message );
+                } } )
                 break;
             case "log_id":
-                addField( {id: Filter.LOG_ID, type: "number", label: "Log ID", placeholder: "", patern: "[0-9]*" } )
+                addField( {id: Filter.LOG_ID, type: "text", label: "Log ID", placeholder: "", patern: "[0-9]*", validator: () => {
+
+                } } )
                 break;
             default:
                 break;
         }
+
+        console.log( uiFields );
     }
 
+    // Supprime le champs et insert dans la liste de selection des filtres
     const handleDeleteField = ( e: number ) => {
         setUiFields( prevState => prevState.filter( f => f.id !== e ) )
 
-        //TODO :: need change
-        /*let item = default_filter.find( item => item.option === e )
+        let item = default_filter.find( item => item.id === e )
         setFilters( prevState => {
             let newArray = [ item as Item,...prevState ]
             return newArray.sort( (x, y) => x.id > y.id ? 1 : -1 )
-        } )*/
+        })
     }
+
+    const applyFilters = () => {
+        setIsBtnDisabled( true );
+
+        if ( !handleValidation() ) {
+            toast.show({
+                content: "Le formulaire contient une ou plusieurs erreurs",
+                duration: 3000,
+            });
+            setIsBtnDisabled( false );
+        }
+
+        let start_datetime : string = (uiFields.find( field => field.id === Filter.START_DATE ) !== undefined) ? getDate( startDate ) : "";
+        let end_datetime : string   = (uiFields.find( field => field.id === Filter.END_DATE ) !== undefined) ? getDate( endDate ) : "";
+        let id_log : number         = logIDInput.current !== null ? parseInt( logIDInput.current.value ) : 0;
+        let rowsNumber : number     = rowsNumberInput.current !== null ? parseInt( rowsNumberInput.current.value ) : 0;
+
+        let tokens: Token[] = [];
+        if ( tokenIPInput.current !== null ) {
+            tokens.push( { token_type: "IP", token_value: tokenIPInput.current.value } );
+        }
+        if ( statusInput.current !== null ) {
+            tokens.push( { token_type: "Status", token_value: statusInput.current.value } );
+        }
+
+        let obj : RequestData = {
+            init_datetime: start_datetime,
+            end_datetime: end_datetime,
+            id: id_log,
+            tokens: tokens,
+            rows: rowsNumber
+        }
+
+        setRequestData( obj );
+        //setShouldApplyFilters( true );
+    }
+
+    const getDate = ( date: Date ) : string => {
+        return date.toISOString( ).split("T")[0] + " " + date.toLocaleTimeString( "fr-FR" );
+    }
+
+    /******************************************************
+     |  fields array
+     *****************************************************/
 
     const addField = ( field: Field ) => {
         setUiFields( prevState => [...prevState, field ] )
@@ -126,6 +195,62 @@ export const Logs = () => {
         setUiFields( _ => [] as Field[] )
         setIsLogIDFilter( logIDFilter );
     }
+
+    const setErrorMessage = ( data: Field[], filterID: Filter, message: string ) => {
+        let newArray = [...data];
+        newArray.map( field => field.error = (field.id === filterID) ? message : field.error );
+        setUiFields( newArray );
+    }
+
+    /******************************************************
+     |  Validation
+     *****************************************************/
+
+    const checkInputIsNumber = ( input :  React.MutableRefObject<HTMLInputElement> ) : boolean => {
+        return !( input.current !== null && ( !input.current.validity.valid || parseInt(input.current.value) <= 0) );
+    }
+
+    const handleValidation = () => {
+        if ( uiFields.length === 0 ) return false;
+        let formIsValid = true;
+
+        if ( isLogIDFilter ) {
+            if ( logIDInput.current === null || logIDInput.current.value === "" ) {
+                formIsValid = false;
+                setErrorMessage( uiFields, Filter.LOG_ID, "* Le champ 'Log ID' doit contenir une valeur" );
+            }
+            else if ( !logIDInput.current.validity.valid ) {
+                formIsValid = false;
+                setErrorMessage( uiFields, Filter.LOG_ID, "* Le champ 'Log ID' ne prend que des nombres" );
+            }
+        }
+        else {
+            console.log( "check status" )
+            if ( !checkInputIsNumber(statusInput) ) {
+                console.log( "set false" );
+                formIsValid = false;
+                setErrorMessage( uiFields, Filter.STATUS, "* Le champ 'Status' ne prend que des nombres à 3 chiffres" );
+            }
+            if ( tokenIPInput.current !== null && !tokenIPInput.current.validity.valid ) {
+                formIsValid = false;
+                setErrorMessage( uiFields, Filter.TOKEN_IP, "* Le champ 'Adresse IP' est incorrect" );
+            }
+        }
+
+        if ( !checkInputIsNumber(rowsNumberInput) ) {
+            formIsValid = false;
+            setHasNumberOfRowError( true );
+        }
+        else {
+            setHasNumberOfRowError( false );
+        }
+
+        return formIsValid;
+    }
+
+    /******************************************************
+     |  HTML
+     *****************************************************/
 
     const getInputRef = ( field: Field ) => {
         switch ( field.id ) {
@@ -140,84 +265,13 @@ export const Logs = () => {
         }
     }
 
-    const getDate = ( date: Date ) : string => {
-        return date.toISOString( ).split("T")[0] + " " + date.toLocaleTimeString( "fr-FR" );
-    }
-
-    const applyFilters = () => {
-        setIsBtnDisabled( true );
-
-        if ( !handleValidation() ) {
-            toast.show({
-                content: "Le formulaire contient une ou plusieurs erreurs",
-                duration: 3000,
-            });
-            setIsBtnDisabled( false );
-            return;
-        }
-
-        //let start_datetime : string = startDateInput.current !== null ? startDateInput.current.value : "";
-        //let end_datetime : string   = endDateInput.current !== null ? endDateInput.current.value : "";
-        let id_log : number         = logIDInput.current !== null ? parseInt( logIDInput.current.value ) : 0;
-        let rowsNumber : number     = rowsNumberInput.current !== null ? parseInt( rowsNumberInput.current.value ) : 0;
-
-        let obj : RequestData = {
-            init_datetime: "start_datetime",
-            end_datetime: "end_datetime",
-            id: id_log,
-            tokens: [
-                {
-                    token_type: "IP",
-                    token_value: "10.16.27.62.244"
-                }
-            ],
-            rows: rowsNumber
-        }
-
-        setRequestData( obj );
-        setShouldApplyFilters( true );
-    }
-    
-    const handleValidation = () => {
-        if ( uiFields.length === 0 ) return false;
-        let formIsValid = true;
-
-        if ( isLogIDFilter ) {
-            if ( logIDInput.current === null || logIDInput.current.value === "" ) {
-                formIsValid = false;
-                setErrorMessage( Filter.LOG_ID, "* Le champ 'Log ID' doit contenir une valeur" );
-            }
-            else if ( !logIDInput.current.validity.valid ) {
-                formIsValid = false;
-                setErrorMessage( Filter.LOG_ID, "* Le champ 'Log ID' ne prend que des nombres" );
-            }
-        }
-        else {
-
-        }
-
-        if ( rowsNumberInput.current !== null && ( !rowsNumberInput.current.validity.valid || parseInt(rowsNumberInput.current.value) <= 0) ) {
-            formIsValid = false;
-            setHasNumberOfRowError( true );
-        }
-        else {
-            setHasNumberOfRowError( false );
-        }
-        
-        return formIsValid;
-    }
-
-    const setErrorMessage = ( filter: Filter, message: string ) => {
-        uiFields.map( field => field.error = field.id === filter ? message : field.error )
-    }
-
     const getInput = ( field: Field ) => {
         if (field.id === Filter.START_DATE || field.id === Filter.END_DATE) {
             let inputField = field as DateTimeInput;
             return <DateTimePicker onChange={inputField.setter} value={ inputField.value } format="yyyy-MM-dd hh:mm:ss a" />
         }
         let inputField = field as Input;
-        return <FormControl ref={ getInputRef( inputField ) } type={ inputField.type } pattern={ inputField.patern } placeholder={inputField.placeholder} />
+        return <FormControl ref={ getInputRef( inputField ) } type={ inputField.type } pattern={ inputField.patern } placeholder={inputField.placeholder} onBlur={ () => inputField.validator( uiFields ) } />
     }
 
     return (
@@ -240,7 +294,7 @@ export const Logs = () => {
                                                             <Col sm={2} className="input-labels" >
                                                                 { field.label }
                                                             </Col>
-                                                            <Col sm={9} className="filter-container">
+                                                            <Col sm={9} className="filter-container" >
                                                                 <Container fluid className="p-0">
                                                                     <Row>
                                                                         { getInput( field ) }
