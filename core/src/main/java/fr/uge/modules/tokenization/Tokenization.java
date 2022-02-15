@@ -1,8 +1,7 @@
 package fr.uge.modules.tokenization;
 
 import fr.uge.modules.api.model.TokenModel;
-import fr.uge.modules.api.model.Tokens;
-import fr.uge.modules.linking.token.Token;
+import fr.uge.modules.api.model.entities.Token;
 import fr.uge.modules.linking.token.type.*;
 import io.quarkus.logging.Log;
 import org.jboss.logging.Logger;
@@ -17,7 +16,7 @@ import java.util.*;
 @ApplicationScoped
 public class Tokenization {
 
-    public Tokens tokenizeLog(long id, String body) {
+    public Token tokenizeLog(long id, String body) {
 /*        Objects.requireNonNull(body);
         // Containing the regex
         List<TokenType> tokenTypes = new ArrayList<>();

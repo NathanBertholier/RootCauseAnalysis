@@ -1,6 +1,6 @@
 package fr.uge.modules.linking.token.type;
 
-import fr.uge.modules.linking.token.Token;
+import fr.uge.modules.api.model.entities.Token;
 
 public class TypeIPv6 implements TokenType{
 
@@ -15,6 +15,11 @@ public class TypeIPv6 implements TokenType{
 
     @Override
     public String getRegex() { return regex; }
+
+    @Override
+    public Integer getTokenTypeId() {
+        return 2;
+    }
 
     public static float cardBetween(String t1, String t2){
         int res = 0;

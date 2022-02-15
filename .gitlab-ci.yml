@@ -42,11 +42,15 @@ perf:
   image: maven:3.8.4-openjdk-17
   stage: quality
   script:
-    - cd core
-    - mvn -Dtest=Perf* test
+    - cd rootcausecore/modules
+    - mkdir report
+    - cd linking_synthetization
+    - mvn -Dtest=PerfTest test | tail -n 12 | head -n 1 > ../report/linking_synthetization.txt
+    - cd ../tokenization
+    - mvn -Dtest=PerfTest test | tail -n 12 | head -n 1 > ../report/tokenization.txt
   artifacts:
     paths:
-      - core/perf.log
+      - rootcausecore/modules/report
   only:
     - schedules
 

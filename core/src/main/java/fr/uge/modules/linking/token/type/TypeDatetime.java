@@ -1,6 +1,6 @@
 package fr.uge.modules.linking.token.type;
 
-import fr.uge.modules.linking.token.Token;
+import fr.uge.modules.api.model.entities.Token;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
@@ -18,6 +18,11 @@ public class TypeDatetime implements TokenType{
     @Override
     public String getRegex() {
         return regex;
+    }
+
+    @Override
+    public Integer getTokenTypeId() {
+        return 4;
     }
 
     @Override

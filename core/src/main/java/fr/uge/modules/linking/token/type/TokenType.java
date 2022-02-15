@@ -1,6 +1,6 @@
 package fr.uge.modules.linking.token.type;
 
-import fr.uge.modules.linking.token.Token;
+import fr.uge.modules.api.model.entities.Token;
 
 import java.util.Optional;
 
@@ -8,6 +8,8 @@ public interface TokenType {
 
     String getName();
     String getRegex();
+    Integer getTokenTypeId();
+    
     float computeProximity(Token t1, Token t2);
 
     static Optional<TokenType> fromTokenTypeId(int tokentypeId){
