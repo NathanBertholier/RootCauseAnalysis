@@ -8,9 +8,9 @@ import java.sql.*;
 
 class TokenizationTest {
 
-    private static Connection connection;
+    /* private static Connection connection;
     private Tokenization tokenization = new Tokenization();
-    /*
+   
     static {
         try {
             connection = DriverManager.getConnection("jdbc:h2:mem:test;INIT=RUNSCRIPT FROM 'src/test/resources/lightdata.sql'");
@@ -18,7 +18,7 @@ class TokenizationTest {
             e.printStackTrace();
         }
     }
-     */
+    
 
     @Test
     void tokenization() throws SQLException {
@@ -35,5 +35,5 @@ class TokenizationTest {
             //tokenization.tokenizeLog(null);
         });
     }
-
+     */
 }
