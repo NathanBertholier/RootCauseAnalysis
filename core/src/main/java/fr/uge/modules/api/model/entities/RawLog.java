@@ -6,12 +6,12 @@ import javax.persistence.*;
 import java.util.Objects;
 
 @Entity
-//@Table(name = "rawlog", schema = "public", catalog = "rootcause")
 public class RawLog extends PanacheEntityBase {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     public long id;
+
     @Basic
     @Column(name = "value")
     public String log;

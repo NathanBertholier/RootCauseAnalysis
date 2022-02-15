@@ -8,7 +8,6 @@ import io.smallrye.mutiny.Uni;
 
 import java.sql.Timestamp;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class TokenRetriever {
     public static Uni<List<Log>> getTokens(TokenRequest tokenRequest){
