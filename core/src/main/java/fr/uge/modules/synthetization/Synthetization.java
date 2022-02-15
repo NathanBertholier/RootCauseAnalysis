@@ -32,6 +32,7 @@ public class Synthetization {
     }
 
     public static ReportResponse getReport(long rootlog, ReportParameter reportParameter) throws SQLException {
+        /*
         Linking l = new Linking("jdbc:postgresql://" +
                 PROPERTIES.getProperty("DBSRV") +
                 ":5432/" +
@@ -44,6 +45,8 @@ public class Synthetization {
         var rootLog = l.getTarget();
         var map = l.getTree();
         return new ReportResponse(new CompleteLog(rootLog.getId(), rootLog.getContent(), rootLog.getDatetime(), rootLog.getTokens()), getTokens(map), getLogs(map));
+         */
+        return null;
     }
 
     private static TokensMostSeen[] getTokens(SortedMap<Float, CompleteLog> map) {
