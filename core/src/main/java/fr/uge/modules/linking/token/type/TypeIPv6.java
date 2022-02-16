@@ -18,16 +18,9 @@ public class TypeIPv6 implements TokenType{
 
     @Override
     public Integer getTokenTypeId() {
-        return 2;
+        return TokenTypeId.ID_IPV6;
     }
 
-    @Override
-    public int matcher(String word) {
-        if(word.matches(regex)){
-            return TokenTypeId.ID_IPV6;
-        }
-        return -1;
-    }
 
     public static float cardBetween(String t1, String t2){
         int res = 0;

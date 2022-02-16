@@ -21,15 +21,7 @@ public class TypeTime implements TokenType{
 
     @Override
     public Integer getTokenTypeId() {
-        return 1;
-    }
-
-    @Override
-    public int matcher(String word) {
-        if(word.matches(regex)){
-            return TokenTypeId.ID_IPV4;
-        }
-        return -1;
+        return 0;
     }
 
     @Override

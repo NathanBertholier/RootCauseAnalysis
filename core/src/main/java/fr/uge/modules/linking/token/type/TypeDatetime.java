@@ -22,15 +22,7 @@ public class TypeDatetime implements TokenType{
 
     @Override
     public Integer getTokenTypeId() {
-        return 4;
-    }
-
-    @Override
-    public int matcher(String word) {
-        if(word.matches(regex)){
-            return 0;
-        }
-        return -1;
+        return TokenTypeId.ID_DATETIME;
     }
 
     @Override

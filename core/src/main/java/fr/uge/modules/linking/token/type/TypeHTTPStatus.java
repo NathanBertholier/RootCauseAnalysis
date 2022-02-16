@@ -19,15 +19,7 @@ public class TypeHTTPStatus implements TokenType{
 
     @Override
     public Integer getTokenTypeId() {
-        return 3;
-    }
-
-    @Override
-    public int matcher(String word) {
-        if(word.matches(regex)){
-            return TokenTypeId.ID_STATUS;
-        }
-        return -1;
+        return TokenTypeId.ID_STATUS;
     }
 
     @Override

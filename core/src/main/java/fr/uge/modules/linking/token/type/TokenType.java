@@ -10,7 +10,12 @@ public interface TokenType {
     String getRegex();
     Integer getTokenTypeId();
 
-    int matcher(String word);
+    default int matcher(String word){
+        if(word.matches(getRegex())){
+            return getTokenTypeId();
+        }
+        return -1;
+    }
 
     float computeProximity(TokenModel t1, TokenModel t2);
 

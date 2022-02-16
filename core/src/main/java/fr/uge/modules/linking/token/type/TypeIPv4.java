@@ -18,16 +18,8 @@ public class TypeIPv4 implements TokenType {
     public String getRegex() { return regex; }
 
     @Override
-    public int matcher(String word){
-        if(word.matches(regex)){
-            return TokenTypeId.ID_IPV4;
-        }
-        return -1;
-    }
-
-    @Override
     public Integer getTokenTypeId() {
-        return 1;
+        return TokenTypeId.ID_IPV4;
     }
 
     public static float cardBetween(String t1, String t2){
