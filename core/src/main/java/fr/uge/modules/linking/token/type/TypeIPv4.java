@@ -22,7 +22,7 @@ public class TypeIPv4 implements TokenType {
         return TokenTypeId.ID_IPV4.getId();
     }
 
-    public static float cardBetween(String t1, String t2){
+    private static float cardBetween(String t1, String t2){
         int res = 0;
         for(int i = 0; i < Math.min(t1.length(),t2.length()); i++){
             if(t1.charAt(i) == t2.charAt(i))
@@ -31,7 +31,7 @@ public class TypeIPv4 implements TokenType {
         return res;
     }
 
-    public static float jaccard(String t1, String t2){
+    private static float jaccard(String t1, String t2){
         return (cardBetween(t1, t2) / t1.length()) * 100;
     }
 
