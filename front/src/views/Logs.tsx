@@ -1,5 +1,5 @@
 import {Sidebar} from "../components/Sidebar";
-import React, {useEffect, useRef, useState} from "react";
+import React, { useRef, useState} from "react";
 import {LogList, default_request} from "../components/LogList";
 import {Button, Col, Container, Dropdown, DropdownButton, Form, FormControl, Row} from "react-bootstrap";
 import { AiOutlineCloseCircle } from "react-icons/ai";
@@ -55,7 +55,7 @@ export const Logs = () => {
     // ui
     const [ isLogIDFilter, setIsLogIDFilter ]               = useState( false );
     const [ isBtnDisabled, setIsBtnDisabled ]               = useState( false );
-    const [ hasNumberOfRowError, setHasNumberOfRowError ]   = useState( false );
+    const [ rowInputError, setRowInputError ]               = useState( "" );
     const [ uiFields, setUiFields ]                         = useState<Field[]>( [] );
     const [ filters, setFilters ]                           = useState<Item[]>( default_filter );
 
@@ -75,20 +75,21 @@ export const Logs = () => {
      | Event
      *****************************************************/
 
-    // Select le mode de filtrage et retire dans la liste de selection de filtre et ajoute sur la list de champs
+    // Select le mode de filtrage et retire dans la liste de selection de filtre et ajoute sur la liste des champs
     const handleSelect = (e:string | null) => {
         setFilters( prevState => {
             if ( e === "log_id" && !isLogIDFilter ) {
                 prevState = default_filter
-                resetFilters( true );
+                resetUIFields( true );
             }
             else if ( isLogIDFilter ) {
                 prevState = default_filter
-                resetFilters( false );
+                resetUIFields( false );
             }
             return prevState.filter(f => f.option !== e);
         } )
 
+        // ajoute sur la liste des champs
         switch ( e ) {
             case "start_date":
                 addField( {id: Filter.START_DATE, type: "datetime", label: "date de début", value: startDate, setter: (date: Date) => setStartDate( date ) } )
@@ -121,15 +122,20 @@ export const Logs = () => {
                 } } )
                 break;
             case "log_id":
-                addField( {id: Filter.LOG_ID, type: "text", label: "Log ID", placeholder: "", patern: "[0-9]*", validator: () => {
-
+                addField( {id: Filter.LOG_ID, type: "text", label: "Log ID", placeholder: "", patern: "[0-9]*", validator: data => {
+                        let message = "";
+                        if ( logIDInput.current !== null && logIDInput.current.value === "" ) {
+                            message = "* Le champ 'Log ID' est vide";
+                        }
+                        else if (logIDInput.current !== null && !logIDInput.current.validity.valid) {
+                            message = "* Le champ 'Log ID' est incorrect";
+                        }
+                        setErrorMessage( data, Filter.LOG_ID, message );
                 } } )
                 break;
             default:
                 break;
         }
-
-        console.log( uiFields );
     }
 
     // Supprime le champs et insert dans la liste de selection des filtres
@@ -143,6 +149,7 @@ export const Logs = () => {
         })
     }
 
+    // verifie les champs, construit le json pour l'API et met a jour la liste de log
     const applyFilters = () => {
         setIsBtnDisabled( true );
 
@@ -152,6 +159,7 @@ export const Logs = () => {
                 duration: 3000,
             });
             setIsBtnDisabled( false );
+            return;
         }
 
         let start_datetime : string = (uiFields.find( field => field.id === Filter.START_DATE ) !== undefined) ? getDate( startDate ) : "";
@@ -176,42 +184,58 @@ export const Logs = () => {
         }
 
         setRequestData( obj );
-        //setShouldApplyFilters( true );
+        setShouldApplyFilters( true );
     }
 
-    const getDate = ( date: Date ) : string => {
-        return date.toISOString( ).split("T")[0] + " " + date.toLocaleTimeString( "fr-FR" );
+    // check rows Input is valid
+    const onRowsInputFocusOut = () : boolean => {
+        if ( checkIsEmpty(rowsNumberInput) ) {
+            setRowInputError( "* Le champ 'Nombre de ligne' est vide" );
+            return false;
+        }
+        else if ( checkIsNotValid(rowsNumberInput) ) {
+            setRowInputError( "* Le champ 'Nombre de ligne' doit être compris entre 1 et 100" );
+            return false
+        }
+        setRowInputError( "" );
+        return true;
     }
 
     /******************************************************
-     |  fields array
+     |  fields & filters array
      *****************************************************/
 
+    // Ajout dans la liste des champs
     const addField = ( field: Field ) => {
         setUiFields( prevState => [...prevState, field ] )
     }
 
-    const resetFilters = ( logIDFilter: boolean ) => {
-        setUiFields( _ => [] as Field[] )
-        setIsLogIDFilter( logIDFilter );
-    }
-
+    // set l'erreur pour un champs spécifique
     const setErrorMessage = ( data: Field[], filterID: Filter, message: string ) => {
         let newArray = [...data];
         newArray.map( field => field.error = (field.id === filterID) ? message : field.error );
         setUiFields( newArray );
     }
 
+    // remise à zéro de la liste des champs
+    const resetUIFields = ( logIDFilter: boolean ) => {
+        setUiFields( _ => [] as Field[] )
+        setIsLogIDFilter( logIDFilter );
+    }
+
     /******************************************************
      |  Validation
      *****************************************************/
 
-    const checkInputIsNumber = ( input :  React.MutableRefObject<HTMLInputElement> ) : boolean => {
-        return !( input.current !== null && ( !input.current.validity.valid || parseInt(input.current.value) <= 0) );
+    const checkIsEmpty = ( input :  React.MutableRefObject<HTMLInputElement> ) : boolean => {
+        return input.current !== null && input.current.value === "";
+    }
+
+    const checkIsNotValid = (input :  React.MutableRefObject<HTMLInputElement>) : boolean => {
+        return input.current !== null && !input.current.validity.valid;
     }
 
     const handleValidation = () => {
-        if ( uiFields.length === 0 ) return false;
         let formIsValid = true;
 
         if ( isLogIDFilter ) {
@@ -225,31 +249,45 @@ export const Logs = () => {
             }
         }
         else {
-            console.log( "check status" )
-            if ( !checkInputIsNumber(statusInput) ) {
-                console.log( "set false" );
+            // STATUS
+            if ( checkIsEmpty(statusInput) ) {
+                formIsValid = false;
+                setErrorMessage( uiFields, Filter.STATUS, "* Le champ 'Status' est vide" );
+            }
+            else if ( checkIsNotValid( statusInput ) ) {
                 formIsValid = false;
                 setErrorMessage( uiFields, Filter.STATUS, "* Le champ 'Status' ne prend que des nombres à 3 chiffres" );
             }
-            if ( tokenIPInput.current !== null && !tokenIPInput.current.validity.valid ) {
+
+            // IP - v4
+            if ( checkIsEmpty(tokenIPInput) ) {
+                formIsValid = false;
+                setErrorMessage( uiFields, Filter.TOKEN_IP, "* Le champ 'Adresse IP' est vide" );
+            }
+            else if ( checkIsNotValid(tokenIPInput) ) {
                 formIsValid = false;
                 setErrorMessage( uiFields, Filter.TOKEN_IP, "* Le champ 'Adresse IP' est incorrect" );
             }
         }
 
-        if ( !checkInputIsNumber(rowsNumberInput) ) {
+        if ( !onRowsInputFocusOut() ) {
             formIsValid = false;
-            setHasNumberOfRowError( true );
-        }
-        else {
-            setHasNumberOfRowError( false );
         }
 
         return formIsValid;
     }
 
     /******************************************************
-     |  HTML
+     | Tools
+     *****************************************************/
+
+    // recupere la date en format YY-MM-DD hh:mm:ss
+    const getDate = ( date: Date ) : string => {
+        return date.toISOString( ).split("T")[0] + " " + date.toLocaleTimeString( "fr-FR" );
+    }
+
+    /******************************************************
+     |  View
      *****************************************************/
 
     const getInputRef = ( field: Field ) => {
@@ -338,12 +376,12 @@ export const Logs = () => {
                                     <Row>
                                         <Col>
                                             <Form.Text className="text-muted">Nombre de ligne :</Form.Text>
-                                            <Form.Control ref={rowsNumberInput} type="number" className="custom-input"  min="1" />
+                                            <Form.Control ref={rowsNumberInput} type="text" className="custom-input" pattern="^[1-9][0-9]?$|^100$" onBlur={ onRowsInputFocusOut } defaultValue="30" />
                                             <Button className={`custom-filter-btn ${isBtnDisabled ? "disabled" : ""}`} variant="outline-primary" onClick={ () => applyFilters() } disabled={ isBtnDisabled } >Valider</Button>
                                         </Col>
                                     </Row>
-                                    <Row className={ hasNumberOfRowError ? "" : "d-none" } >
-                                        <div className="error" >* Le champ 'Log ID' ne prend que des nombres</div>
+                                    <Row className={ rowInputError !== "" ? "" : "d-none" } >
+                                        <div className="error" >{ rowInputError }</div>
                                     </Row>
                                 </Container>
                             </Col>
