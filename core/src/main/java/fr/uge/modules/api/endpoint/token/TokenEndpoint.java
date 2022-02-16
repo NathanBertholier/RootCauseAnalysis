@@ -18,11 +18,6 @@ public class TokenEndpoint {
 
     @POST
     public Uni<TokensResponse> getTokens(TokenRequest tokenRequest){
-        var builder = new StringBuilder();
-        builder.append("TokenRequest: ").append(tokenRequest);
-
         return TokenRetriever.fromLogs(TokenRetriever.getTokens(tokenRequest));
     }
-
-
 }
