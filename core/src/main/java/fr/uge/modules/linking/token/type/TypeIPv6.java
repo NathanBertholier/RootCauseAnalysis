@@ -4,47 +4,29 @@ import fr.uge.modules.api.model.TokenModel;
 
 public class TypeIPv6 implements TokenType{
 
-    private final String name = "ipv6";
+    private static final String NAME = "ipv6";
     //format sans compression : "^(?:[0-9a-fA-F]{1,4}:){7}[0-9a-fA-F]{1,4}$"
-    private final String regex = "^((?:[0-9A-Fa-f]{1,4}(?::[0-9A-Fa-f]{1,4})*)?)::((?:[0-9A-Fa-f]{1,4}(?::[0-9A-Fa-f]{1,4})*)?)$";
+    private static final String REGEX = "(([0-9a-fA-F]{1,4}:){7,7}[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,7}:|([0-9a-fA-F]{1,4}:){1,6}:[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,5}(:[0-9a-fA-F]{1,4}){1,2}|([0-9a-fA-F]{1,4}:){1,4}(:[0-9a-fA-F]{1,4}){1,3}|([0-9a-fA-F]{1,4}:){1,3}(:[0-9a-fA-F]{1,4}){1,4}|([0-9a-fA-F]{1,4}:){1,2}(:[0-9a-fA-F]{1,4}){1,5}|[0-9a-fA-F]{1,4}:((:[0-9a-fA-F]{1,4}){1,6})|:((:[0-9a-fA-F]{1,4}){1,7}|:)|fe80:(:[0-9a-fA-F]{0,4}){0,4}%[0-9a-zA-Z]{1,}|::(ffff(:0{1,4}){0,1}:){0,1}((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\\.){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])|([0-9a-fA-F]{1,4}:){1,4}:((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\\.){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9]))";
 
     @Override
     public String getName() {
-        return name;
+        return NAME;
     }
 
     @Override
-    public String getRegex() { return regex; }
+    public String getRegex() { return REGEX; }
 
     @Override
     public Integer getTokenTypeId() {
-        return 2;
-    }
-
-    @Override
-    public int matcher(String word) {
-        if(word.matches(regex)){
-            return TokenTypeId.ID_IPV6;
-        }
-        return -1;
-    }
-
-    public static float cardBetween(String t1, String t2){
-        int res = 0;
-        for(int i = 0; i < Math.min(t1.length(),t2.length()); i++){
-            if(t1.charAt(i) == t2.charAt(i))
-                res++;
-        }
-        return res;
-    }
-
-    public static float jaccard(String t1, String t2){
-        return (cardBetween(t1, t2) / t1.length()) * 100;
+        return TokenTypeId.ID_IPV6.getId();
     }
 
     @Override
     public float computeProximity(TokenModel t1, TokenModel t2) {
-        return jaccard(t1.token_value(), t2.token_value());
+        if(t1.token_value().equals(t2.token_value())){
+            return 100;
+        }
+        return 0;
     }
 
 }

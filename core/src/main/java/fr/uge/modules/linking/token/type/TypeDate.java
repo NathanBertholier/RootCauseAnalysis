@@ -4,30 +4,22 @@ import fr.uge.modules.api.model.TokenModel;
 
 public class TypeDate implements TokenType{
 
-    private final String name = "date";
-    private final String regex = "((19|2[0-9])[0-9]{2})-(0[1-9]|1[012])-(0[1-9]|[12][0-9]|3[01])";
+    private static final String NAME = "date";
+    private static final String REGEX = "([0-9]{4})-(0[1-9]|1[012])-(0[1-9]|[12][0-9]|3[01])";
 
     @Override
     public String getName() {
-        return name;
+        return NAME;
     }
 
     @Override
     public String getRegex() {
-        return regex;
+        return REGEX;
     }
 
     @Override
     public Integer getTokenTypeId() {
-        return 1;
-    }
-
-    @Override
-    public int matcher(String word) {
-        if(word.matches(regex)){
-            return 0;
-        }
-        return -1;
+        return 0;
     }
 
     @Override
