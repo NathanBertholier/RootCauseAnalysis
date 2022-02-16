@@ -1,9 +1,13 @@
 import http from "../http-common"
-import { ResponseData, RequestData } from "../types/token.type"
+import {TokensRequest} from "../types/TokensRequest";
 
 class DataService {
-    getAll( request: RequestData ) {
-        return http.post<Array<ResponseData>>("/tokens", request );
+    getAll( request: TokensRequest ) {
+        return http.post("/tokens", request );
+    }
+
+    getTokenTypes() {
+        return http.get( "/tokentypes" );
     }
 }
 export default new DataService();

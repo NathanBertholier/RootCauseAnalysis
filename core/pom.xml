@@ -85,6 +85,16 @@
             <scope>test</scope>
         </dependency>
         <dependency>
+            <groupId>io.quarkus</groupId>
+            <artifactId>quarkus-junit5</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.rest-assured</groupId>
+            <artifactId>rest-assured</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter</artifactId>
             <version>5.8.2</version>
@@ -121,7 +131,8 @@
                 <version>3.0.0-M5</version>
                 <configuration>
                     <excludes>
-                        <exclude>Perf*</exclude>
+                        <exclude>fr.uge.modules.tokenization.PerfTokenizationTest</exclude>
+                        <exclude>fr.uge.modules.api.*.java</exclude>
                     </excludes>
                 </configuration>
             </plugin>
