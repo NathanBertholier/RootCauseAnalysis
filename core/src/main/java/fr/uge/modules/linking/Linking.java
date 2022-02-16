@@ -9,42 +9,40 @@ import fr.uge.modules.linking.token.type.TokenType;
 import fr.uge.modules.linking.token.type.TypeDatetime;
 import fr.uge.modules.linking.token.type.TypeHTTPStatus;
 import fr.uge.modules.linking.token.type.TypeIPv4;
+import io.quarkus.runtime.annotations.QuarkusMain;
 import io.smallrye.mutiny.Uni;
 import io.vertx.mutiny.sqlclient.Row;
 import io.vertx.mutiny.sqlclient.RowIterator;
 
 import java.sql.*;
 import java.time.Duration;
-import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.concurrent.ExecutionException;
-import java.util.function.BiFunction;
-import java.util.function.Function;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class Linking {
-
-    private static final String TYPE_DATE = "Datetime";
-    private static final String TYPE_IPV4 = "IPv4";
-    private static final String TYPE_STATUT = "Statut";
-    private static final String IDTOKENTYPE = "idtokentype";
-    private static final String VALUE = "value";
-
     private final Logger logger = Logger.getLogger(this.getClass().getName());
 
     private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-    private final List<TokenType> tokenTypes = new ArrayList<>(); //Token Types to considerate
-    private List<LogEntity> logs; //Logs coming from target time to target time less delta
+    private final HashMap<Integer, TokenType> tokensType = new HashMap<>();
+    private List<LogEntity> logs = new ArrayList<>(); //Logs coming from target time to target time less delta
     private SortedMap<Float, LogEntity> tree;
     private CompleteLog target;
 
+    public static void main(String[] args) {
+        var link = new Linking();
+        link.link(58, new ReportParameter(false, 86400, false, 0, 15));
+    }
 
     public Linking() {
-        tokenTypes.add(new TypeDatetime());
-        tokenTypes.add(new TypeHTTPStatus());
-        tokenTypes.add(new TypeIPv4());
+        this.addInTokensType(TokenType.TokenTypeId.ID_IPV4.getId(), new TypeIPv4());
+        this.addInTokensType(TokenType.TokenTypeId.ID_STATUS.getId(), new TypeHTTPStatus());
+    }
+
+    private void addInTokensType(Integer id, TokenType tokenType) {
+        tokensType.compute(id, (k,v) -> tokenType);
     }
 
     public void link(long id, ReportParameter rp) {
@@ -60,11 +58,8 @@ public class Linking {
             logger.log(Level.INFO,() -> "Log target : " + target + "\n");
             var datetime = log.getDatetime();
             //Get the list of logs within the delta
-            logs = LogEntity.<LogEntity>find("id != ?1 and datetime between ?2 and ?3",
-                    id,
-                    datetime,
-                    Timestamp.valueOf(datetime.toLocalDateTime().minus(Duration.ofSeconds(rp.delta()))))
-                    .list().subscribeAsCompletionStage().get();
+            logs = new ArrayList<>(LogEntity.<LogEntity>find("id != ?1 and datetime between ?2 and ?3", id, datetime, Timestamp.valueOf(datetime.toLocalDateTime().minus(Duration.ofSeconds(rp.delta()))))
+                    .list().subscribeAsCompletionStage().get());
             logs.forEach(System.out::println);
 
             tree = computeProximityTree(target, logs, rp);
@@ -114,24 +109,27 @@ public class Linking {
         TreeMap<Float, LogEntity> redBlack = new TreeMap<>(Collections.reverseOrder());
 
         var targetDatetime = logTarget.getDatetime();
-        HashMap<Integer, TokenType> tokensType = new HashMap<>();
 
         HashMap<Integer, List<TokenEntity>> tokenTarget = new HashMap<>();
         fillHashmap(logTarget.getTokens(), tokenTarget);
 
         var delta = rp.delta();
+
         HashMap<Integer, List<TokenEntity>> tokenToLink = new HashMap<>();
         logWithinDelta.forEach(log -> {
-            float proximity = 0;
-            float tmp = TypeDatetime.computeDateTimeProximity(log.getDatetime().toLocalDateTime(), logTarget.getDatetime(), rp.delta());
-            proximity += tmp;
+            float proximity = TypeDatetime.computeDateTimeProximity(log.getDatetime().toLocalDateTime(), targetDatetime, delta);
+            System.out.println("Proximity  : " + proximity);
             fillHashmap(log.getTokens(), tokenToLink);
 
-            tokenTarget.keySet().stream()
-                    .map((k) -> tokensType.get(k)
+            proximity += (float) tokenTarget.keySet().stream()
+                    .mapToDouble((k) -> tokensType.get(k)
                             .computeProximity(tokenTarget.get(k),
-                    tokenToLink.get(k)));
+                    tokenToLink.get(k))).sum();
+
+            System.out.println("SUM " + proximity);
             proximity /= tokenTarget.size();// NUMBER OF TOKENS CONSIDERATE
+
+            System.out.println("TOTAL " + proximity);
             if(redBlack.size() > rp.network_size() - 1) {
                 if (proximity > redBlack.lastKey()) {
                     redBlack.pollLastEntry();
@@ -140,6 +138,7 @@ public class Linking {
             } else {
                 redBlack.put(proximity, log);
             }
+            tokenToLink.clear();
         });
         return redBlack;
     }
@@ -154,9 +153,9 @@ public class Linking {
     public String computeLinks(long id1, long id2) {
         StringBuilder sb = new StringBuilder();
         sb.append("{");
-        for (TokenType tt : tokenTypes) {
+        /*for (TokenType tt : tokenTypes) {
             sb.append(tt.getName()).append(" : ");
-        }
+        }*/
         sb.append("}");
         return sb.toString();
     }
