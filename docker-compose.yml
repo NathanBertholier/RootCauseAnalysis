@@ -45,7 +45,7 @@ services:
     container_name: "RootCause"
     restart: always
     ports:
-      - "8080:8080"
+      - "8081:8081"
     depends_on:
           - "rabbitmq"
     networks:
