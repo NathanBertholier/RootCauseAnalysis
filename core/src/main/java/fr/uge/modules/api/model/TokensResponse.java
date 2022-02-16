@@ -17,7 +17,7 @@ public record TokensResponse(CompleteLog[] logDemonstrators) {
     @Override
     public String toString() {
         return "TokensResponse{" +
-                "logDemonstrators=" + Arrays.toString(logDemonstrators) +
+                "dd=" + Arrays.toString(logDemonstrators) +
                 '}';
     }
 }
