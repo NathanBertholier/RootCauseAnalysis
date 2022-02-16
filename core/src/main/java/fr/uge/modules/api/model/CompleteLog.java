@@ -1,6 +1,6 @@
 package fr.uge.modules.api.model;
 
-import fr.uge.modules.api.model.entities.Token;
+import fr.uge.modules.api.model.entities.TokenEntity;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -10,20 +10,20 @@ public class CompleteLog {
     private final long id;
     private final LocalDateTime datetime;
     private String content;
-    private final ArrayList<Token> tokens = new ArrayList<>();
+    private final ArrayList<TokenEntity> tokens = new ArrayList<>();
 
-    public CompleteLog(long id, LocalDateTime ldt, List<Token> tokenSet) {
+    public CompleteLog(long id, LocalDateTime ldt, List<TokenEntity> tokenSet) {
         this(id, "", ldt, tokenSet);
     }
 
-    public CompleteLog(long id, String content, LocalDateTime ldt, List<Token> tokenSet) {
+    public CompleteLog(long id, String content, LocalDateTime ldt, List<TokenEntity> tokenSet) {
         this.content = content;
         this.id = id;
         this.datetime = ldt;
         tokens.addAll(tokenSet);
     }
 
-    public ArrayList<Token> getTokens() {
+    public ArrayList<TokenEntity> getTokens() {
         return tokens;
     }
 
@@ -45,7 +45,7 @@ public class CompleteLog {
         sb.append("Log : ").append(id).append(" {\n");
         sb.append("DateTime : ").append(datetime).append("\n");
         sb.append("Tokens : \n");
-        for(Token token : tokens){
+        for(TokenEntity token : tokens){
             sb.append("\t").append(token).append("\n");
         }
         sb.append(" }");
