@@ -1,6 +1,6 @@
 package fr.uge.modules.api.endpoint.insertion;
 
-import fr.uge.modules.api.model.entities.RawLog;
+import fr.uge.modules.api.model.entities.RawLogEntity;
 import io.quarkus.hibernate.reactive.panache.Panache;
 import io.smallrye.common.annotation.Blocking;
 import io.smallrye.mutiny.Uni;
@@ -21,14 +21,14 @@ import java.util.logging.Logger;
 public class InsertBatchLog {
 
     private static final Logger logger = Logger.getGlobal();
-    @Channel("logs") Emitter<RawLog> emitter;
+    @Channel("logs") Emitter<RawLogEntity> emitter;
 
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     @Blocking
-    public Uni<Response> insertLog(List<RawLog> inputs) {
-        inputs.forEach(input -> Panache.<RawLog>withTransaction(input::persist)
+    public Uni<Response> insertLog(List<RawLogEntity> inputs) {
+        inputs.forEach(input -> Panache.<RawLogEntity>withTransaction(input::persist)
                 .onFailure().invoke(() -> logger.severe("ERROR while inserting in database Rawlog"))
                 .await().indefinitely());
 

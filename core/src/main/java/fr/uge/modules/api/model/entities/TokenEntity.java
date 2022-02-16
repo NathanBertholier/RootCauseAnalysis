@@ -1,14 +1,12 @@
 package fr.uge.modules.api.model.entities;
 
-import fr.uge.modules.linking.token.type.TokenType;
 import io.quarkus.hibernate.reactive.panache.PanacheEntityBase;
 
 import javax.persistence.*;
-import java.util.Objects;
 
 @Entity
 @Table(name = "token", schema = "public", catalog = "rootcause")
-public class Token extends PanacheEntityBase {
+public class TokenEntity extends PanacheEntityBase {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Id
     @Column(name = "id")

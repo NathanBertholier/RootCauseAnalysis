@@ -10,7 +10,7 @@ import java.util.Objects;
 
 @Entity
 //@Table(name = "log", schema = "public", catalog = "rootcause")
-public class Log extends PanacheEntityBase {
+public class LogEntity extends PanacheEntityBase {
     @Id
     @Column(name = "id")
     public long id;
@@ -21,7 +21,7 @@ public class Log extends PanacheEntityBase {
 
     @OneToMany(cascade = CascadeType.ALL)
     @JoinColumn(name = "idlog")
-    public List<Token> tokens;
+    public List<TokenEntity> tokens;
 
     public long getId() {
         return id;
@@ -35,7 +35,7 @@ public class Log extends PanacheEntityBase {
         return datetime;
     }
 
-    public List<Token> getTokens() {
+    public List<TokenEntity> getTokens() {
         return this.tokens;
     }
 
@@ -47,7 +47,7 @@ public class Log extends PanacheEntityBase {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        Log logEntity = (Log) o;
+        LogEntity logEntity = (LogEntity) o;
         return id == logEntity.id && Objects.equals(datetime, logEntity.datetime);
     }
 
@@ -66,8 +66,8 @@ public class Log extends PanacheEntityBase {
     }
 
     // Partiel pour le moment
-    public static Uni<List<Log>> retrieveLogs(long logId, Timestamp start, Timestamp end, int rows){
-        return Log
+    public static Uni<List<LogEntity>> retrieveLogs(long logId, Timestamp start, Timestamp end, int rows){
+        return LogEntity
                 .find("id = ?1 and datetime between ?2 and ?3", logId, start, end)
                 .range(0, rows).list();
     }
