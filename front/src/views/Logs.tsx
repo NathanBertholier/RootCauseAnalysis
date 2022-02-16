@@ -1,11 +1,13 @@
 import {Sidebar} from "../components/Sidebar";
-import React, { useRef, useState} from "react";
+import React, {useEffect, useRef, useState} from "react";
 import {LogList, default_request} from "../components/LogList";
 import {Button, Col, Container, Dropdown, DropdownButton, Form, FormControl, Row} from "react-bootstrap";
 import { AiOutlineCloseCircle } from "react-icons/ai";
-import {RequestData, Token} from "../types/token.type"
 import {toast} from "../tools/ToastManager";
 import DateTimePicker from 'react-datetime-picker';
+import DataService from "../services/DataService";
+import {TokensRequest} from "../types/TokensRequest";
+import {TokensResponse} from "../types/TokensResponse";
 
 type Item = {
     id: number
@@ -52,6 +54,7 @@ const default_filter: Item[] = [
 ];
 
 export const Logs = () => {
+    const [ DEFAULT_FILTERS, setDEFAULT_FILTERS ]           = useState<Item[]>( [] );
     // ui
     const [ isLogIDFilter, setIsLogIDFilter ]               = useState( false );
     const [ isBtnDisabled, setIsBtnDisabled ]               = useState( false );
@@ -61,7 +64,7 @@ export const Logs = () => {
 
     // event
     const [ shouldApplyFilters, setShouldApplyFilters ]     = useState( false );
-    const [ requestData, setRequestData ]                   = useState<RequestData>( default_request );
+    const [ requestData, setRequestData ]                   = useState<TokensRequest>( default_request );
 
     // input value
     const [ startDate, setStartDate]    = useState(new Date());
@@ -167,15 +170,14 @@ export const Logs = () => {
         let id_log : number         = logIDInput.current !== null ? parseInt( logIDInput.current.value ) : 0;
         let rowsNumber : number     = rowsNumberInput.current !== null ? parseInt( rowsNumberInput.current.value ) : 0;
 
-        let tokens: Token[] = [];
+        /*let tokens: Token[] = [];
         if ( tokenIPInput.current !== null ) {
             tokens.push( { token_type: "IP", token_value: tokenIPInput.current.value } );
         }
         if ( statusInput.current !== null ) {
             tokens.push( { token_type: "Status", token_value: statusInput.current.value } );
         }
-
-        let obj : RequestData = {
+        /*let obj : TokensRequest = {
             init_datetime: start_datetime,
             end_datetime: end_datetime,
             id: id_log,
@@ -184,7 +186,7 @@ export const Logs = () => {
         }
 
         setRequestData( obj );
-        setShouldApplyFilters( true );
+        setShouldApplyFilters( true );*/
     }
 
     // check rows Input is valid
@@ -311,6 +313,20 @@ export const Logs = () => {
         let inputField = field as Input;
         return <FormControl ref={ getInputRef( inputField ) } type={ inputField.type } pattern={ inputField.patern } placeholder={inputField.placeholder} onBlur={ () => inputField.validator( uiFields ) } />
     }
+
+    useEffect(() => {
+        DataService.getTokenTypes().then((response: any) => {
+            let obj : string[] = response.data
+            let array : Item[] = []
+            obj.map( s => {
+
+            } )
+            console.log( obj );
+        }).catch((e: Error) => {
+            //TODO TOAST
+            console.log(e)
+        });
+    });
 
     return (
         <Container fluid>

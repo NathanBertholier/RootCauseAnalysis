@@ -1,22 +1,21 @@
 import React, {Component} from "react";
-import {Log, RequestData} from "../types/token.type"
 import {Table} from "react-bootstrap";
 import {Row} from "./TableRowLog";
 import DataService from "../services/DataService";
 import {toast} from "../tools/ToastManager";
+import {TokensRequest} from "../types/TokensRequest";
+import {TokensResponse, Log} from "../types/TokensResponse";
 
-export const default_request: RequestData = {
-    "init_datetime": "2021-11-20T00:00:05.000",
-    "end_datetime": "2021-11-20T00:20:00.000",
-    "id": 54,
-    "tokens": [
-        {
-            "token_type": "IP",
-            "token_value": "10.16.27.62.244"
-        }
-    ],
-    "rows": 30
-};
+export const default_request : TokensRequest = {
+    "init_datetime": "2020-06-15 00:00:00.000000",
+    "end_datetime": "2020-06-16 00:00:00.000000",
+    "id": -1,
+    "tokenModel": {
+        "token_type": 0,
+        "token_value": "string"
+    },
+    "rows": 10
+}
 
 export class LogList extends Component{
     state = {
@@ -27,7 +26,7 @@ export class LogList extends Component{
         this.retrieveLogs();
     }
 
-    filter( request: RequestData ) {
+    filter( request: TokensRequest ) {
         // TODO : probably other root and format
         DataService.getAll(request).then((response: any) => {
             let obj : Log[] = JSON.parse( JSON.stringify(response.data[0].logDemonstrators) )
@@ -46,9 +45,9 @@ export class LogList extends Component{
 
     retrieveLogs() {
         DataService.getAll( default_request ).then((response: any) => {
-            let obj : Log[] = JSON.parse( JSON.stringify(response.data[0].logDemonstrators) )
+            let logs : Log[] = response.data
             this.setState( {
-                list: obj
+                list: logs
             })
         }).catch((e: Error) => {
             toast.show({
@@ -59,7 +58,6 @@ export class LogList extends Component{
     }
 
     render() {
-        const { list } = this.state;
         return (
             <div>
                 <Table striped bordered hover className="logTable">
@@ -73,8 +71,8 @@ export class LogList extends Component{
                     </thead>
                     <tbody>
                     {
-                        list.map( ( log, index ) => {
-                            return  <Row id={ log.id } datetime={log.datetime} content={log.content} tokenModels={ log.tokenModels } key={index} />
+                        this.state.list.map( ( log, index ) => {
+                            return  <Row id={ log.id } datetime={log.datetime} content={log.content} tokens={ log.tokens } key={index} />
                         })
                     }
                     </tbody>
