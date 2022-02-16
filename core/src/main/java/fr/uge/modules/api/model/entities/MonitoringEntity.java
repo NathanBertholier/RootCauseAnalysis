@@ -6,7 +6,8 @@ import java.sql.Timestamp;
 import java.util.Objects;
 
 @Entity
-public class Monitoring extends PanacheEntityBase {
+@Table(name = "monitoring")
+public class MonitoringEntity extends PanacheEntityBase {
     @Id
     @Column(name = "datetime")
     private Timestamp datetime;
@@ -56,7 +57,7 @@ public class Monitoring extends PanacheEntityBase {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        Monitoring that = (Monitoring) o;
+        MonitoringEntity that = (MonitoringEntity) o;
         return deliver == that.deliver && publish == that.publish && Double.compare(that.avgRate, avgRate) == 0 && Objects.equals(datetime, that.datetime);
     }
 
