@@ -1,4 +1,4 @@
-version: '3.8'
+version: '3.3'
 
 services:
 
@@ -13,12 +13,10 @@ services:
       - "15672:15672"
     volumes:
       - ./DockerVolumes/RabbitMQ/Setup/:/etc/rabbitmq/
-      - ./DockerVolumes/RabbitMQ/Volume/:/var/lib/rabbitmq/
-      - ./DockerVolumes/RabbitMQ/Volume/:/var/log/rabbitmq/
 
   timescale:
     image: timescale/timescaledb:latest-pg12
-    container_name: "Timescale"
+    container_name: "timescale"
     environment:
       POSTGRES_USER: "root"
       POSTGRES_PASSWORD: "root"
@@ -40,18 +38,22 @@ services:
     volumes:
       - ./DockerVolumes/Grafana/Setup/provisioning:/etc/grafana/provisioning
       - ./DockerVolumes/Grafana/Setup/dashboards:/var/lib/grafana/dashboards
-    environment:
-      GF_SECURITY_ALLOW_EMBEDDING: "true"
-      GF_AUTH_ANONYMOUS_ENABLED: "true"
-      GF_AUTH_ANONYMOUS_ORG_ROLE: "viewer"
+      - ./DockerVolumes/Grafana/Setup/grafana.ini:/etc/grafana/grafana.ini
 
   rootcause:
     build: .
     container_name: "RootCause"
+    restart: always
     ports:
-      - "80:8080"
+      - "8080:8080"
+    depends_on:
+          - "rabbitmq"
     networks:
       - root-cause-net
+    environment:
+      DELTA: ${DELTA}
+      PROXIMITY_LIMIT: ${PROXIMITY_LIMIT}
+      NETWORK_SIZE: ${NETWORK_SIZE}
 
 networks:
   root-cause-net:

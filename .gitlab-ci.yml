@@ -1,3 +1,9 @@
+before_script:
+  - eval `ssh-agent -s`
+  - echo "$SSH_KEY" | tr -d '\r' | ssh-add -
+  - mkdir -p ~/.ssh
+  - chmod 700 ~/.ssh
+  - export TAG="${CI_COMMIT_TAG:-latest}" && echo $TAG
 
 stages:
   - quality
@@ -24,10 +30,10 @@ sonarqube:
 deploy:
   stage: deploy
   script:
-    - docker login 192.168.4.102:5050 -u Nathan -p ydht-a2yasET12xdfe2z
-    - docker build -t 192.168.4.102:5050/rootteam/root-cause .
-    - docker tag 192.168.4.102:5050/rootteam/root-cause 192.168.4.102:5050/rootteam/root-cause:${TAG}
-    - docker push 192.168.4.102:5050/rootteam/root-cause:${TAG}
+    - docker login 192.168.4.102:5050 -u Nathan -p RJKfzaGjFsyh12z8zG1f
+    - docker build -t rootteam/rootcause .
+    - docker tag rootteam/rootcause 192.168.4.102:5050/rootteam/rootcause:${TAG}
+    - docker push 192.168.4.102:5050/rootteam/rootcause:${TAG}
     - ssh -o StrictHostKeyChecking=no nathan@192.168.4.102 "docker-compose up --force-recreate --build -d > logs/$(date +'%d-%m-%y_%H-%M-%S').txt"
   only:
     - tags
@@ -36,15 +42,11 @@ perf:
   image: maven:3.8.4-openjdk-17
   stage: quality
   script:
-    - cd rootcausecore/modules
-    - mkdir report
-    - cd linking_synthetization
-    - mvn -Dtest=PerfTest test | tail -n 12 | head -n 1 > ../report/linking_synthetization.txt
-    - cd ../tokenization
-    - mvn -Dtest=PerfTest test | tail -n 12 | head -n 1 > ../report/tokenization.txt
+    - cd core
+    - mvn -Dtest=Perf* test
   artifacts:
     paths:
-      - rootcausecore/modules/report
+      - core/perf.log
   only:
     - schedules
 
