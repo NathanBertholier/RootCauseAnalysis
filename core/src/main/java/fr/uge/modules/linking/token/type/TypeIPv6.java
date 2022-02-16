@@ -1,6 +1,6 @@
 package fr.uge.modules.linking.token.type;
 
-import fr.uge.modules.linking.token.Token;
+import fr.uge.modules.api.model.TokenModel;
 
 public class TypeIPv6 implements TokenType{
 
@@ -21,6 +21,14 @@ public class TypeIPv6 implements TokenType{
         return 2;
     }
 
+    @Override
+    public int matcher(String word) {
+        if(word.matches(regex)){
+            return TokenTypeId.ID_IPV6;
+        }
+        return -1;
+    }
+
     public static float cardBetween(String t1, String t2){
         int res = 0;
         for(int i = 0; i < Math.min(t1.length(),t2.length()); i++){
@@ -35,8 +43,8 @@ public class TypeIPv6 implements TokenType{
     }
 
     @Override
-    public float computeProximity(Token t1, Token t2) {
-        return jaccard(t1.getValue(), t2.getValue());
+    public float computeProximity(TokenModel t1, TokenModel t2) {
+        return jaccard(t1.token_value(), t2.token_value());
     }
 
 }

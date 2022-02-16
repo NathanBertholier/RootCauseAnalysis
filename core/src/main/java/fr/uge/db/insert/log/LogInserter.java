@@ -1,9 +1,5 @@
 package fr.uge.db.insert.log;
 
-import fr.uge.modules.api.model.entities.RawLog;
-import io.smallrye.mutiny.Uni;
-import io.vertx.core.json.JsonObject;
-import org.eclipse.microprofile.reactive.messaging.Incoming;
 import javax.enterprise.context.ApplicationScoped;
 
 import java.util.Properties;

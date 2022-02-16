@@ -1,6 +1,8 @@
 package fr.uge.modules.linking.token.type;
 
-import fr.uge.modules.linking.token.Token;
+import fr.uge.modules.api.model.TokenModel;
+
+import java.util.Optional;
 
 public class TypeTime implements TokenType{
 
@@ -23,7 +25,15 @@ public class TypeTime implements TokenType{
     }
 
     @Override
-    public float computeProximity(Token t1, Token t2) {
+    public int matcher(String word) {
+        if(word.matches(regex)){
+            return TokenTypeId.ID_IPV4;
+        }
+        return -1;
+    }
+
+    @Override
+    public float computeProximity(TokenModel t1, TokenModel t2) {
         return 0;
     }
 
