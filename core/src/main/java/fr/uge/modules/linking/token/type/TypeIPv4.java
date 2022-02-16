@@ -2,8 +2,6 @@ package fr.uge.modules.linking.token.type;
 
 import fr.uge.modules.api.model.TokenModel;
 
-import java.util.Optional;
-
 public class TypeIPv4 implements TokenType {
 
     private static final String NAME = "ipv4";

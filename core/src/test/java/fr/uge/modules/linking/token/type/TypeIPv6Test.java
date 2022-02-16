@@ -8,7 +8,13 @@ import java.util.StringJoiner;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 
-public class TypeIPv6Test {
+class TypeIPv6Test {
+
+    @Test
+    void nullValue() {
+        TypeIPv6 typeIPv6 = new TypeIPv6();
+        assertThrows(NullPointerException.class,() -> typeIPv6.matcher(null));
+    }
 
     private String generatorIPv6(){
         Random r = new Random();
@@ -16,7 +22,6 @@ public class TypeIPv6Test {
         for(int i = 0;i<8;i++){
             s.add(generatorHex(r.nextInt(4)+1));
         }
-        System.out.println(s);
         return s.toString();
     }
     private String generatorHex(int nb){
@@ -34,10 +39,9 @@ public class TypeIPv6Test {
     void regexMatchValues() {
         TypeIPv6 typeIPv6 = new TypeIPv6();
         assertAll(
-                () -> assertTrue("2001:0620:0000:0000:0211:24FF:FE80:C12C".matches(typeIPv6.getRegex())),
-                () -> assertTrue("2001:620:0:0:211:24FF:FE80:C12C".matches(typeIPv6.getRegex())),
-                () -> assertTrue("2001:620::211:24FF:FE80:C12C".matches(typeIPv6.getRegex())));
-
+                () -> assertEquals(typeIPv6.getTokenTypeId(), typeIPv6.matcher("2001:0620:0000:0000:0211:24FF:FE80:C12C")),
+                () -> assertEquals(typeIPv6.getTokenTypeId(), typeIPv6.matcher("2001:620:0:0:211:24FF:FE80:C12C")),
+                () -> assertEquals(typeIPv6.getTokenTypeId(), typeIPv6.matcher("2001:620::211:24FF:FE80:C12C")));
         for(int i=0;i<10;i++){
             assertTrue(
                     generatorIPv6().matches(typeIPv6.getRegex()));
@@ -48,11 +52,11 @@ public class TypeIPv6Test {
     void regexNotMatchValue() {
         TypeIPv6 typeIPv6 = new TypeIPv6();
         assertAll(
-                () -> assertFalse("2001:0620:0000:0000:0211:24FF:FE80".matches(typeIPv6.getRegex())),
-                () -> assertFalse("2001:0620:0000:0000:".matches(typeIPv6.getRegex())),
-                () -> assertFalse("2001:0620:0000:0000:0211:24FF:FE80:C12C:".matches(typeIPv6.getRegex())),
-                () -> assertFalse("2001:0620:0000:0000:0211".matches(typeIPv6.getRegex())),
-                () -> assertFalse("2001:41D0:1:2E4e::/64".matches(typeIPv6.getRegex())),
-                () -> assertFalse("2001:0620:0000:0000:0211:24FF:FE80:C12C:CFGH".matches(typeIPv6.getRegex())));
+                () -> assertEquals(-1, typeIPv6.matcher("2001:0620:0000:0000:0211:24FF:FE80")),
+                () -> assertEquals(-1, typeIPv6.matcher("2001:0620:0000:0000:")),
+                () -> assertEquals(-1, typeIPv6.matcher("2001:0620:0000:0000:0211")),
+                () -> assertEquals(-1, typeIPv6.matcher("2001:41D0:1:2E4e::/64")),
+                () -> assertEquals(-1, typeIPv6.matcher("2001:0620:0000:0000:0211:24FF:FE80:C12C:CFGH")),
+                () -> assertEquals(-1, typeIPv6.matcher("2001:0620:0000:0000:0211:24FF:FE80:C12C:")));
     }
 }

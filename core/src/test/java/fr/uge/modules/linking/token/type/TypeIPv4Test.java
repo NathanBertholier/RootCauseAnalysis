@@ -7,21 +7,27 @@ import java.util.Random;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 
-public class TypeIPv4Test {
+class TypeIPv4Test {
+
+    @Test
+    void nullValue() {
+        TypeIPv4 typeIPv4 = new TypeIPv4();
+        assertThrows(NullPointerException.class,() -> typeIPv4.matcher(null));
+    }
+
     @Test
     void regexMatchValues() {
         TypeIPv4 typeIPv4 = new TypeIPv4();
         assertAll(
-                () -> assertTrue("10.50.49.13".matches(typeIPv4.getRegex())),
-                () -> assertTrue("172.16.1.23".matches(typeIPv4.getRegex())),
-                () -> assertTrue("192.168.1.34".matches(typeIPv4.getRegex())),
-                () -> assertTrue("224.0.0.1".matches(typeIPv4.getRegex())),
-                () -> assertTrue("240.0.0.1".matches(typeIPv4.getRegex())));
+                () -> assertEquals(typeIPv4.getTokenTypeId(), typeIPv4.matcher("10.50.49.13")),
+                () -> assertEquals(typeIPv4.getTokenTypeId(), typeIPv4.matcher("172.16.1.23")),
+                () -> assertEquals(typeIPv4.getTokenTypeId(), typeIPv4.matcher("192.168.1.34")),
+                () -> assertEquals(typeIPv4.getTokenTypeId(), typeIPv4.matcher("224.0.0.1")),
+                () -> assertEquals(typeIPv4.getTokenTypeId(), typeIPv4.matcher("240.0.0.1")));
+
         Random r = new Random();
         for(int i=0;i<10;i++){
-            assertTrue(
-                    (r.nextInt( 256)+"."+r.nextInt( 256)+"."+r.nextInt( 256)+"."+r.nextInt( 256))
-                            .matches(typeIPv4.getRegex()));
+            assertEquals(typeIPv4.getTokenTypeId(), typeIPv4.matcher(r.nextInt( 256)+"."+r.nextInt( 256)+"."+r.nextInt( 256)+"."+r.nextInt( 256)));
         }
     }
 
@@ -29,11 +35,11 @@ public class TypeIPv4Test {
     void regexNotMatchValue() {
         TypeIPv4 typeIPv4 = new TypeIPv4();
         assertAll(
-                () -> assertFalse("192.168.1".matches(typeIPv4.getRegex())),
-                () -> assertFalse("192.168".matches(typeIPv4.getRegex())),
-                () -> assertFalse("192".matches(typeIPv4.getRegex())),
-                () -> assertFalse("192.168.1.34.34".matches(typeIPv4.getRegex())),
-                () -> assertFalse("192.168.1.256".matches(typeIPv4.getRegex())),
-                () -> assertFalse("256.256.256.256".matches(typeIPv4.getRegex())));
+                () -> assertEquals(-1, typeIPv4.matcher("192.168.1")),
+                () -> assertEquals(-1, typeIPv4.matcher("192.168")),
+                () -> assertEquals(-1, typeIPv4.matcher("192")),
+                () -> assertEquals(-1, typeIPv4.matcher("192.168.1.34.34")),
+                () -> assertEquals(-1, typeIPv4.matcher("256.256.256.256")),
+                () -> assertEquals(-1, typeIPv4.matcher("192.168.1.256")));
     }
 }
