@@ -10,7 +10,9 @@ import java.util.List;
 @Path("/tokentypes")
 public class TokenTypeEndpoint {
     @GET
-    public Uni<List<TokenTypeEntity>> getTokenTypes() {
-        return TokenTypeEntity.<TokenTypeEntity>listAll();
+    public Uni<List<String>> getTokenTypes() {
+        return TokenTypeEntity
+                .<TokenTypeEntity>listAll()
+                .map(list -> list.stream().map(tokentype -> tokentype.name).toList());
     }
 }
