@@ -12,7 +12,7 @@ public class LinkTest {
     @Test
     public void linkShouldReturnCorrectJSON() {
         given()
-                .when().get("http://localhost:8080/link?delta=7200&id1=2&id2=3")
+                .when().get("http://localhost:8083/link?delta=7200&id1=2&id2=3")
                 .then()
                 .statusCode(200)
                 .body("computations[0].token_type",is("type"))

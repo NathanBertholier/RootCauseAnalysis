@@ -25,7 +25,7 @@ public class Log extends PanacheEntityBase {
 
     @OneToOne
     @JoinColumn(name = "id")
-    public RawLog rawLog;
+    public RawLogEntity rawLog;
 
     public long getId() {
         return id;
@@ -51,11 +51,11 @@ public class Log extends PanacheEntityBase {
         this.tokens = tokens;
     }
 
-    public RawLog getRawLog() {
+    public RawLogEntity getRawLog() {
         return rawLog;
     }
 
-    public void setRawLog(RawLog rawLog) {
+    public void setRawLog(RawLogEntity rawLog) {
         this.rawLog = rawLog;
     }
 

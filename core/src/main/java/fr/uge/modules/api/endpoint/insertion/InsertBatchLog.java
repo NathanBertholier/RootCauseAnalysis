@@ -15,6 +15,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.net.URI;
 import java.util.List;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 @Path("/insert/batch")
@@ -32,12 +33,14 @@ public class InsertBatchLog {
                 .onFailure().invoke(() -> logger.severe("ERROR while inserting in database Rawlog"))
                 .await().indefinitely());
 
-        inputs.forEach(System.out::println);
+        inputs.forEach(in -> logger.log(Level.INFO,in.toString()));
         var response = Response
                 .created(URI.create("/insertlog/batch"));
         inputs.forEach(input -> {
             response.entity(input);
+            logger.log(Level.INFO,"Response build");
             emitter.send(input);
+            logger.log(Level.INFO,"message in queue");
         });
         return Uni.createFrom().item(response.build());
     }

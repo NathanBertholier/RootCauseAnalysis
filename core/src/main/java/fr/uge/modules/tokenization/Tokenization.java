@@ -1,7 +1,7 @@
 package fr.uge.modules.tokenization;
 
-import fr.uge.modules.api.model.entities.LogEntity;
-import fr.uge.modules.api.model.entities.TokenEntity;
+import fr.uge.modules.api.model.entities.Log;
+import fr.uge.modules.api.model.entities.Token;
 import fr.uge.modules.linking.token.type.*;
 
 import java.sql.Timestamp;
@@ -25,10 +25,10 @@ public class Tokenization {
         tokenTypes.add(new TypeEdgeResponse());
     }
 
-    public LogEntity tokenizeLog(long id, String body) {
+    public Log tokenizeLog(long id, String body) {
         Objects.requireNonNull(body);
         // Containing the token values
-        List<TokenEntity> tokens = new ArrayList<>();
+        List<Token> tokens = new ArrayList<>();
 
         String dateString = "";
         String timeString = "";
@@ -43,7 +43,7 @@ public class Tokenization {
             }
         }
 
-        var log = new LogEntity();
+        var log = new Log();
         log.setId(id);
         log.setDatetime(convertStringToTimestamp(dateString + " " + timeString));
         log.setTokens(tokens);
@@ -51,11 +51,11 @@ public class Tokenization {
         return log;
     }
 
-    private void parseTokens(List<TokenEntity> tokenEntities, String word) {
+    private void parseTokens(List<Token> tokenEntities, String word) {
         for(TokenType tokenType: tokenTypes){
             var type = tokenType.matcher(word);
             if(type != -1){
-                TokenEntity token = new TokenEntity();
+                Token token = new Token();
                 token.setIdtokentype(type);
                 token.setValue(word);
                 System.out.println(token);
