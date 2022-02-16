@@ -28,10 +28,11 @@ public class InsertSingleLog {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Uni<Response> insertLog(RawLogEntity input) {
-        System.out.println("Input: " + input);
         return Panache.<RawLogEntity>withTransaction(input::persist)
                 .map(item -> {
                             emitter.send(item);
+                            System.out.println("Input: " + input);
+
                             return Response
                                     .created(URI.create("/insertlog/single/"))
                                     .entity(item.id)

@@ -6,6 +6,7 @@ import java.sql.Timestamp;
 import java.util.Objects;
 
 @Entity
+@Table(name = "monitoring")
 public class MonitoringEntity extends PanacheEntityBase {
     @Id
     @Column(name = "datetime")

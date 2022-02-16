@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Objects;
 
 @Entity
-//@Table(name = "log", schema = "public", catalog = "rootcause")
+@Table(name = "log", schema = "public", catalog = "rootcause")
 public class LogEntity extends PanacheEntityBase {
     @Id
     @Column(name = "id")
@@ -29,6 +29,10 @@ public class LogEntity extends PanacheEntityBase {
 
     public void setId(long id) {
         this.id = id;
+    }
+
+    public void setTokens(List<TokenEntity> tokens) {
+        this.tokens = tokens;
     }
 
     public Timestamp getDatetime() {
@@ -71,5 +75,4 @@ public class LogEntity extends PanacheEntityBase {
                 .find("id = ?1 and datetime between ?2 and ?3", logId, start, end)
                 .range(0, rows).list();
     }
-
 }

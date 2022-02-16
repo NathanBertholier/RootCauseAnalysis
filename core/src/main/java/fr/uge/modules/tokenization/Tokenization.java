@@ -12,7 +12,6 @@ import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-//@ApplicationScoped
 public class Tokenization {
     private static final Logger LOGGER = Logger.getGlobal();
     private final List<TokenType> tokenTypes = new ArrayList<>();
@@ -44,9 +43,9 @@ public class Tokenization {
         }
 
         var log = new LogEntity();
-        log.id = id;
-        log.datetime = convertStringToTimestamp(dateString + " " + timeString);
-        log.tokens = tokens;
+        log.setId(id);
+        log.setDatetime(convertStringToTimestamp(dateString + " " + timeString));
+        log.setTokens(tokens);
         System.out.println(log);
         return log;
     }
@@ -55,10 +54,11 @@ public class Tokenization {
         for(TokenType tokenType: tokenTypes){
             var type = tokenType.matcher(word);
             if(type != -1){
-                TokenEntity tokenEntity = new TokenEntity();
-                tokenEntity.setId(type);
-                tokenEntity.setValue(word);
-                tokenEntities.add(tokenEntity);
+                TokenEntity token = new TokenEntity();
+                token.setIdtokentype(type);
+                token.setValue(word);
+                System.out.println(token);
+                tokenEntities.add(token);
             }
         }
     }
