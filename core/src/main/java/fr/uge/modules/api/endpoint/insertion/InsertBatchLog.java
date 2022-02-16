@@ -1,8 +1,7 @@
 package fr.uge.modules.api.endpoint.insertion;
 
-import fr.uge.modules.api.model.entities.RawLog;
+import fr.uge.modules.api.model.entities.RawLogEntity;
 import io.quarkus.hibernate.reactive.panache.Panache;
-import io.smallrye.common.annotation.Blocking;
 import io.smallrye.mutiny.Uni;
 import org.eclipse.microprofile.reactive.messaging.Channel;
 import org.eclipse.microprofile.reactive.messaging.Emitter;
@@ -24,24 +23,24 @@ import java.util.stream.LongStream;
 public class InsertBatchLog {
     private static final Function<Object, Response> withCreated = entity -> Response.created(URI.create("/insert/batch")).entity(entity).build();
     private static final Supplier<Response> withServerError = () -> Response.serverError().build();
-    private static final Function<List<RawLog>, LongStream> asLongStream = inputs -> LongStream.of(inputs.stream().mapToLong(r -> r.id).toArray());
+    private static final Function<List<RawLogEntity>, LongStream> asLongStream = inputs -> LongStream.of(inputs.stream().mapToLong(r -> r.id).toArray());
 
     private static final Logger logger = Logger.getGlobal();
-    @Channel("logs") Emitter<RawLog> emitter;
+    @Channel("logs") Emitter<RawLogEntity> emitter;
 
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Uni<Response> insertLog(List<RawLog> inputs) {
+    public Uni<Response> insertLog(List<RawLogEntity> inputs) {
         return Panache.withTransaction(
-                () -> RawLog.persist(inputs)
+                () -> RawLogEntity.persist(inputs)
                         .onItemOrFailure().transform((success, error) -> {
                             if(error != null) {
                                 logger.severe("Errror while inserting: " + error);
                                 return withServerError.get();
                             } else {
                                 logger.info("Inserted: " + inputs);
-                                inputs.forEach(rawLog -> emitter.send(rawLog));
+                                inputs.forEach(rawLogEntity -> emitter.send(rawLogEntity));
                                 return withCreated.apply(asLongStream.apply(inputs));
                             }
                         })

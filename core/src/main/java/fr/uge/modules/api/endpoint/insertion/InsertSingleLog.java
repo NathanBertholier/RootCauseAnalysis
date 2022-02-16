@@ -35,7 +35,7 @@ public class InsertSingleLog {
 
                             return Response
                                     .created(URI.create("/insertlog/single/"))
-                                    .entity(item.getId())
+                                    .entity(item.id)
                                     .build();
                         }
                 );
