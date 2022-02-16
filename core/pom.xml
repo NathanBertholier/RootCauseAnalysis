@@ -137,6 +137,7 @@
                 <configuration>
                     <excludes>
                         <exclude>fr.uge.modules.tokenization.PerfTokenizationTest</exclude>
+                        <exclude>fr.uge.modules.api.*.java</exclude>
                     </excludes>
                 </configuration>
             </plugin>
