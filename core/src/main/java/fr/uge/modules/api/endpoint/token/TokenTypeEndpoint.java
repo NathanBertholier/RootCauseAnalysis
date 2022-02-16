@@ -12,6 +12,6 @@ import java.util.stream.Collectors;
 public class TokenTypeEndpoint {
     @GET
     public Uni<List<String>> getTokenTypes() {
-        return TokenTypeEntity.<TokenTypeEntity>listAll().map(tokenTypeEntities -> tokenTypeEntities.stream().map(TokenTypeEntity::getName).toList());
+        return TokenTypeEntity.<TokenTypeEntity>listAll().map(tokenTypeEntities -> tokenTypeEntities.stream().map(TokenTypeEntity::getName).collect(Collectors.toList()));
     }
 }

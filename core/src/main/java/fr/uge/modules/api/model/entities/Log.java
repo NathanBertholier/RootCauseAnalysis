@@ -23,6 +23,10 @@ public class Log extends PanacheEntityBase {
     @JoinColumn(name = "idlog")
     public List<Token> tokens;
 
+    @OneToOne
+    @JoinColumn(name = "id")
+    public RawLog rawLog;
+
     public long getId() {
         return id;
     }
@@ -41,6 +45,18 @@ public class Log extends PanacheEntityBase {
 
     public void setDatetime(Timestamp datetime) {
         this.datetime = datetime;
+    }
+
+    public void setTokens(List<Token> tokens) {
+        this.tokens = tokens;
+    }
+
+    public RawLog getRawLog() {
+        return rawLog;
+    }
+
+    public void setRawLog(RawLog rawLog) {
+        this.rawLog = rawLog;
     }
 
     @Override

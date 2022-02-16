@@ -1,5 +1,6 @@
 package fr.uge.modules.api.model.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.quarkus.hibernate.reactive.panache.PanacheEntityBase;
 
 import javax.persistence.*;
@@ -8,6 +9,7 @@ import java.util.Objects;
 @Entity
 @Table(name = "tokentype", schema = "public", catalog = "rootcause")
 public class TokenTypeEntity extends PanacheEntityBase {
+    @JsonIgnore
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Id
     @Column(name = "id")
