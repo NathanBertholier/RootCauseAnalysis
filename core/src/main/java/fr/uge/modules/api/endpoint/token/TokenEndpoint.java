@@ -16,12 +16,10 @@ public class TokenEndpoint {
     private static final Logger LOGGER = Logger.getLogger(TokenEndpoint.class.getName());
 
     @POST
-    @Blocking
     public Uni<CompleteLog[]> getTokens(TokenRequest tokenRequest){
         var builder = new StringBuilder();
         builder.append("TokenRequest: ").append(tokenRequest);
         Uni<TokensResponse> responseUni = TokenRetriever.fromLogs(TokenRetriever.getTokens(tokenRequest));
-        responseUni.invoke(tokensResponse -> System.out.println(tokensResponse)).await().indefinitely();
         return responseUni.map(TokensResponse::logDemonstrators);
     }
 
