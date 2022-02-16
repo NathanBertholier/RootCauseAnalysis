@@ -46,4 +46,12 @@ public class TokenTypeEntity extends PanacheEntityBase {
     public int hashCode() {
         return Objects.hash(id, name);
     }
+
+    @Override
+    public String toString() {
+        return "TokenTypeEntity{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                '}';
+    }
 }

@@ -1,6 +1,6 @@
 package fr.uge.modules.api.endpoint.insertion;
 
-import fr.uge.modules.api.model.entities.RawLog;
+import fr.uge.modules.api.model.entities.RawLogEntity;
 import fr.uge.modules.tokenization.Tokenization;
 import io.quarkus.hibernate.reactive.panache.Panache;
 import io.smallrye.mutiny.Uni;
@@ -17,13 +17,14 @@ import java.util.logging.Logger;
 public class RawlogProcessor {
     private final Logger LOGGER = Logger.getGlobal();
     private final Tokenization tokenization = new Tokenization();
+
     //@Inject
     //Tokenization tokenization;
 
     @Incoming(value = "logTokenization")
     public Uni<Response> processTokenization(Message<JsonObject> incoming){
         System.out.println(incoming);
-        var rawlog = incoming.getPayload().mapTo(RawLog.class);
+        var rawlog = incoming.getPayload().mapTo(RawLogEntity.class);
         var log = tokenization.tokenizeLog(rawlog.getId(),
                 rawlog.getLog());
 

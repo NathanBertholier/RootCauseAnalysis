@@ -1,7 +1,7 @@
 package fr.uge.db.insert.monitoring;
 
 import com.google.gson.JsonParser;
-import fr.uge.modules.api.model.entities.Monitoring;
+import fr.uge.modules.api.model.entities.MonitoringEntity;
 import io.quarkus.hibernate.reactive.panache.Panache;
 import io.quarkus.scheduler.Scheduled;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
@@ -33,7 +33,7 @@ public class MonitorInserter {
 
     @Scheduled(every="5s")
     public void getValueFromAPI() {
-        Monitoring monitoring = new Monitoring();
+        MonitoringEntity monitoring = new MonitoringEntity();
         try {
             String sURL = "http://"
                     + rabbitmqurl
@@ -64,7 +64,7 @@ public class MonitorInserter {
             return;
         }
 
-        Panache.<Monitoring>withTransaction(monitoring::persist)
+        Panache.<MonitoringEntity>withTransaction(monitoring::persist)
                 .onFailure().invoke(() -> this.logger.severe("ERROR while inserting in database monitoring"))
                 .await().indefinitely();
     }

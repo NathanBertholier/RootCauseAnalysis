@@ -1,7 +1,7 @@
 package fr.uge.modules.tokenization;
 
-import fr.uge.modules.api.model.entities.Log;
-import fr.uge.modules.linking.token.Token;
+import fr.uge.modules.api.model.entities.LogEntity;
+import fr.uge.modules.api.model.entities.TokenEntity;
 import fr.uge.modules.linking.token.type.*;
 
 import java.sql.Timestamp;
@@ -12,65 +12,64 @@ import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-//@ApplicationScoped
 public class Tokenization {
-    private final TypeDate patternDate = new TypeDate();
-    private final TypeTime patternTime = new TypeTime();
-    private final TypeDatetime patternDatetime = new TypeDatetime();
-    private final TypeIPv4 patternIP = new TypeIPv4();
-    private final TypeHTTPStatus patternStatus = new TypeHTTPStatus();
     private static final Logger LOGGER = Logger.getGlobal();
+    private final List<TokenType> tokenTypes = new ArrayList<>();
+    private final TypeTime time = new TypeTime();
+    private final TypeDate date = new TypeDate();
+    private final SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
+    public Tokenization() {
+        tokenTypes.add(new TypeIPv4());
+        tokenTypes.add(new TypeHTTPStatus());
+        tokenTypes.add(new TypeEdgeResponse());
+    }
 
-    public Log tokenizeLog(long id, String body) {
+    public LogEntity tokenizeLog(long id, String body) {
         Objects.requireNonNull(body);
-        // Containing the regex
-        Token tokenIP = new Token(this.patternIP);
-        Token tokenStatus = new Token(this.patternStatus);
-        ArrayList<Token> tokens = new ArrayList<>();
-        tokens.add(tokenIP);
-        tokens.add(tokenStatus);
+        // Containing the token values
+        List<TokenEntity> tokens = new ArrayList<>();
 
-        StringBuilder datetime = new StringBuilder();
-        for(String word : body.split("\t")){
-            if(word.matches(this.patternDate.getRegex())) {
-                datetime.append(word);
-            } else if(word.matches(this.patternTime.getRegex())) {
-                datetime.append(" ").append(word);
-            } else if(word.matches(this.patternIP.getRegex())) {
-                tokenIP.setValue(word);
-            } else if(word.matches(patternStatus.getRegex())){
-                tokenStatus.setValue(word);
+        String dateString = "";
+        String timeString = "";
+
+        for (String word : body.split("\t")) {
+            if(date.matcher(word) != -1) {
+                dateString = word;
+            } else if(time.matcher(word) != -1) {
+                timeString = word;
+            } else {
+                this.parseTokens(tokens, word);
             }
         }
 
-        var log = new Log();
-        log.id = id;
-        log.datetime = convertStringToTimestamp(datetime.toString(), "yyyy-MM-dd");
-        log.tokens = tokens.stream()
-                .map(token -> {
-                    var tokenConstruct = new fr.uge.modules.api.model.entities.Token();
-                    tokenConstruct.idtokentype = token.getType().getTokenTypeId();
-                    tokenConstruct.value = token.getValue() + "";
-                    return tokenConstruct;
-                }).toList();
+        var log = new LogEntity();
+        log.setId(id);
+        log.setDatetime(convertStringToTimestamp(dateString + " " + timeString));
+        log.setTokens(tokens);
+        System.out.println(log);
         return log;
     }
 
-    public static Timestamp convertStringToTimestamp(String strDate, String pattern) {
+    private void parseTokens(List<TokenEntity> tokenEntities, String word) {
+        for(TokenType tokenType: tokenTypes){
+            var type = tokenType.matcher(word);
+            if(type != -1){
+                TokenEntity token = new TokenEntity();
+                token.setIdtokentype(type);
+                token.setValue(word);
+                System.out.println(token);
+                tokenEntities.add(token);
+            }
+        }
+    }
+
+    public Timestamp convertStringToTimestamp(String strDate) {
         try {
-            SimpleDateFormat formatter = new SimpleDateFormat(pattern);
-            Date date = formatter.parse(strDate);
-            return new Timestamp(date.getTime());
+            return new Timestamp(this.formatter.parse(strDate).getTime());
         } catch (ParseException e) {
             LOGGER.log(Level.WARNING, "Incorrect timestamp ",e);
         }
         return Timestamp.from(Instant.now());
-    }
-
-    public static Timestamp convertStringToTimestamp(String strDate) throws ParseException {
-        SimpleDateFormat formatter = new SimpleDateFormat();
-        Date date = formatter.parse(strDate);
-        return new Timestamp(date.getTime());
     }
 }

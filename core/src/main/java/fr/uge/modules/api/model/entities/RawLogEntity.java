@@ -7,7 +7,8 @@ import javax.persistence.*;
 import java.util.Objects;
 
 @Entity
-public class RawLog extends PanacheEntityBase {
+@Table(name = "rawlog")
+public class RawLogEntity extends PanacheEntityBase {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
@@ -37,7 +38,7 @@ public class RawLog extends PanacheEntityBase {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        RawLog that = (RawLog) o;
+        RawLogEntity that = (RawLogEntity) o;
         return id == that.id && Objects.equals(log, that.log);
     }
 

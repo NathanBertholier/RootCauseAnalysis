@@ -1,29 +1,29 @@
 package fr.uge.modules.linking.token.type;
 
-import fr.uge.modules.linking.token.Token;
+import fr.uge.modules.api.model.TokenModel;
 
 public class TypeDate implements TokenType{
 
-    private final String name = "date";
-    private final String regex = "((19|2[0-9])[0-9]{2})-(0[1-9]|1[012])-(0[1-9]|[12][0-9]|3[01])";
+    private static final String NAME = "date";
+    private static final String REGEX = "([0-9]{4})-(0[1-9]|1[012])-(0[1-9]|[12][0-9]|3[01])";
 
     @Override
     public String getName() {
-        return name;
+        return NAME;
     }
 
     @Override
     public String getRegex() {
-        return regex;
+        return REGEX;
     }
 
     @Override
     public Integer getTokenTypeId() {
-        return 1;
+        return 0;
     }
 
     @Override
-    public float computeProximity(Token t1, Token t2) {
+    public float computeProximity(TokenModel t1, TokenModel t2) {
         return 0;
     }
 
