@@ -4,6 +4,7 @@ import com.google.gson.JsonParser;
 import fr.uge.modules.api.model.entities.Monitoring;
 import io.quarkus.hibernate.reactive.panache.Panache;
 import io.quarkus.scheduler.Scheduled;
+import org.eclipse.microprofile.config.inject.ConfigProperty;
 
 import javax.enterprise.context.ApplicationScoped;
 import java.io.IOException;
@@ -23,6 +24,8 @@ public class MonitorInserter {
     private static final String QUEUE_NAME = "logs";
     private final Properties properties = new Properties();
     private final Logger logger = Logger.getGlobal();
+    @ConfigProperty(name = "rabbitmq-host")
+    String rabbitmqurl;
 
     MonitorInserter() throws IOException {
         this.properties.load(MonitorInserter.class.getClassLoader().getResourceAsStream("init.properties"));
@@ -33,7 +36,7 @@ public class MonitorInserter {
         Monitoring monitoring = new Monitoring();
         try {
             String sURL = "http://"
-                    + this.properties.getProperty("MQMONITORINGSRV")
+                    + rabbitmqurl
                     + ":15672/api/exchanges/%2f/"
                     + QUEUE_NAME;
 

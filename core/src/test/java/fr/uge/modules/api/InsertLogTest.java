@@ -27,7 +27,7 @@ public class InsertLogTest {
         IntStream.range(0, 10).forEach(index -> given()
                 .contentType("application/json")
                 .body("[{\"log\": \"2020-06-15 12:47:50 CDG50-C1 6542 82.255.169.186 200\"}]")
-                .when().post("http://localhost:8083/insertlog/batch")
+                .when().post("http://localhost:8083/insert/batch")
                 .then()
                 .statusCode(200)
                 .body(is(index)));

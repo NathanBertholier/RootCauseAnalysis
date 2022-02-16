@@ -19,7 +19,7 @@ public class Log extends PanacheEntityBase {
     @Column(name = "datetime")
     public Timestamp datetime;
 
-    @OneToMany(cascade = CascadeType.ALL)
+    @OneToMany(cascade = CascadeType.ALL,fetch = FetchType.EAGER)
     @JoinColumn(name = "idlog")
     public List<Token> tokens;
 
@@ -66,9 +66,9 @@ public class Log extends PanacheEntityBase {
     }
 
     // Partiel pour le moment
-    public static Uni<List<Log>> retrieveLogs(long logId, Timestamp start, Timestamp end, int rows){
+    public static Uni<List<Log>>retrieveLogs(long logId, Timestamp start, Timestamp end, int rows){
         return Log
-                .find("id = ?1 and datetime between ?2 and ?3", logId, start, end)
+                .find("datetime between ?1 and ?2", start, end)
                 .range(0, rows).list();
     }
 

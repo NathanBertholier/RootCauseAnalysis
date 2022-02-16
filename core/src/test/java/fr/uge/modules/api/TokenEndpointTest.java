@@ -1,5 +1,6 @@
 package fr.uge.modules.api;
 
+import fr.uge.modules.api.model.TokenRequest;
 import io.quarkus.test.junit.QuarkusTest;
 import org.junit.jupiter.api.Test;
 
@@ -11,7 +12,8 @@ class TokenEndpointTest {
 
     @Test
     void getTokens() {
-        given()
+        TokenRequest tokenRequest = new TokenRequest(null, null, -1, null, 10);
+        given().body(tokenRequest)
                 .when().post("http://localhost:8083/tokens")
                 .then()
                 .statusCode(200)
