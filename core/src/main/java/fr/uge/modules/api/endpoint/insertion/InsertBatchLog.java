@@ -15,10 +15,16 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.net.URI;
 import java.util.List;
+import java.util.function.Function;
+import java.util.function.Supplier;
 import java.util.logging.Logger;
+import java.util.stream.LongStream;
 
 @Path("/insert/batch")
 public class InsertBatchLog {
+    private static final Function<Object, Response> withCreated = entity -> Response.created(URI.create("/insert/batch")).entity(entity).build();
+    private static final Supplier<Response> withServerError = () -> Response.serverError().build();
+    private static final Function<List<RawLog>, LongStream> asLongStream = inputs -> LongStream.of(inputs.stream().mapToLong(r -> r.id).toArray());
 
     private static final Logger logger = Logger.getGlobal();
     @Channel("logs") Emitter<RawLog> emitter;
@@ -26,20 +32,19 @@ public class InsertBatchLog {
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    @Blocking
     public Uni<Response> insertLog(List<RawLog> inputs) {
-        inputs.forEach(input -> Panache.<RawLog>withTransaction(input::persist)
-                .onFailure().invoke(() -> logger.severe("ERROR while inserting in database Rawlog"))
-                .await().indefinitely());
-
-        inputs.forEach(System.out::println);
-        var response = Response
-                .created(URI.create("/insertlog/batch"));
-        inputs.forEach(input -> {
-            response.entity(input);
-            emitter.send(input);
-        });
-        return Uni.createFrom().item(response.build());
+        return Panache.withTransaction(
+                () -> RawLog.persist(inputs)
+                        .onItemOrFailure().transform((success, error) -> {
+                            if(error != null) {
+                                logger.severe("Errror while inserting: " + error);
+                                return withServerError.get();
+                            } else {
+                                logger.info("Inserted: " + inputs);
+                                inputs.forEach(rawLog -> emitter.send(rawLog));
+                                return withCreated.apply(asLongStream.apply(inputs));
+                            }
+                        })
+        );
     }
-
 }

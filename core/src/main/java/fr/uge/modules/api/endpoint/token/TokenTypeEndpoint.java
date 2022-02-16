@@ -11,6 +11,6 @@ import java.util.List;
 public class TokenTypeEndpoint {
     @GET
     public Uni<List<TokenTypeEntity>> getTokenTypes() {
-        return TokenTypeEntity.listAll();
+        return TokenTypeEntity.<TokenTypeEntity>listAll();
     }
 }
