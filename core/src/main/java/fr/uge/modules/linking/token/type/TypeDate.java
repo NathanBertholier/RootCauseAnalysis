@@ -1,6 +1,6 @@
 package fr.uge.modules.linking.token.type;
 
-import fr.uge.modules.linking.token.Token;
+import fr.uge.modules.api.model.TokenModel;
 
 public class TypeDate implements TokenType{
 
@@ -18,7 +18,20 @@ public class TypeDate implements TokenType{
     }
 
     @Override
-    public float computeProximity(Token t1, Token t2) {
+    public Integer getTokenTypeId() {
+        return 1;
+    }
+
+    @Override
+    public int matcher(String word) {
+        if(word.matches(regex)){
+            return 0;
+        }
+        return -1;
+    }
+
+    @Override
+    public float computeProximity(TokenModel t1, TokenModel t2) {
         return 0;
     }
 

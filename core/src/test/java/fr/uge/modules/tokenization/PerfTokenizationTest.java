@@ -1,10 +1,6 @@
 package fr.uge.modules.tokenization;
 
-import fr.uge.modules.api.model.Tokens;
-import org.junit.jupiter.api.*;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import org.junit.jupiter.api.RepeatedTest;
 
 import java.io.IOException;
 import java.sql.*;
@@ -13,7 +9,9 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.logging.SimpleFormatter;
 
-public class PerfTokenizationTest {
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+class PerfTokenizationTest {
     private static  Connection connection;
     private static final Logger LOGGER = Logger.getLogger("Rootcause");
     private Tokenization tokenization = new Tokenization();

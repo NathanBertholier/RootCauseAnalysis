@@ -15,7 +15,6 @@
     <modules>
         <module>rabbitmq</module>
         <module>benchmark</module>
-        <module>batchloggenerator</module>
     </modules>
 
     <properties>

@@ -1,6 +1,6 @@
 package fr.uge.modules.linking.token.type;
 
-import fr.uge.modules.linking.token.Token;
+import fr.uge.modules.api.model.TokenModel;
 
 public class TypeHTTPStatus implements TokenType{
 
@@ -18,10 +18,23 @@ public class TypeHTTPStatus implements TokenType{
     }
 
     @Override
-    public float computeProximity(Token t1, Token t2) {
-        if(t1.getValue().equals(t2.getValue())){
+    public Integer getTokenTypeId() {
+        return 3;
+    }
+
+    @Override
+    public int matcher(String word) {
+        if(word.matches(regex)){
+            return TokenTypeId.ID_STATUS;
+        }
+        return -1;
+    }
+
+    @Override
+    public float computeProximity(TokenModel t1, TokenModel t2) {
+        if(t1.token_value().equals(t2.token_value())){
             return 100;
-        } else if(t1.getValue().startsWith(t2.getValue().substring(0,1))){
+        } else if(t1.token_value().startsWith(t2.token_value().substring(0,1))){
             return 80;
         } else {
             return 0;

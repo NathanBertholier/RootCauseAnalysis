@@ -1,34 +1,40 @@
 package fr.uge.modules.api.endpoint.insertion;
 
-import fr.uge.modules.api.model.Tokens;
-import fr.uge.modules.api.model.RawLog;
+import fr.uge.modules.api.model.entities.RawLogEntity;
 import fr.uge.modules.tokenization.Tokenization;
-import io.smallrye.reactive.messaging.rabbitmq.IncomingRabbitMQMetadata;
+import io.quarkus.hibernate.reactive.panache.Panache;
+import io.smallrye.mutiny.Uni;
 import io.vertx.core.json.JsonObject;
 import org.eclipse.microprofile.reactive.messaging.Incoming;
 import org.eclipse.microprofile.reactive.messaging.Message;
-import org.eclipse.microprofile.reactive.messaging.Outgoing;
 
 import javax.enterprise.context.ApplicationScoped;
-import javax.inject.Inject;
-import java.util.Optional;
+import javax.ws.rs.core.Response;
+import java.net.URI;
 import java.util.logging.Logger;
 
 @ApplicationScoped
 public class RawlogProcessor {
     private final Logger LOGGER = Logger.getGlobal();
+    private final Tokenization tokenization = new Tokenization();
 
-    @Inject
-    Tokenization tokenization;
+    //@Inject
+    //Tokenization tokenization;
 
     @Incoming(value = "logTokenization")
-    @Outgoing(value = "tokens")
-    public Tokens processTokenization(Message<JsonObject> incoming){
-        var log = incoming.getPayload().mapTo(RawLog.class);
-        log.persistAndFlush();
-        Optional<IncomingRabbitMQMetadata> metadata = incoming.getMetadata(IncomingRabbitMQMetadata.class);
-        return tokenization.tokenizeLog(metadata.orElseThrow().getHeader("id", Long.class).orElseThrow(),
-                log.log);
+    public Uni<Response> processTokenization(Message<JsonObject> incoming){
+        System.out.println(incoming);
+        var rawlog = incoming.getPayload().mapTo(RawLogEntity.class);
+        var log = tokenization.tokenizeLog(rawlog.getId(),
+                rawlog.getValue());
+
+        incoming.ack();
+        return Panache.withTransaction(log::persist)
+                .map(item -> Response
+                        .created(URI.create("/insertlog/single/"))
+                        .entity(item)
+                        .build()
+                );
     }
 }
 

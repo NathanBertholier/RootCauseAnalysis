@@ -1,11 +1,10 @@
 package fr.uge.modules.linking;
 
 import fr.uge.modules.api.model.CompleteLog;
+import fr.uge.modules.api.model.entities.TokenEntity;
 import fr.uge.modules.api.model.report.ReportParameter;
-import fr.uge.modules.linking.token.Token;
 import fr.uge.modules.linking.token.type.TokenType;
 import fr.uge.modules.linking.token.type.TypeDatetime;
-import fr.uge.modules.linking.token.type.TypeHTTPStatus;
 import fr.uge.modules.linking.token.type.TypeIPv4;
 import io.smallrye.mutiny.Uni;
 import io.vertx.mutiny.pgclient.PgPool;
@@ -67,15 +66,17 @@ public class Linking {
         tokenTypes.add(new TypeIPv4());
     }
 
-    private Token createToken(String type, String value) {
+    private TokenEntity createToken(String type, String value) {
+        /*
         TokenType tt;
-        switch(type){
-            case TYPE_DATE -> tt = new TypeDatetime();
+        return switch(type){
+            case TYPE_DATE -> new TypeDatetime();
             case TYPE_IPV4 -> tt = new TypeIPv4();
             case TYPE_STATUT -> tt = new TypeHTTPStatus();
             default -> throw new IllegalArgumentException("TokenType: "+type);
         }
-        return new Token(value, tt);
+         */
+        return null;
     }
 
     private Uni<CompleteLog> rowToLog(RowIterator<Row> iterator) {
@@ -114,7 +115,7 @@ public class Linking {
             fetchLog.setLong(1, idlogtarget);
             ResultSet logTarget = fetchLog.executeQuery();
 
-            ArrayList<Token> tokenSet = new ArrayList<>();
+            ArrayList<TokenEntity> tokenSet = new ArrayList<>();
             logTarget.next();
             //fetching data in the resultset given from query
             LocalDateTime ldt = logTarget.getTimestamp(TYPE_DATE).toLocalDateTime();
@@ -148,7 +149,7 @@ public class Linking {
             long id;
             LocalDateTime ldt;
             List<CompleteLog> lst = new ArrayList<>();
-            List<Token> tokenSet = new ArrayList<>();
+            List<TokenEntity> tokenSet = new ArrayList<>();
             CompleteLog current;
             while (lines.next()) {
                 //init log
@@ -193,6 +194,7 @@ public class Linking {
     }
 
     public SortedMap<Float, CompleteLog> computeProximityTree(CompleteLog target, List<CompleteLog> logWithinDelta, ReportParameter rp){
+        /*
         TreeMap<Float, CompleteLog> redBlack = new TreeMap<>(Collections.reverseOrder());
         logWithinDelta.forEach(log -> {
             float proximity = 0;
@@ -213,6 +215,8 @@ public class Linking {
             }
         });
         return redBlack;
+         */
+        return new TreeMap<>();
     }
 
     /**

@@ -5,9 +5,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.cli.*;
 
 import java.io.IOException;
-import java.net.URI;
 import java.nio.file.*;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -132,5 +132,13 @@ public class Benchmark {
         options.addOption(outputOption);
 
         return options;
+    }
+    private List<List<String>> cutList(List<String> originalList, int partitionSize) {
+        List<List<String>> partitions = new ArrayList<>();
+        for (int i = 0; i < originalList.size(); i += partitionSize) {
+            partitions.add(originalList.subList(i,
+                    Math.min(i + partitionSize, originalList.size())));
+        }
+        return partitions;
     }
 }

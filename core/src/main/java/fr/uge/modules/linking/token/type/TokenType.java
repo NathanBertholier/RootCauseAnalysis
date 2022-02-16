@@ -1,27 +1,26 @@
 package fr.uge.modules.linking.token.type;
 
-import fr.uge.modules.linking.token.Token;
+import fr.uge.modules.api.model.TokenModel;
 
-import java.util.Objects;
 import java.util.Optional;
 
 public interface TokenType {
 
     String getName();
-
     String getRegex();
+    Integer getTokenTypeId();
 
-    float computeProximity(Token t1, Token t2);
+    int matcher(String word);
 
-    static Optional<TokenType> fromTokenTypeId(int tokentypeId) {
-        return Optional.ofNullable(switch (tokentypeId) {
-            case 1 -> new TypeIPv4();
-            case 2 -> new TypeIPv6();
-            case 3 -> new TypeHTTPStatus();
-            case 4 -> new TypeDatetime();
-            case 5 -> new TypeEdgeResponse();
-            default -> null;
-        });
+    float computeProximity(TokenModel t1, TokenModel t2);
+
+    public class TokenTypeId{
+        public static final int ID_IPV4 = 1;
+        public static final int ID_IPV6 = 2;
+        public static final int ID_STATUS = 3;
+        public static final int ID_DATETIME = 4;
+        public static final int ID_EDGERESPONSE = 5;
+
     }
 
 }

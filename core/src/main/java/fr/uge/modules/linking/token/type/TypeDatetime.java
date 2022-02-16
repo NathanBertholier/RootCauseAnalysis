@@ -1,6 +1,6 @@
 package fr.uge.modules.linking.token.type;
 
-import fr.uge.modules.linking.token.Token;
+import fr.uge.modules.api.model.TokenModel;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
@@ -8,7 +8,7 @@ import java.time.temporal.ChronoUnit;
 public class TypeDatetime implements TokenType{
 
     private final String name = "datetime";
-    private final String regex = "((19|2[0-9])[0-9]{2})-(0[1-9]|1[012])-(0[1-9]|[12][0-9]|3[01]) ([2][0-3]|[0-1][0-9]|[1-9]):[0-5][0-9]:([0-5][0-9]|[6][0])";
+    private final String regex = "((19|2[0-9])[0-9]{2})-(0[1-9]|1[012])-(0[1-9]|[12][0-9]|3[01])\t([2][0-3]|[0-1][0-9]|[1-9]):[0-5][0-9]:([0-5][0-9]|[6][0])";
 
     @Override
     public String getName() {
@@ -21,7 +21,20 @@ public class TypeDatetime implements TokenType{
     }
 
     @Override
-    public float computeProximity(Token t1, Token t2) {
+    public Integer getTokenTypeId() {
+        return 4;
+    }
+
+    @Override
+    public int matcher(String word) {
+        if(word.matches(regex)){
+            return 0;
+        }
+        return -1;
+    }
+
+    @Override
+    public float computeProximity(TokenModel t1, TokenModel t2) {
         return 0;
     }
 
