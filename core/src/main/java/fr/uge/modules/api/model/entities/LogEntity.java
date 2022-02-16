@@ -69,7 +69,6 @@ public class LogEntity extends PanacheEntityBase {
                 '}';
     }
 
-    // Partiel pour le moment
     public static Uni<List<LogEntity>> retrieveLogs(long logId, Timestamp start, Timestamp end, int rows){
         return LogEntity
                 .find("id = ?1 and datetime between ?2 and ?3", logId, start, end)

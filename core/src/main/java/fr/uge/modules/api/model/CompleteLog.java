@@ -1,10 +1,14 @@
 package fr.uge.modules.api.model;
 
+import fr.uge.modules.api.model.entities.LogEntity;
+import fr.uge.modules.api.model.entities.RawLogEntity;
 import fr.uge.modules.api.model.entities.TokenEntity;
+import io.quarkus.hibernate.reactive.panache.PanacheEntityBase;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 public class CompleteLog {
     private final long id;
@@ -21,6 +25,10 @@ public class CompleteLog {
         this.id = id;
         this.datetime = ldt;
         tokens.addAll(tokenSet);
+    }
+
+    public CompleteLog(LogEntity logEntity, RawLogEntity rawLogEntity) {
+        this(logEntity.getId(), rawLogEntity.getValue(), logEntity.getDatetime().toLocalDateTime(), logEntity.getTokens());
     }
 
     public ArrayList<TokenEntity> getTokens() {

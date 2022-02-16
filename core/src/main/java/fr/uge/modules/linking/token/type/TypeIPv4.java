@@ -1,8 +1,10 @@
 package fr.uge.modules.linking.token.type;
 
-import fr.uge.modules.api.model.TokenModel;
+import fr.uge.modules.api.model.entities.TokenEntity;
 
-import java.util.Optional;
+import java.util.List;
+
+import static fr.uge.modules.linking.token.type.TokenType.TokenTypeId.ID_IPV4;
 
 public class TypeIPv4 implements TokenType {
 
@@ -20,7 +22,7 @@ public class TypeIPv4 implements TokenType {
     @Override
     public int matcher(String word){
         if(word.matches(regex)){
-            return TokenTypeId.ID_IPV4;
+            return ID_IPV4;
         }
         return -1;
     }
@@ -43,8 +45,9 @@ public class TypeIPv4 implements TokenType {
         return (cardBetween(t1, t2) / t1.length()) * 100;
     }
 
-    public float computeProximity(TokenModel t1, TokenModel t2) {
-        return jaccard(t1.token_value(), t2.token_value());
+    public float computeProximity(List<TokenEntity> tokenLeft, List<TokenEntity> tokenRight) {
+        return 0;
+        //return jaccard(tokenLeft.getValue(), tokenRight.getValue());
     }
 
 }

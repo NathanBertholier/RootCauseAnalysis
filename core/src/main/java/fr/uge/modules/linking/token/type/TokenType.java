@@ -1,8 +1,8 @@
 package fr.uge.modules.linking.token.type;
 
-import fr.uge.modules.api.model.TokenModel;
+import fr.uge.modules.api.model.entities.TokenEntity;
 
-import java.util.Optional;
+import java.util.List;
 
 public interface TokenType {
 
@@ -12,9 +12,9 @@ public interface TokenType {
 
     int matcher(String word);
 
-    float computeProximity(TokenModel t1, TokenModel t2);
+    float computeProximity(List<TokenEntity> tokenLeft, List<TokenEntity> tokenRight);
 
-    public class TokenTypeId{
+    class TokenTypeId{
         public static final int ID_IPV4 = 1;
         public static final int ID_IPV6 = 2;
         public static final int ID_STATUS = 3;

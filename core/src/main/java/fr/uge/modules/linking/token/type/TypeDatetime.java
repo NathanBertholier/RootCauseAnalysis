@@ -1,9 +1,10 @@
 package fr.uge.modules.linking.token.type;
 
-import fr.uge.modules.api.model.TokenModel;
+import fr.uge.modules.api.model.entities.TokenEntity;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
+import java.util.List;
 
 public class TypeDatetime implements TokenType{
 
@@ -34,7 +35,7 @@ public class TypeDatetime implements TokenType{
     }
 
     @Override
-    public float computeProximity(TokenModel t1, TokenModel t2) {
+    public float computeProximity(List<TokenEntity> tokenLeft, List<TokenEntity> tokenRight) {
         return 0;
     }
 

@@ -7,9 +7,6 @@ import io.smallrye.mutiny.Uni;
 
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
-import java.sql.Timestamp;
-import java.util.Collections;
-import java.util.List;
 import java.util.logging.Logger;
 
 @Path("/tokens")
@@ -23,6 +20,4 @@ public class TokenEndpoint {
 
         return TokenRetriever.fromLogs(TokenRetriever.getTokens(tokenRequest));
     }
-
-
 }
