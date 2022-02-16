@@ -1,4 +1,4 @@
-type Token = {
+export type Token = {
     token_type: string
     token_value: string
 }
