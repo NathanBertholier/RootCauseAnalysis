@@ -381,7 +381,7 @@ export const Logs = () => {
                                         </Col>
                                     </Row>
                                     <Row className={ rowInputError !== "" ? "" : "d-none" } >
-                                        <div className="error" >{ rowInputError }</div>
+                                        <div className="error row-number-error" >{ rowInputError }</div>
                                     </Row>
                                 </Container>
                             </Col>

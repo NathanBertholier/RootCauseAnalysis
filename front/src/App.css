@@ -103,11 +103,15 @@
 
 .error {
   color: red;
+  font-size: 12px;
 }
 
 .form-error {
-  padding-top: 10px;
   text-align: left;
+}
+
+.row-number-error, .form-error {
+  padding-top: 10px;
 }
 
 .react-datetime-picker {
