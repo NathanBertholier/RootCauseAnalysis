@@ -2,34 +2,24 @@ package fr.uge.modules.linking.token.type;
 
 import fr.uge.modules.api.model.TokenModel;
 
-import java.util.Optional;
+public class TypeTime implements TokenType {
 
-public class TypeTime implements TokenType{
-
-    private final String name = "time";
-    private final String regex = "([2][0-3]|[0-1][0-9]|[1-9]):[0-5][0-9]:([0-5][0-9]|[6][0])";
+    private static final String NAME = "time";
+    private static final String REGEX = "([2][0-3]|[0-1][0-9]|[1-9]):[0-5][0-9]:([0-5][0-9]|[6][0])";
 
     @Override
     public String getName() {
-        return name;
+        return NAME;
     }
 
     @Override
     public String getRegex() {
-        return regex;
+        return REGEX;
     }
 
     @Override
     public Integer getTokenTypeId() {
-        return 1;
-    }
-
-    @Override
-    public int matcher(String word) {
-        if(word.matches(regex)){
-            return TokenTypeId.ID_IPV4;
-        }
-        return -1;
+        return 0;
     }
 
     @Override
