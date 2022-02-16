@@ -9,12 +9,12 @@ import {TokensResponse, Log} from "../types/TokensResponse";
 export const default_request : TokensRequest = {
     "init_datetime": "2020-06-15 00:00:00.000000",
     "end_datetime": "2020-06-16 00:00:00.000000",
-    "id": -1,
+    "id": 2,
     "tokenModel": {
         "token_type": 0,
         "token_value": "string"
     },
-    "rows": 10
+    "rows": 2
 }
 
 export class LogList extends Component{
@@ -29,12 +29,11 @@ export class LogList extends Component{
     filter( request: TokensRequest ) {
         // TODO : probably other root and format
         DataService.getAll(request).then((response: any) => {
-            let obj : Log[] = JSON.parse( JSON.stringify(response.data[0].logDemonstrators) )
+            console.log(response);
+            let logs : Log[] = response.data
             this.setState( {
-                list: obj
+                list: logs
             })
-            console.log( obj );
-            console.log("update");
         }).catch((e: Error) => {
             toast.show({
                 content: "un problème est survenue",
