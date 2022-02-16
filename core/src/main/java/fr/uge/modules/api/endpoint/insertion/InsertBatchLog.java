@@ -6,6 +6,8 @@ import io.smallrye.mutiny.Uni;
 import org.eclipse.microprofile.reactive.messaging.Channel;
 import org.eclipse.microprofile.reactive.messaging.Emitter;
 
+import javax.inject.Inject;
+import javax.validation.Validator;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -27,21 +29,25 @@ public class InsertBatchLog {
 
     private static final Logger logger = Logger.getGlobal();
     @Channel("logs") Emitter<RawLogEntity> emitter;
+    @Inject Validator validator;
 
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Uni<Response> insertLog(List<RawLogEntity> inputs) {
+        var rawLogs = inputs.stream().filter(rawlog -> validator.validate(rawlog).isEmpty()).toList();
+        if(rawLogs.isEmpty()) return Uni.createFrom().item(Response.status(400).entity("Log content cannot be empty").build());
+
         return Panache.withTransaction(
-                () -> RawLogEntity.persist(inputs)
+                () -> RawLogEntity.persist(rawLogs)
                         .onItemOrFailure().transform((success, error) -> {
                             if(error != null) {
                                 logger.severe("Errror while inserting: " + error);
                                 return withServerError.get();
                             } else {
-                                logger.info("Inserted: " + inputs);
-                                inputs.forEach(rawLogEntity -> emitter.send(rawLogEntity));
-                                return withCreated.apply(asLongStream.apply(inputs));
+                                logger.info("Inserted: " + rawLogs);
+                                rawLogs.forEach(rawLogEntity -> emitter.send(rawLogEntity));
+                                return withCreated.apply(asLongStream.apply(rawLogs));
                             }
                         })
         );

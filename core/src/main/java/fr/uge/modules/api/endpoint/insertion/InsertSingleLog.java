@@ -6,6 +6,9 @@ import io.smallrye.mutiny.Uni;
 import org.eclipse.microprofile.reactive.messaging.Channel;
 import org.eclipse.microprofile.reactive.messaging.Emitter;
 
+import javax.inject.Inject;
+import javax.validation.ConstraintViolation;
+import javax.validation.Validator;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -20,25 +23,31 @@ import java.util.logging.Logger;
  */
 @Path("/insert/single")
 public class InsertSingleLog {
-
     private static final Logger logger = Logger.getGlobal();
     @Channel("logs") Emitter<RawLogEntity> emitter;
+    @Inject Validator validator;
 
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Uni<Response> insertLog(RawLogEntity input) {
-        return Panache.<RawLogEntity>withTransaction(input::persist)
-                .map(item -> {
-                            emitter.send(item);
-                            System.out.println("Input: " + input);
+        var violations = validator.validate(input);
+        if (!violations.isEmpty()) {
+            return Uni.createFrom().item(
+                    Response.status(400).entity(violations.stream().map(ConstraintViolation::getMessage)).build()
+            );
+        } else {
+            return Panache.<RawLogEntity>withTransaction(input::persist)
+                    .map(item -> {
+                                emitter.send(item);
+                                System.out.println("Input: " + input);
 
-                            return Response
-                                    .created(URI.create("/insertlog/single/"))
-                                    .entity(item.id)
-                                    .build();
-                        }
-                );
+                                return Response
+                                        .created(URI.create("/insertlog/single/"))
+                                        .entity(item.id)
+                                        .build();
+                            }
+                    );
+        }
     }
-
 }
