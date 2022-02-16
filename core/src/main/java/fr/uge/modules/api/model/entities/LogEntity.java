@@ -23,6 +23,10 @@ public class LogEntity extends PanacheEntityBase {
     @JoinColumn(name = "idlog")
     public List<TokenEntity> tokens;
 
+    @OneToOne
+    @JoinColumn(name = "id")
+    public RawLog rawLog;
+
     public long getId() {
         return id;
     }
@@ -45,6 +49,18 @@ public class LogEntity extends PanacheEntityBase {
 
     public void setDatetime(Timestamp datetime) {
         this.datetime = datetime;
+    }
+
+    public void setTokens(List<Token> tokens) {
+        this.tokens = tokens;
+    }
+
+    public RawLog getRawLog() {
+        return rawLog;
+    }
+
+    public void setRawLog(RawLog rawLog) {
+        this.rawLog = rawLog;
     }
 
     @Override
@@ -70,9 +86,10 @@ public class LogEntity extends PanacheEntityBase {
     }
 
     // Partiel pour le moment
-    public static Uni<List<LogEntity>> retrieveLogs(long logId, Timestamp start, Timestamp end, int rows){
-        return LogEntity
-                .find("id = ?1 and datetime between ?2 and ?3", logId, start, end)
+    public static Uni<List<Log>>retrieveLogs(long logId, Timestamp start, Timestamp end, int rows){
+        return Log
+                .find("datetime between ?1 and ?2", start, end)
                 .range(0, rows).list();
     }
+
 }

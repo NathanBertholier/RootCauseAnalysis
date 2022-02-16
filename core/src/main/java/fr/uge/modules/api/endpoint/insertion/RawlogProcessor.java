@@ -1,6 +1,6 @@
 package fr.uge.modules.api.endpoint.insertion;
 
-import fr.uge.modules.api.model.entities.RawLogEntity;
+import fr.uge.modules.api.model.entities.RawLog;
 import fr.uge.modules.tokenization.Tokenization;
 import io.quarkus.hibernate.reactive.panache.Panache;
 import io.smallrye.mutiny.Uni;
