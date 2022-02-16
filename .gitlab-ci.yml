@@ -11,8 +11,6 @@ stages:
 
 sonarqube:
   image: maven:3.8.4-openjdk-17
-  services:
-    - docker:dind
   variables:
     SONAR_USER_HOME: "${CI_PROJECT_DIR}/.sonar"  # Defines the location of the analysis task cache
     GIT_DEPTH: "0"  # Tells git to fetch all the branches of the project, required by the analysis task
@@ -24,7 +22,6 @@ sonarqube:
 
   stage: quality
   script:
-    - docker-compose up -d
     - cd core
     - mvn verify sonar:sonar -Dsonar.projectKey=RootCause -Dsonar.qualitygate.wait=true
   only: 
