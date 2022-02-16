@@ -6,20 +6,20 @@ import java.util.Optional;
 
 public class TypeIPv4 implements TokenType {
 
-    private final String name = "ipv4";
-    private final String regex = "(([01]?[0-9]{1,2}|2[0-4][0-9]|25[0-5]).){3}([01]?[0-9]{1,2}|2[0-4][0-9]|25[0-5])";
+    private static final String NAME = "ipv4";
+    private static final String REGEX = "(([01]?[0-9]{1,2}|2[0-4][0-9]|25[0-5]).){3}([01]?[0-9]{1,2}|2[0-4][0-9]|25[0-5])";
 
     @Override
     public String getName() {
-        return name;
+        return NAME;
     }
 
     @Override
-    public String getRegex() { return regex; }
+    public String getRegex() { return REGEX; }
 
     @Override
     public Integer getTokenTypeId() {
-        return TokenTypeId.ID_IPV4;
+        return TokenTypeId.ID_IPV4.getId();
     }
 
     public static float cardBetween(String t1, String t2){

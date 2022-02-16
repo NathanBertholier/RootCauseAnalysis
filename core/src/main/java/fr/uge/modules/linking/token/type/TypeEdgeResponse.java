@@ -22,12 +22,12 @@ public class TypeEdgeResponse implements TokenType {
 
     @Override
     public Integer getTokenTypeId() {
-        return TokenTypeId.ID_EDGERESPONSE;
+        return TokenTypeId.ID_EDGERESPONSE.getId();
     }
 
     @Override
     public float computeProximity(TokenModel t1, TokenModel t2) {
-        if (t1 == t2) {
+        if (t1.equals(t2)) {
             return 100;
         } else if (ERRORS.contains(t1.token_value()) && ERRORS.contains(t2.token_value())) {
             return 50;
