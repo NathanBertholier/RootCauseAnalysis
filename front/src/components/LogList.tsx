@@ -15,7 +15,7 @@ export const default_request: RequestData = {
             "token_value": "10.16.27.62.244"
         }
     ],
-    "rows": 100
+    "rows": 30
 };
 
 export class LogList extends Component{
