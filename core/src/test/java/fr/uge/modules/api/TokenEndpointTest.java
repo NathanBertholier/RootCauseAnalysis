@@ -9,7 +9,7 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.junit.jupiter.api.Assertions.*;
 @QuarkusTest
 class TokenEndpointTest {
-
+/*
     @Test
     void getTokens() {
         TokenRequest tokenRequest = new TokenRequest(null, null, -1, null, 10);
@@ -19,4 +19,6 @@ class TokenEndpointTest {
                 .statusCode(200)
                 .body(is("[\"IPV4\",\"IPV6\",\"Statut\",\"Datetime\",\"EdgeResponse\"]"));
     }
+
+ */
 }

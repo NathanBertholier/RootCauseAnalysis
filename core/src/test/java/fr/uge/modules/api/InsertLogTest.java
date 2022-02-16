@@ -29,7 +29,6 @@ public class InsertLogTest {
                 .body("[{\"log\": \"2020-06-15 12:47:50 CDG50-C1 6542 82.255.169.186 200\"}]")
                 .when().post("http://localhost:8083/insert/batch")
                 .then()
-                .statusCode(200)
-                .body(is(index)));
+                .statusCode(201));
     }
 }
