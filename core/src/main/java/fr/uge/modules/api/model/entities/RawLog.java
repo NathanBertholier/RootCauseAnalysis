@@ -1,16 +1,16 @@
 package fr.uge.modules.api.model.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import io.quarkus.hibernate.reactive.panache.PanacheEntity;
 import io.quarkus.hibernate.reactive.panache.PanacheEntityBase;
 
 import javax.persistence.*;
 import java.util.Objects;
 
 @Entity
-public class RawLog extends PanacheEntityBase {
+public class RawLog extends PanacheEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @JsonIgnore
     @Column(name = "id")
     public long id;
 

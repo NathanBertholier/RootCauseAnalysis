@@ -1,5 +1,9 @@
 package fr.uge.modules.api;
 
+import fr.uge.modules.api.model.entities.Log;
+import fr.uge.modules.api.model.entities.RawLog;
+import fr.uge.modules.api.model.entities.Token;
+import io.quarkus.hibernate.reactive.panache.Panache;
 import io.quarkus.test.junit.QuarkusTest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -12,8 +16,10 @@ import static org.hamcrest.CoreMatchers.is;
 @QuarkusTest
 public class InsertLogTest {
     @BeforeEach
-    public void sanitizeDatabases(){
-        //use panache to drop every db items
+    public void sanitizeDatabases() {
+        RawLog.deleteAll();
+        Log.deleteAll();
+        Token.deleteAll();
     }
 
     @Test
