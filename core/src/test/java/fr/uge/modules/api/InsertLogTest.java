@@ -1,8 +1,8 @@
 package fr.uge.modules.api;
 
-import fr.uge.modules.api.model.entities.Log;
-import fr.uge.modules.api.model.entities.RawLog;
-import fr.uge.modules.api.model.entities.Token;
+import fr.uge.modules.api.model.entities.LogEntity;
+import fr.uge.modules.api.model.entities.RawLogEntity;
+import fr.uge.modules.api.model.entities.TokenEntity;
 import io.quarkus.hibernate.reactive.panache.Panache;
 import io.quarkus.test.junit.QuarkusTest;
 import org.junit.jupiter.api.BeforeEach;
@@ -17,9 +17,9 @@ import static org.hamcrest.CoreMatchers.is;
 public class InsertLogTest {
     @BeforeEach
     public void sanitizeDatabases() {
-        RawLog.deleteAll();
-        Log.deleteAll();
-        Token.deleteAll();
+        RawLogEntity.deleteAll();
+        LogEntity.deleteAll();
+        TokenEntity.deleteAll();
     }
 
     @Test
