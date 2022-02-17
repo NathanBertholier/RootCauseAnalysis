@@ -9,14 +9,13 @@ import fr.uge.modules.linking.token.type.TokenType;
 import fr.uge.modules.linking.token.type.TypeDatetime;
 import fr.uge.modules.linking.token.type.TypeHTTPStatus;
 import fr.uge.modules.linking.token.type.TypeIPv4;
-import io.quarkus.runtime.annotations.QuarkusMain;
+import io.quarkus.logging.Log;
 import io.smallrye.mutiny.Uni;
 import io.vertx.mutiny.sqlclient.Row;
 import io.vertx.mutiny.sqlclient.RowIterator;
 
 import java.sql.*;
 import java.time.Duration;
-import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.concurrent.ExecutionException;
 import java.util.logging.Level;
@@ -25,9 +24,8 @@ import java.util.logging.Logger;
 public class Linking {
     private final Logger logger = Logger.getLogger(this.getClass().getName());
 
-    private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
     private final HashMap<Integer, TokenType> tokensType = new HashMap<>();
-    private List<LogEntity> logs = new ArrayList<>(); //Logs coming from target time to target time less delta
+    private final List<LogEntity> logs = new ArrayList<>(); //Logs coming from target time to target time less delta
     private SortedMap<Float, LogEntity> tree;
     private CompleteLog target;
 
@@ -44,7 +42,6 @@ public class Linking {
         logs.clear();
         try {
             var log = LogEntity.<LogEntity>findById(id).subscribeAsCompletionStage().get();
-            System.out.println(log);
             this.target = new CompleteLog(log,
                     RawLogEntity.<RawLogEntity>findById(id).subscribeAsCompletionStage().get());
 
@@ -53,13 +50,11 @@ public class Linking {
             var datetime = log.getDatetime();
             //Get the list of logs within the delta
 
-            var t = Timestamp.valueOf(datetime.toLocalDateTime().minus(Duration.ofSeconds(rp.delta())));
-            var logToLink = LogEntity.<LogEntity>find("datetime = '2021-12-14 09:25:12.000000'")
-                    .range(0, 25).list().subscribe().asCompletionStage().get();
-            //,
-            //                            datetime,
-            //                            Timestamp.valueOf(datetime.toLocalDateTime().minus(Duration.ofSeconds(rp.delta()))))
-            logs = new ArrayList<>(logToLink);
+            var logToLink = LogEntity.<LogEntity>find("datetime between ?1 and ?2",
+                            Timestamp.valueOf(datetime.toLocalDateTime().minus(Duration.ofSeconds(rp.delta()))),
+                            datetime)
+                    .list().subscribe().asCompletionStage().get();
+            logs.addAll(logToLink);
             logs.forEach(System.out::println);
 
             tree = computeProximityTree(target, logs, rp);
@@ -107,7 +102,6 @@ public class Linking {
 
     public SortedMap<Float, LogEntity> computeProximityTree(CompleteLog logTarget, List<LogEntity> logWithinDelta, ReportParameter rp){
         TreeMap<Float, LogEntity> redBlack = new TreeMap<>(Collections.reverseOrder());
-
         var targetDatetime = logTarget.getDatetime();
 
         HashMap<Integer, List<TokenEntity>> tokenTarget = new HashMap<>();
@@ -122,17 +116,16 @@ public class Linking {
         System.out.println(delta);
         logWithinDelta.forEach(log -> {
             float proximity = TypeDatetime.computeDateTimeProximity(log.getDatetime().toLocalDateTime(), targetDatetime, delta);
-            log.getTokens().forEach(token -> {
-                tokenToLink.get(token.getIdtokentype()).add(token);
-            });
+            log.getTokens().forEach(token -> tokenToLink.get(token.getIdtokentype()).add(token));
 
             proximity += tokenTarget.keySet().stream()
                     .mapToDouble((k) -> tokensType.get(k)
                             .computeProximity(tokenTarget.get(k),
                     tokenToLink.get(k))).sum();
 
-            proximity /= (tokenTarget.size() + 1);// NUMBER OF TOKENS CONSIDERATE
+            proximity /= (tokenTarget.size() + 1); // NUMBER OF TOKENS CONSIDERATE + TIMESTAMP
 
+            System.out.println(proximity);
             if(redBlack.size() > rp.network_size() - 1) {
                 if (proximity > redBlack.lastKey()) {
                     redBlack.pollLastEntry();
@@ -143,6 +136,9 @@ public class Linking {
             }
             tokenToLink.forEach((k,v) -> v.clear());
         });
+        System.out.println(redBlack);
+        redBlack.forEach((k,v) -> System.out.println(k + " LOG " + v));
+        redBlack.forEach((k,v) -> System.out.println(k));
         return redBlack;
     }
 
