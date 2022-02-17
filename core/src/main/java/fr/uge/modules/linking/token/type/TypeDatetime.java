@@ -32,7 +32,13 @@ public class TypeDatetime implements TokenType{
     }
 
     public static float computeDateTimeProximity(LocalDateTime ldt1, LocalDateTime ldt2, float delta){
-        return  1 - (Math.abs(ChronoUnit.SECONDS.between(ldt1,ldt2))/delta);
+        var time = ChronoUnit.SECONDS.between(ldt1,ldt2);
+        if(time > delta) {
+            return 0;
+        } else if(time == 0) {
+            return 100;
+        }
+        return  1 - (time/delta);
     }
 
 }

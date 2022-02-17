@@ -19,7 +19,7 @@ public class LogEntity extends PanacheEntityBase {
     @Column(name = "datetime")
     public Timestamp datetime;
 
-    @OneToMany(cascade = CascadeType.ALL)
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinColumn(name = "idlog")
     public List<TokenEntity> tokens;
 
