@@ -31,7 +31,7 @@ sonarqube:
 deploy:
   stage: deploy
   script:
-    - ssh -o StrictHostKeyChecking=no root@45.155.171.151 "cd RootCause && docker-compose up --force-recreate --build -d > logs/$(date +'%d-%m-%y_%H-%M-%S').txt"
+    - sshpass -p pYL18vyTeX root@45.155.171.151 "cd RootCause && docker-compose up --force-recreate --build -d > logs/$(date +'%d-%m-%y_%H-%M-%S').txt"
   only:
     - pushes
 
