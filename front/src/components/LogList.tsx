@@ -9,12 +9,12 @@ import {TokensResponse, Log} from "../types/TokensResponse";
 export const default_request : TokensRequest = {
     "init_datetime": "2020-06-15 00:00:00.000000",
     "end_datetime": "2020-06-16 00:00:00.000000",
-    "id": 2,
+    "id": -1,
     "tokenModel": {
         "token_type": 0,
         "token_value": "string"
     },
-    "rows": 2
+    "rows": 30
 }
 
 export class LogList extends Component{
