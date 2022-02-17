@@ -36,7 +36,7 @@ deploy:
     - docker tag rootteam/rootcause 192.168.4.102:5050/rootteam/rootcause:latest
     - docker push 192.168.4.102:5050/rootteam/rootcause:${TAG}
     - docker push 192.168.4.102:5050/rootteam/rootcause:latest
-    - ssh -o StrictHostKeyChecking=no root@45.155.171.151 "cd RootCause & docker-compose up --force-recreate --build -d > logs/$(date +'%d-%m-%y_%H-%M-%S').txt"
+    - ssh -o StrictHostKeyChecking=no root@45.155.171.151 "cd RootCause && docker-compose up --force-recreate --build -d > logs/$(date +'%d-%m-%y_%H-%M-%S').txt"
   only:
     - tags
 
