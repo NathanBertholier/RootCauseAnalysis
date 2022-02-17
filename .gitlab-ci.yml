@@ -1,8 +1,4 @@
 before_script:
-  - eval `ssh-agent -s`
-  - echo "$SSH_KEY" | tr -d '\r' | ssh-add -
-  - mkdir -p ~/.ssh
-  - chmod 700 ~/.ssh
   - export TAG="${CI_COMMIT_TAG:-latest}" && echo $TAG
 
 stages:
@@ -29,6 +25,8 @@ sonarqube:
 
 deploy:
   stage: deploy
+  tags:
+    - prod
   script:
     - docker login 192.168.4.102:5050 -u Nathan -p RJKfzaGjFsyh12z8zG1f
     - docker build -t rootteam/rootcause .
@@ -36,7 +34,8 @@ deploy:
     - docker tag rootteam/rootcause 192.168.4.102:5050/rootteam/rootcause:latest
     - docker push 192.168.4.102:5050/rootteam/rootcause:${TAG}
     - docker push 192.168.4.102:5050/rootteam/rootcause:latest
-    - ssh -o StrictHostKeyChecking=no root@45.155.171.151 "cd RootCause && docker-compose up --force-recreate --build -d > logs/$(date +'%d-%m-%y_%H-%M-%S').txt"
+    - cd /root/RootCause
+    - docker-compose up --force-recreate --build -d > logs/$(date +'%d-%m-%y_%H-%M-%S').txt
   only:
     - tags
 
