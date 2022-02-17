@@ -5,6 +5,7 @@ before_script:
   - mkdir -p ~/.ssh
   - chmod 700 ~/.ssh
   - export TAG="${CI_COMMIT_TAG:-latest}" && echo $TAG
+  - apt-get install sshpass -y
 
 stages:
   - quality
