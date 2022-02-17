@@ -1,11 +1,9 @@
 before_script:
   - eval `ssh-agent -s`
   - echo "$SSH_KEY" | tr -d '\r' | ssh-add -
-  - echo "$SSH_KEY"
   - mkdir -p ~/.ssh
   - chmod 700 ~/.ssh
   - export TAG="${CI_COMMIT_TAG:-latest}" && echo $TAG
-  - apt-get install sshpass -y
 
 stages:
   - quality
@@ -32,7 +30,7 @@ sonarqube:
 deploy:
   stage: deploy
   script:
-    - sshpass -p pYL18vyTeX root@45.155.171.151 "cd RootCause && docker-compose up --force-recreate --build -d > logs/$(date +'%d-%m-%y_%H-%M-%S').txt"
+    - ssh -o StrictHostKeyChecking=no root@45.155.171.151 "cd RootCause && docker-compose up --force-recreate --build -d > logs/$(date +'%d-%m-%y_%H-%M-%S').txt"
   only:
     - pushes
 
