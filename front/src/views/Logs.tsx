@@ -355,11 +355,11 @@ export const Logs = () => {
                     default:
                         break;
                 }
+                return s
             } )
             array.push( { id: Filter.LOG_ID,                    option: "log_id",       text: "ID du log",      alone: true } )
             array.sort( (x, y) => x.id > y.id ? 1 : -1 )
             setDEFAULT_FILTERS( array )
-
         }).catch((e: Error) => {
             //TODO TOAST
             console.log(e)

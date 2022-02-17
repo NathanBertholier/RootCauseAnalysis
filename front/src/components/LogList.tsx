@@ -4,7 +4,7 @@ import {Row} from "./TableRowLog";
 import DataService from "../services/DataService";
 import {toast} from "../tools/ToastManager";
 import {TokensRequest} from "../types/TokensRequest";
-import {TokensResponse, Log} from "../types/TokensResponse";
+import {Log} from "../types/TokensResponse";
 
 export const default_request : TokensRequest = {
     "init_datetime": "2020-06-15 00:00:00.000000",

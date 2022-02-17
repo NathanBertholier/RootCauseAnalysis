@@ -58,7 +58,8 @@
   width: 80%;
   margin-left: 20%;
   padding: 0;
-  height: 100vh;
+  min-height: 100vh;
+  background-color: #d9dbe0;
 }
 
 .black-icon {
@@ -67,7 +68,7 @@
 
 .title {
   text-align: left;
-  margin-left: 20px;
+  margin: 15px 10px 40px;
 }
 
 .logTable {
@@ -121,4 +122,18 @@
 .react-datetime-picker .react-datetime-picker__wrapper {
   border-radius: 0.25rem;
   padding: 5px;
+}
+
+.graph-container {
+  margin-bottom: 30px;
+  background-color: white;
+  border-radius: 10px;
+  padding: 15px 10px 25px;
+  margin-right: 10px;
+}
+
+.graph-title {
+  text-align: left;
+  font-size: 30px;
+  margin-bottom: 30px;
 }
