@@ -25,7 +25,7 @@ deploy:
   tags:
     - prod
   script:
-    - cd RootCause
+    - pwd
     - docker-compose up --force-recreate --build -d > logs/$(date +'%d-%m-%y_%H-%M-%S').txt"
   only:
     - pushes
