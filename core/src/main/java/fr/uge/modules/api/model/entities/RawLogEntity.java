@@ -1,5 +1,6 @@
 package fr.uge.modules.api.model.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.quarkus.hibernate.reactive.panache.PanacheEntityBase;
 
 import javax.persistence.*;
@@ -25,12 +26,12 @@ public class RawLogEntity extends PanacheEntityBase {
         this.id = id;
     }
 
-    public String getValue() {
+    public String getLog() {
         return log;
     }
 
-    public void setValue(String value) {
-        this.log = value;
+    public void setLog(String log) {
+        this.log = log;
     }
 
     @Override

@@ -4,6 +4,7 @@ import com.google.gson.JsonParser;
 import fr.uge.modules.api.model.entities.MonitoringEntity;
 import io.quarkus.hibernate.reactive.panache.Panache;
 import io.quarkus.scheduler.Scheduled;
+import org.eclipse.microprofile.config.inject.ConfigProperty;
 
 import javax.enterprise.context.ApplicationScoped;
 import java.io.IOException;
@@ -21,19 +22,16 @@ import java.util.logging.Logger;
 @ApplicationScoped
 public class MonitorInserter {
     private static final String QUEUE_NAME = "logs";
-    private final Properties properties = new Properties();
     private final Logger logger = Logger.getGlobal();
-
-    MonitorInserter() throws IOException {
-        this.properties.load(MonitorInserter.class.getClassLoader().getResourceAsStream("init.properties"));
-    }
+    @ConfigProperty(name = "rabbitmq-host")
+    String rabbitmqurl;
 
     @Scheduled(every="5s")
     public void getValueFromAPI() {
         MonitoringEntity monitoring = new MonitoringEntity();
         try {
             String sURL = "http://"
-                    + this.properties.getProperty("MQMONITORINGSRV")
+                    + rabbitmqurl
                     + ":15672/api/exchanges/%2f/"
                     + QUEUE_NAME;
 

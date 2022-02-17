@@ -1,9 +1,9 @@
 import React from "react";
 import {useState} from "react";
 import { Collapse } from "react-bootstrap"
-import {Log} from "../types/token.type";
+import {Log} from "../types/TokensResponse";
 
-export const Row = ({ id, datetime, tokenModels, content } : Log ) => {
+export const Row = ({ id, datetime, tokens, content } : Log ) => {
     const [ isUnfold, setIsUnfold ] = useState(false);
 
     return (
@@ -11,11 +11,11 @@ export const Row = ({ id, datetime, tokenModels, content } : Log ) => {
         <td>{id}</td>
             <td>{datetime}</td>
             <td>
-                <span>{tokenModels.length}</span>
-                { tokenModels.map( (token, index ) => {
+                <span>{tokens.length}</span>
+                { tokens.map( (token, index ) => {
                     return <Collapse in={isUnfold} key={index}>
                         <div id="example-collapse-text">
-                            {token.token_type} : { token.token_value }
+                            {token.token_type.name} : { token.value }
                         </div>
                     </Collapse>
 

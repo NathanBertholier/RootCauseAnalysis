@@ -1,25 +1,33 @@
 package fr.uge.modules.api.model.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.quarkus.hibernate.reactive.panache.PanacheEntityBase;
 
 import javax.persistence.*;
 
 @Entity
 @Table(name = "token", schema = "public", catalog = "rootcause")
-public class TokenEntity extends PanacheEntityBase {
+public class Token extends PanacheEntityBase {
+    @JsonIgnore
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Id
     @Column(name = "id")
     public long id;
+    @JsonIgnore
     @Basic
     @Column(name = "idlog")
     public long idlog;
+    @OneToOne
+    @JoinColumn(name = "idtokentype",insertable = false, updatable = false)
+    public TokenTypeEntity token_type;
+    @JsonIgnore
     @Basic
     @Column(name = "idtokentype")
     public int idtokentype;
     @Basic
     @Column(name = "value")
     public String value;
+
 
     public long getId() {
         return id;
@@ -45,21 +53,19 @@ public class TokenEntity extends PanacheEntityBase {
         this.idtokentype = idtokentype;
     }
 
-    public String getValue() {
-        return value;
+    public String[] getValue() {
+        return new String[]{value};
     }
 
     public void setValue(String value) {
         this.value = value;
     }
 
-    @Override
-    public String toString() {
-        return "TokenEntity{" +
-                "id=" + id +
-                ", idlog=" + idlog +
-                ", idtokentype=" + idtokentype +
-                ", value='" + value + '\'' +
-                '}';
+    public TokenTypeEntity getToken_type() {
+        return token_type;
+    }
+
+    public void setToken_type(TokenTypeEntity token_type) {
+        this.token_type = token_type;
     }
 }
