@@ -137,3 +137,23 @@
   font-size: 30px;
   margin-bottom: 30px;
 }
+/*******************************
+ * Log Css
+ *******************************/
+
+.logs-container {
+  background-color: white;
+  width: auto;
+  min-height: 70vh;
+  border-radius: 10px;
+  margin-right: 50px;
+  margin-left: 15px;
+}
+
+.logs-filters-container {
+  padding-top: 30px;
+}
+
+.logs-table-container {
+  padding-bottom: 50px;
+}

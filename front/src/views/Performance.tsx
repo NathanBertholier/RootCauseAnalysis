@@ -8,7 +8,7 @@ export const Performance = () => {
             <Row>
                 <Sidebar selected="perf" />
                 <div id="content-wrapper" >
-                    <h1 className="title" >Performance</h1>
+                    <h1 className="title">Performance</h1>
                     <Container fluid>
                         <Row className="graph-container" >
                             <h2 className="graph-title">Volumes</h2>

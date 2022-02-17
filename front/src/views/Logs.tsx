@@ -71,8 +71,8 @@ export const Logs = () => {
     const rowsNumberInput               = useRef<HTMLInputElement>(null!);
 
     const DEFAULT_FIELDS : Field[] = [
-        {id: Filter.START_DATE, type: "datetime", label: "date de début", value: startDate, setter: (date: Date) => setStartDate( date ) },
-        {id: Filter.END_DATE, type: "datetime", label: "date de fin", value: endDate, setter: (date: Date) => setEndDate( date ) },
+        {id: Filter.START_DATE, type: "datetime", label: "Date de début", value: startDate, setter: (date: Date) => setStartDate( date ) },
+        {id: Filter.END_DATE, type: "datetime", label: "Date de fin", value: endDate, setter: (date: Date) => setEndDate( date ) },
         {id: Filter.EDGE_RESPONSE, type: "text", label: "Edge Response", placeholder: "", patern: "^((Hit)|(RefreshHit)|(Miss)|(LimitExceeded)|(CapacityExceeded)|(Error)|(Redirect))$", validator: data => {
             let message = getErrorMessage( "Edge Response", edgeResponseInput )
             setErrorMessage( data, Filter.EDGE_RESPONSE, message );
@@ -337,8 +337,8 @@ export const Logs = () => {
             obj.map( s => {
                 switch ( s ) {
                     case "Datetime":
-                        array.push( { id: Filter.START_DATE,    option: "start_date",   text: "date début",     alone: false } )
-                        array.push( { id: Filter.END_DATE,      option: "end_date",     text: "date fin",       alone: false }, )
+                        array.push( { id: Filter.START_DATE,    option: "start_date",   text: "Date début",     alone: false } )
+                        array.push( { id: Filter.END_DATE,      option: "end_date",     text: "Date fin",       alone: false }, )
                         break;
                     case "IPv4":
                         array.push( { id: Filter.IPv4,          option: "ipv4",         text: s,                alone: false } )
@@ -376,8 +376,8 @@ export const Logs = () => {
                 <Sidebar selected="logs" />
                 <div id="content-wrapper" >
                     <h1 className="title" >Logs</h1>
-                    <Container fluid>
-                        <Row>
+                    <Container fluid className="logs-container">
+                        <Row className="logs-filters-container" >
                             <Col sm={8}>
                                 <Container fluid className="p-0">
                                     <Row>
@@ -387,10 +387,10 @@ export const Logs = () => {
                                                     uiFields.map( ( field, index ) => {
 
                                                         return <Row key={index}>
-                                                            <Col sm={2} className="input-labels" >
+                                                            <Col sm={3} className="input-labels" >
                                                                 { field.label }
                                                             </Col>
-                                                            <Col sm={9} className="filter-container" >
+                                                            <Col sm={8} className="filter-container" >
                                                                 <Container fluid className="p-0">
                                                                     <Row>
                                                                         { getInput( field ) }
@@ -444,14 +444,16 @@ export const Logs = () => {
                                 </Container>
                             </Col>
                         </Row>
+                        <Row className="logs-table-container" >
+                            <LogList ref={ logList => {
+                                if ( shouldApplyFilters && logList !== null ) {
+                                    logList.filter( requestData );
+                                    setShouldApplyFilters( false );
+                                    setIsBtnDisabled( false );
+                                }
+                            } } />
+                        </Row>
                     </Container>
-                    <LogList ref={ logList => {
-                        if ( shouldApplyFilters && logList !== null ) {
-                            logList.filter( requestData );
-                            setShouldApplyFilters( false );
-                            setIsBtnDisabled( false );
-                        }
-                    } } />
                 </div>
             </Row>
         </Container>
