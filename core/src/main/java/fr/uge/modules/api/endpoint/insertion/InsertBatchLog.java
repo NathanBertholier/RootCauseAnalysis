@@ -8,7 +8,6 @@ import org.eclipse.microprofile.reactive.messaging.Emitter;
 
 import javax.inject.Inject;
 import javax.validation.ConstraintViolation;
-import javax.validation.Valid;
 import javax.validation.Validator;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
@@ -24,7 +23,6 @@ import java.util.function.Predicate;
 import java.util.function.Supplier;
 import java.util.logging.Logger;
 import java.util.stream.LongStream;
-import java.util.stream.Stream;
 
 @Path("/insertlog")
 public class InsertBatchLog {
@@ -47,13 +45,15 @@ public class InsertBatchLog {
                 .map(ConstraintViolation::getMessage)
                 .toList();
 
-        if(!violations.isEmpty()) return Uni.createFrom().item(Response.status(400).entity(violations).build());
+        if(!violations.isEmpty()) {
+            return Uni.createFrom().item(Response.status(400).entity(violations).build());
+        }
 
         return Panache.withTransaction(
                 () -> RawLogEntity.persist(inputs)
                         .onItemOrFailure().transform((success, error) -> {
                             if(error != null) {
-                                logger.severe("Errror while inserting: " + error);
+                                logger.severe("Error while inserting: " + error);
                                 return withServerError.get();
                             } else {
                                 logger.info("Inserted: " + inputs);
