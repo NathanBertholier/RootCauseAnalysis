@@ -28,7 +28,7 @@ public class CompleteLog {
     }
 
     public CompleteLog(LogEntity logEntity, RawLogEntity rawLogEntity) {
-        this(logEntity.getId(), rawLogEntity.getValue(), logEntity.getDatetime().toLocalDateTime(), logEntity.getTokens());
+        this(logEntity.getId(), rawLogEntity.getLog(), logEntity.getDatetime().toLocalDateTime(), logEntity.getTokens());
     }
 
     public ArrayList<TokenEntity> getTokens() {

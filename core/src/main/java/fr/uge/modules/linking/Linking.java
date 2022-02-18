@@ -2,14 +2,12 @@ package fr.uge.modules.linking;
 
 import fr.uge.modules.api.model.CompleteLog;
 import fr.uge.modules.api.model.entities.LogEntity;
-import fr.uge.modules.api.model.entities.RawLogEntity;
 import fr.uge.modules.api.model.entities.TokenEntity;
 import fr.uge.modules.api.model.report.ReportParameter;
 import fr.uge.modules.linking.token.type.TokenType;
 import fr.uge.modules.linking.token.type.TypeDatetime;
 import fr.uge.modules.linking.token.type.TypeHTTPStatus;
 import fr.uge.modules.linking.token.type.TypeIPv4;
-import io.quarkus.logging.Log;
 import io.smallrye.mutiny.Uni;
 import io.vertx.mutiny.sqlclient.Row;
 import io.vertx.mutiny.sqlclient.RowIterator;
@@ -42,8 +40,9 @@ public class Linking {
         logs.clear();
         try {
             var log = LogEntity.<LogEntity>findById(id).subscribeAsCompletionStage().get();
+            System.out.println(log);
             this.target = new CompleteLog(log,
-                    RawLogEntity.<RawLogEntity>findById(id).subscribeAsCompletionStage().get());
+                    log.getRawLog());
 
             //Get the target log
             logger.log(Level.INFO,() -> "Log target : " + target + "\n");
@@ -108,7 +107,6 @@ public class Linking {
         fillHashmap(logTarget.getTokens(), tokenTarget);
 
         var delta = rp.delta();
-
 
         HashMap<Integer, List<TokenEntity>> tokenToLink = new HashMap<>();
         this.tokensType.forEach((id,v) -> tokenToLink.computeIfAbsent(id, k -> new ArrayList<>()));

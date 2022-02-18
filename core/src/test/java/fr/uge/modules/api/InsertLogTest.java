@@ -1,10 +1,9 @@
 package fr.uge.modules.api;
 
-import fr.uge.modules.api.model.entities.Log;
+import fr.uge.modules.api.model.entities.LogEntity;
 import fr.uge.modules.api.model.entities.RawLogEntity;
-import fr.uge.modules.api.model.entities.Token;
+import fr.uge.modules.api.model.entities.TokenEntity;
 import io.quarkus.test.junit.QuarkusTest;
-import netscape.javascript.JSObject;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -20,8 +19,8 @@ public class InsertLogTest {
     @BeforeEach
     public void sanitizeDatabases() {
         RawLogEntity.deleteAll();
-        Log.deleteAll();
-        Token.deleteAll();
+        LogEntity.deleteAll();
+        TokenEntity.deleteAll();
     }
 
     @Test

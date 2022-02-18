@@ -7,7 +7,7 @@ import javax.persistence.*;
 
 @Entity
 @Table(name = "token", schema = "public", catalog = "rootcause")
-public class Token extends PanacheEntityBase {
+public class TokenEntity extends PanacheEntityBase {
     @JsonIgnore
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Id
