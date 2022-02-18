@@ -14,16 +14,20 @@ export const default_request : TokensRequest = {
         "token_type": 0,
         "token_value": "string"
     },
-    "rows": 2
+    "rows": 1
 }
 
-export class LogList extends Component{
+type LogsTableProp = {
+    gettingData: (x:boolean) => void
+}
+
+export class LogsTable extends Component<LogsTableProp>{
     state = {
         list: Array<Log>()
     }
 
     componentDidMount() {
-        this.retrieveLogs();
+        this.filter( default_request );
     }
 
     filter( request: TokensRequest ) {
@@ -34,25 +38,13 @@ export class LogList extends Component{
             this.setState( {
                 list: logs
             })
+            this.props.gettingData( false );
         }).catch((e: Error) => {
             toast.show({
                 content: "un problème est survenue",
                 duration: 3000,
             });
-        });
-    }
-
-    retrieveLogs() {
-        DataService.getAll( default_request ).then((response: any) => {
-            let logs : Log[] = response.data
-            this.setState( {
-                list: logs
-            })
-        }).catch((e: Error) => {
-            toast.show({
-                content: "un problème est survenue",
-                duration: 3000,
-            });
+            this.props.gettingData( false );
         });
     }
 
@@ -76,7 +68,6 @@ export class LogList extends Component{
                     }
                     </tbody>
                 </Table>
-
             </div>
         )
     }

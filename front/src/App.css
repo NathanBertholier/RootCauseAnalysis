@@ -73,8 +73,6 @@
 
 .logTable {
   margin-bottom: 0;
-  margin-left: 20px;
-  width: calc(100% - 20px);
 }
 
 .custom-input {
@@ -155,5 +153,29 @@
 }
 
 .logs-table-container {
+  position: relative;
   padding-bottom: 50px;
+}
+
+/*******************************
+ * Loader overlay
+ *******************************/
+
+.spinner-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: black;
+  opacity: 0.5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+}
+
+.loader-message {
+  margin-left: 10px;
+  font-size: 18px;
 }

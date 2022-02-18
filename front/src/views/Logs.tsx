@@ -1,12 +1,13 @@
 import {Sidebar} from "../components/Sidebar";
 import React, {useEffect, useRef, useState} from "react";
-import {LogList, default_request} from "../components/LogList";
+import {LogsTable, default_request} from "../components/LogsTable";
 import {Button, Col, Container, Dropdown, DropdownButton, Form, FormControl, Row} from "react-bootstrap";
 import { AiOutlineCloseCircle } from "react-icons/ai";
 import {toast} from "../tools/ToastManager";
 import DateTimePicker from 'react-datetime-picker';
 import DataService from "../services/DataService";
 import {TokenModel, TokensRequest} from "../types/TokensRequest";
+import { Loader } from "../components/Loader"
 
 type Item = {
     id: number
@@ -51,7 +52,7 @@ export const Logs = () => {
     const [ DEFAULT_FILTERS, setDEFAULT_FILTERS ]           = useState<Item[]>( [] );
     // ui
     const [ isLogIDFilter, setIsLogIDFilter ]               = useState( false );
-    const [ isBtnDisabled, setIsBtnDisabled ]               = useState( false );
+    const [ isBtnDisabled, setIsBtnDisabled ]               = useState( true );
     const [ rowInputError, setRowInputError ]               = useState( "" );
     const [ uiFields, setUiFields ]                         = useState<Field[]>( [] );
     const [ filters, setFilters ]                           = useState<Item[]>( DEFAULT_FILTERS );
@@ -173,23 +174,19 @@ export const Logs = () => {
 
         let tokens: TokenModel = { token_type: -1, token_value: "" };
         if ( tokenIPInput.current !== null ) {
-            console.log("v4");
             tokens = { token_type: 1, token_value: tokenIPInput.current.value }
             //tokens.push( { token_type: 1, token_value: tokenIPInput.current.value } );
         }
         if ( tokenIPv6Input.current !== null ) {
-            console.log("v6");
             tokens = { token_type: 2, token_value: tokenIPv6Input.current.value }
             //tokens.push(  );
         }
 
         if ( statusInput.current !== null ) {
-            console.log("status");
             tokens = { token_type: 3, token_value: statusInput.current.value }
         }
 
         if ( edgeResponseInput.current !== null ) {
-            console.log("edge");
             tokens = { token_type: 5, token_value: edgeResponseInput.current.value }
         }
 
@@ -445,13 +442,14 @@ export const Logs = () => {
                             </Col>
                         </Row>
                         <Row className="logs-table-container" >
-                            <LogList ref={ logList => {
-                                if ( shouldApplyFilters && logList !== null ) {
-                                    logList.filter( requestData );
-                                    setShouldApplyFilters( false );
-                                    setIsBtnDisabled( false );
-                                }
-                            } } />
+                                <Loader show={ isBtnDisabled } />
+                                <LogsTable ref={logList => {
+                                    if ( shouldApplyFilters && logList !== null ) {
+                                        logList.filter( requestData );
+                                        setShouldApplyFilters( false );
+                                        //setIsBtnDisabled( false );
+                                    }
+                                } } gettingData={ isGettingData => setIsBtnDisabled( isGettingData ) } />
                         </Row>
                     </Container>
                 </div>
