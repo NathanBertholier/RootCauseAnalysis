@@ -110,6 +110,7 @@ public class Linking {
      */
     // INNER JOIN token t ON log.id = t.idlog
     private CompleteLog fetchLog(long idlogtarget) throws SQLException {
+        /*
         //Query to fetch the tokens of the logtarget in database
         try(PreparedStatement fetchLog = connection.prepareStatement("SELECT * FROM log INNER JOIN token t ON log.id = t.idlog WHERE log.id = ?")){
             fetchLog.setLong(1, idlogtarget);
@@ -127,6 +128,8 @@ public class Linking {
             }
             return new CompleteLog(idlogtarget, ldt, tokenSet);
         }
+         */
+        return null;
     }
 
 
@@ -139,8 +142,9 @@ public class Linking {
      * @return the lists of logs within the delta
      * @throws SQLException
      */
-    private List<CompleteLog> fetchListLog(long idtarget, LocalDateTime datetime, long delta) throws SQLException {
-        LocalDateTime ldtminusdelta = datetime.minus(Duration.ofSeconds(delta));
+    private List<CompleteLog> fetchListLog(long idtarget, Timestamp datetime, long delta) throws SQLException {
+        /*
+        LocalDateTime ldtminusdelta = datetime(Duration.ofSeconds(delta));
         try(PreparedStatement fetchListLog = connection.prepareStatement("SELECT * FROM log INNER JOIN token t ON log.id = t.idlog WHERE datetime BETWEEN ? AND ? AND log.id != ?")) {
             fetchListLog.setTimestamp(1, Timestamp.valueOf(ldtminusdelta.format(formatter)));
             fetchListLog.setTimestamp(2, Timestamp.valueOf(datetime.format(formatter)));
@@ -168,6 +172,8 @@ public class Linking {
             }
             return lst;
         }
+         */
+        return null;
     }
 
     public String fetchTokenType(int id) throws SQLException {

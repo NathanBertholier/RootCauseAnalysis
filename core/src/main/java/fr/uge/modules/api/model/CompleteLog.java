@@ -2,21 +2,22 @@ package fr.uge.modules.api.model;
 
 import fr.uge.modules.api.model.entities.TokenEntity;
 
+import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
 public class CompleteLog {
     private final long id;
-    private final LocalDateTime datetime;
+    private final Timestamp datetime;
     private String content;
     private final ArrayList<TokenEntity> tokens = new ArrayList<>();
 
-    public CompleteLog(long id, LocalDateTime ldt, List<TokenEntity> tokenSet) {
+    public CompleteLog(long id, Timestamp ldt, List<TokenEntity> tokenSet) {
         this(id, "", ldt, tokenSet);
     }
 
-    public CompleteLog(long id, String content, LocalDateTime ldt, List<TokenEntity> tokenSet) {
+    public CompleteLog(long id, String content, Timestamp ldt, List<TokenEntity> tokenSet) {
         this.content = content;
         this.id = id;
         this.datetime = ldt;
@@ -31,7 +32,7 @@ public class CompleteLog {
         return id;
     }
 
-    public LocalDateTime getDatetime() {
+    public Timestamp getDatetime() {
         return datetime;
     }
 

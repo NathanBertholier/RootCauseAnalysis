@@ -7,10 +7,15 @@ import fr.uge.db.insert.monitoring.MonitorInserter;
 import fr.uge.modules.api.model.ReportResponse;
 import fr.uge.modules.api.model.TokensMostSeen;
 import fr.uge.modules.api.model.CompleteLog;
+import fr.uge.modules.api.model.entities.LogEntity;
+import fr.uge.modules.api.model.entities.RawLogEntity;
 import fr.uge.modules.api.model.report.ReportParameter;
+import io.quarkus.hibernate.reactive.panache.PanacheEntity;
+import io.smallrye.mutiny.Uni;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -28,22 +33,12 @@ public class Synthetization {
         }
     }
 
-    public static ReportResponse getReport(long rootlog, ReportParameter reportParameter) throws SQLException {
-        /*
-        Linking l = new Linking("jdbc:postgresql://" +
-                PROPERTIES.getProperty("DBSRV") +
-                ":5432/" +
-                PROPERTIES.getProperty("DB") +
-                "?user=" +
-                PROPERTIES.getProperty("DBLOGIN") +
-                "&password=" +
-                PROPERTIES.getProperty("DBPWD") +
-        "&stringtype=unspecified",rootlog, reportParameter);
-        var rootLog = l.getTarget();
-        var map = l.getTree();
-        return new ReportResponse(new CompleteLog(rootLog.getId(), rootLog.getContent(), rootLog.getDatetime(), rootLog.getTokens()), getTokens(map), getLogs(map));
-         */
-        return null;
+    public static Uni<CompleteLog> getReport(long idRootLog, ReportParameter reportParameter) {
+        return LogEntity
+                .<LogEntity>find("id = ?1", idRootLog)
+                .firstResult()
+                .onFailure().recoverWithUni(error -> Uni.createFrom().failure(NoSuchElementException::new))
+                .map(rootLog -> new CompleteLog(rootLog.id, rootLog.rawLog.log, rootLog.datetime, rootLog.tokens));
     }
 
     private static TokensMostSeen[] getTokens(SortedMap<Float, CompleteLog> map) {
