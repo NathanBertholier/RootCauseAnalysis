@@ -46,10 +46,10 @@ public class Linking {
         //Get the target log
         target = fetchLog(id);
         logger.log(Level.INFO,() -> "Log target : " + target + "\n") ;
-        target.setContent(fetchRawLog(id));
+//       target.content(fetchRawLog(id));
 
         //Get the list of logs within the delta
-        logs = fetchListLog(id, target.getDatetime(), rp.delta());
+        logs = fetchListLog(id, target.datetime(), rp.delta());
         tree = computeProximityTree(target, logs, rp);
     }
 

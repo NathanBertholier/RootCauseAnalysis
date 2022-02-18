@@ -7,39 +7,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-public class CompleteLog {
-    private final long id;
-    private final Timestamp datetime;
-    private String content;
-    private final ArrayList<TokenEntity> tokens = new ArrayList<>();
-
-    public CompleteLog(long id, Timestamp ldt, List<TokenEntity> tokenSet) {
-        this(id, "", ldt, tokenSet);
-    }
-
-    public CompleteLog(long id, String content, Timestamp ldt, List<TokenEntity> tokenSet) {
-        this.content = content;
-        this.id = id;
-        this.datetime = ldt;
-        tokens.addAll(tokenSet);
-    }
-
-    public ArrayList<TokenEntity> getTokens() {
-        return tokens;
-    }
-
-    public long getId() {
-        return id;
-    }
-
-    public Timestamp getDatetime() {
-        return datetime;
-    }
-
-    public String getContent() {
-        return content;
-    }
-
+public record CompleteLog(long id, Timestamp datetime, String content, List<TokenEntity> tokens) {
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
@@ -51,9 +19,5 @@ public class CompleteLog {
         }
         sb.append(" }");
         return sb.toString();
-    }
-
-    public void setContent(String content) {
-        this.content = content;
     }
 }

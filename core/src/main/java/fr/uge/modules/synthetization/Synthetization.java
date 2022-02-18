@@ -9,9 +9,14 @@ import fr.uge.modules.api.model.TokensMostSeen;
 import fr.uge.modules.api.model.CompleteLog;
 import fr.uge.modules.api.model.entities.LogEntity;
 import fr.uge.modules.api.model.entities.RawLogEntity;
+import fr.uge.modules.api.model.entities.TokenEntity;
 import fr.uge.modules.api.model.report.ReportParameter;
 import io.quarkus.hibernate.reactive.panache.PanacheEntity;
+import io.quarkus.panache.common.Sort;
+import io.smallrye.common.annotation.Blocking;
+import io.smallrye.mutiny.Multi;
 import io.smallrye.mutiny.Uni;
+import org.hibernate.criterion.Projections;
 
 import java.io.IOException;
 import java.sql.SQLException;
@@ -19,6 +24,7 @@ import java.time.LocalDateTime;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 public class Synthetization {
     private static ObjectMapper mapper = new ObjectMapper();
@@ -33,15 +39,32 @@ public class Synthetization {
         }
     }
 
-    public static Uni<CompleteLog> getReport(long idRootLog, ReportParameter reportParameter) {
+    @Blocking
+    public static Uni<ReportResponse> getReport(long idRootLog, ReportParameter reportParameter) {
         return LogEntity
-                .<LogEntity>find("id = ?1", idRootLog)
-                .firstResult()
+                .<LogEntity>findById(idRootLog)
                 .onFailure().recoverWithUni(error -> Uni.createFrom().failure(NoSuchElementException::new))
-                .map(rootLog -> new CompleteLog(rootLog.id, rootLog.rawLog.log, rootLog.datetime, rootLog.tokens));
+                .map(rootLog -> {
+                    var logRoot = new CompleteLog(rootLog.id, rootLog.datetime, rootLog.rawLog.log, rootLog.tokens);
+                    var logsChildren = fetchChildren()
+                    return getMostSeenTokens(idRootLog)
+                            .map(map -> map
+                                    .entrySet().stream()
+                                    .map(entry -> new TokensMostSeen(
+                                            entry.getValue().token_type(),
+                                            entry.getValue().token_value(),
+                                            entry.getKey()))
+                                    .collect(Collectors.toSet()))
+                            .map(mostSeen -> new ReportResponse(logRoot, mostSeen, ));
+                    return new ReportResponse(logRoot, tokensMostSeen, null);
+                });
     }
 
-    private static TokensMostSeen[] getTokens(SortedMap<Float, CompleteLog> map) {
+    private static Uni<Map<Long, TokensMostSeen>> getMostSeenTokens(long idRootLog) {
+        return TokenEntity.find("idlog = ?1", idRootLog)
+                .<TokenEntity>stream()
+                .group().by(TokenEntity::getValue)
+                .toUni().map(group -> new TreeMap(Comparator.naturalOrder()));
         /*
         ArrayList<Token> list = new ArrayList<>();
         ArrayList<TokensMostSeen> tokens = new ArrayList<>();
@@ -72,23 +95,20 @@ public class Synthetization {
             tokens.add(new TokensMostSeen(k,tabstring,entry2.getKey()));
         });
          */
-        return new TokensMostSeen[]{};
     }
 
     private static ArrayNode getProximity(SortedMap<Float, CompleteLog> map) {
         ArrayNode prox = mapper.createArrayNode();
         map.forEach((k, v) -> {
             ObjectNode log = mapper.createObjectNode();
-            log.put("id", v.getId());
+            log.put("id", v.id());
             log.put("proximity", k);
             prox.add(log);
         });
         return prox;
     }
 
-    private static CompleteLog[] getLogs(SortedMap<Float, CompleteLog> map) {
-        ArrayList<CompleteLog> logs = new ArrayList<>();
-        map.forEach((k, v) -> logs.add(new CompleteLog(v.getId(), v.getContent(), v.getDatetime(), v.getTokens())));
-        return logs.toArray(CompleteLog[]::new);
+    private static CompleteLog[] fetchChildren() {
+        return null;
     }
 }
