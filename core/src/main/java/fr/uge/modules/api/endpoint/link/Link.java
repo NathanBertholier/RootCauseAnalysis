@@ -2,6 +2,7 @@ package fr.uge.modules.api.endpoint.link;
 
 import fr.uge.modules.api.model.linking.Computation;
 import fr.uge.modules.api.model.linking.LinksResponse;
+import io.smallrye.common.constraint.NotNull;
 import io.smallrye.mutiny.Uni;
 
 import javax.ws.rs.*;
@@ -16,7 +17,13 @@ public class Link {
     @GET
     @Consumes(APPLICATION_JSON)
     @Produces(APPLICATION_JSON)
-    public Uni<LinksResponse> getProximity(@QueryParam("id1") long id_log_first, @QueryParam("id2") long id_log_second, @QueryParam("delta") long delta){
+    public Uni<LinksResponse> getProximity(
+            @QueryParam("id1") @NotNull long id_log_first,
+            @QueryParam("id2") @NotNull long id_log_second,
+            @QueryParam("delta") Long delta){
+        if(delta == null){
+            // get default value
+        }
         return Uni.createFrom().item(response);
     }
 }

@@ -6,7 +6,11 @@ import fr.uge.modules.linking.Linking;
 import fr.uge.modules.synthetization.Synthetization;
 import io.smallrye.common.annotation.Blocking;
 import io.smallrye.mutiny.Uni;
+import org.eclipse.microprofile.config.inject.ConfigProperty;
+
+import javax.inject.Inject;
 import javax.ws.rs.*;
+import javax.ws.rs.core.Response;
 import java.sql.SQLException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -15,21 +19,32 @@ import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 
 @Path("/report/{id}")
 public class Report {
+    @Inject
+    EnvRetriever envRetriever;
     private static final Logger LOGGER = Logger.getLogger(Report.class.getName());
 
     @GET
     @Consumes(APPLICATION_JSON)
     @Produces(APPLICATION_JSON)
-    @Blocking
-    public Uni<ReportResponse> getReport(@PathParam("id")long idLogTarget,
-                                         @QueryParam("expanded") boolean expanded,
-                                         @QueryParam("delta") long delta,
-                                         @QueryParam("cache") boolean cache,
-                                         @QueryParam("proximity_limit") float proximity_limit,
-                                         @QueryParam("network_size") int network_size) throws SQLException {
+    public Uni<Response> getReport(
+            @PathParam("id") long idLogTarget,
+            @QueryParam("expanded") Boolean expanded,
+            @QueryParam("delta") Long delta,
+            @QueryParam("cache") Boolean cache,
+            @QueryParam("proximity_limit") Integer proximity_limit,
+            @QueryParam("network_size") Integer network_size
+    ) throws SQLException {
+        if(expanded == null) expanded = envRetriever.reportDefaultExpanded();
+        if(delta == null) delta = envRetriever.reportDefaultDelta();
+        if(cache == null) cache = envRetriever.reportDefaultCache();
+        if(proximity_limit == null) proximity_limit = envRetriever.reportDefaultLimit();
+        if(network_size == null) network_size = envRetriever.reportDefaultSize();
 
         ReportParameter reportParameter = new ReportParameter(expanded, delta, cache, proximity_limit, network_size);
         LOGGER.log(Level.INFO, "Received request for id " +  idLogTarget + " with parameters: " + reportParameter);
+        System.out.println("ReportParameter: " + reportParameter);
+        var report = Synthetization.getReport(idLogTarget, reportParameter);
+        return Uni.createFrom().item(Response.ok().entity(reportParameter).build());
         //var report = Synthetization.getReport(idLogTarget, reportParameter);
         var link = new Linking();
         link.link(idLogTarget, reportParameter);

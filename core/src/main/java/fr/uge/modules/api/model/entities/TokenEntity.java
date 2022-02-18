@@ -61,6 +61,16 @@ public class TokenEntity extends PanacheEntityBase {
         this.value = value;
     }
 
+    @Override
+    public String toString() {
+        return "TokenEntity{" +
+                "id=" + id +
+                ", idlog=" + idlog +
+                ", idtokentype=" + idtokentype +
+                ", value='" + value + '\'' +
+                '}';
+    }
+
     public TokenTypeEntity getToken_type() {
         return token_type;
     }

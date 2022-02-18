@@ -16,13 +16,13 @@ public class TokenRetriever {
         var rows = tokenRequest.rows();
         var id = tokenRequest.id();
 
-        return LogEntity.retrieveLogs(id, start, end, rows);
+        var betweenDates = LogEntity.retrieveLogs(id, start, end, rows);
+        return betweenDates;
     }
 
     public static Uni<TokensResponse> fromLogs(Uni<List<LogEntity>> logs){
-        return logs.map(list -> list.stream()
-                .map(log -> new CompleteLog(log.getId(), log.getRawLog().getLog(), log.datetime.toLocalDateTime(), log.tokens))
-                .toArray(CompleteLog[]::new)
+        return logs.map(list ->
+            list.stream().map(log -> new CompleteLog(log.id,log.rawLog.log, log.datetime.toLocalDateTime(), log.tokens)).toArray(CompleteLog[]::new)
         ).map(TokensResponse::new);
     }
 }

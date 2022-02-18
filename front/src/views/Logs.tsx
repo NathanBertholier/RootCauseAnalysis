@@ -1,12 +1,13 @@
 import {Sidebar} from "../components/Sidebar";
 import React, {useEffect, useRef, useState} from "react";
-import {LogList, default_request} from "../components/LogList";
+import {LogsTable, default_request} from "../components/LogsTable";
 import {Button, Col, Container, Dropdown, DropdownButton, Form, FormControl, Row} from "react-bootstrap";
 import { AiOutlineCloseCircle } from "react-icons/ai";
 import {toast} from "../tools/ToastManager";
 import DateTimePicker from 'react-datetime-picker';
 import DataService from "../services/DataService";
 import {TokenModel, TokensRequest} from "../types/TokensRequest";
+import { Loader } from "../components/Loader"
 
 type Item = {
     id: number
@@ -51,7 +52,7 @@ export const Logs = () => {
     const [ DEFAULT_FILTERS, setDEFAULT_FILTERS ]           = useState<Item[]>( [] );
     // ui
     const [ isLogIDFilter, setIsLogIDFilter ]               = useState( false );
-    const [ isBtnDisabled, setIsBtnDisabled ]               = useState( false );
+    const [ isBtnDisabled, setIsBtnDisabled ]               = useState( true );
     const [ rowInputError, setRowInputError ]               = useState( "" );
     const [ uiFields, setUiFields ]                         = useState<Field[]>( [] );
     const [ filters, setFilters ]                           = useState<Item[]>( DEFAULT_FILTERS );
@@ -71,8 +72,8 @@ export const Logs = () => {
     const rowsNumberInput               = useRef<HTMLInputElement>(null!);
 
     const DEFAULT_FIELDS : Field[] = [
-        {id: Filter.START_DATE, type: "datetime", label: "date de début", value: startDate, setter: (date: Date) => setStartDate( date ) },
-        {id: Filter.END_DATE, type: "datetime", label: "date de fin", value: endDate, setter: (date: Date) => setEndDate( date ) },
+        {id: Filter.START_DATE, type: "datetime", label: "Date de début", value: startDate, setter: (date: Date) => setStartDate( date ) },
+        {id: Filter.END_DATE, type: "datetime", label: "Date de fin", value: endDate, setter: (date: Date) => setEndDate( date ) },
         {id: Filter.EDGE_RESPONSE, type: "text", label: "Edge Response", placeholder: "", patern: "^((Hit)|(RefreshHit)|(Miss)|(LimitExceeded)|(CapacityExceeded)|(Error)|(Redirect))$", validator: data => {
             let message = getErrorMessage( "Edge Response", edgeResponseInput )
             setErrorMessage( data, Filter.EDGE_RESPONSE, message );
@@ -173,23 +174,19 @@ export const Logs = () => {
 
         let tokens: TokenModel = { token_type: -1, token_value: "" };
         if ( tokenIPInput.current !== null ) {
-            console.log("v4");
             tokens = { token_type: 1, token_value: tokenIPInput.current.value }
             //tokens.push( { token_type: 1, token_value: tokenIPInput.current.value } );
         }
         if ( tokenIPv6Input.current !== null ) {
-            console.log("v6");
             tokens = { token_type: 2, token_value: tokenIPv6Input.current.value }
             //tokens.push(  );
         }
 
         if ( statusInput.current !== null ) {
-            console.log("status");
             tokens = { token_type: 3, token_value: statusInput.current.value }
         }
 
         if ( edgeResponseInput.current !== null ) {
-            console.log("edge");
             tokens = { token_type: 5, token_value: edgeResponseInput.current.value }
         }
 
@@ -337,8 +334,8 @@ export const Logs = () => {
             obj.map( s => {
                 switch ( s ) {
                     case "Datetime":
-                        array.push( { id: Filter.START_DATE,    option: "start_date",   text: "date début",     alone: false } )
-                        array.push( { id: Filter.END_DATE,      option: "end_date",     text: "date fin",       alone: false }, )
+                        array.push( { id: Filter.START_DATE,    option: "start_date",   text: "Date début",     alone: false } )
+                        array.push( { id: Filter.END_DATE,      option: "end_date",     text: "Date fin",       alone: false }, )
                         break;
                     case "IPv4":
                         array.push( { id: Filter.IPv4,          option: "ipv4",         text: s,                alone: false } )
@@ -355,11 +352,11 @@ export const Logs = () => {
                     default:
                         break;
                 }
+                return s
             } )
             array.push( { id: Filter.LOG_ID,                    option: "log_id",       text: "ID du log",      alone: true } )
             array.sort( (x, y) => x.id > y.id ? 1 : -1 )
             setDEFAULT_FILTERS( array )
-
         }).catch((e: Error) => {
             //TODO TOAST
             console.log(e)
@@ -376,8 +373,8 @@ export const Logs = () => {
                 <Sidebar selected="logs" />
                 <div id="content-wrapper" >
                     <h1 className="title" >Logs</h1>
-                    <Container fluid>
-                        <Row>
+                    <Container fluid className="logs-container">
+                        <Row className="logs-filters-container" >
                             <Col sm={8}>
                                 <Container fluid className="p-0">
                                     <Row>
@@ -387,10 +384,10 @@ export const Logs = () => {
                                                     uiFields.map( ( field, index ) => {
 
                                                         return <Row key={index}>
-                                                            <Col sm={2} className="input-labels" >
+                                                            <Col sm={3} className="input-labels" >
                                                                 { field.label }
                                                             </Col>
-                                                            <Col sm={9} className="filter-container" >
+                                                            <Col sm={8} className="filter-container" >
                                                                 <Container fluid className="p-0">
                                                                     <Row>
                                                                         { getInput( field ) }
@@ -444,14 +441,17 @@ export const Logs = () => {
                                 </Container>
                             </Col>
                         </Row>
+                        <Row className="logs-table-container" >
+                                <Loader show={ isBtnDisabled } />
+                                <LogsTable ref={logList => {
+                                    if ( shouldApplyFilters && logList !== null ) {
+                                        logList.filter( requestData );
+                                        setShouldApplyFilters( false );
+                                        //setIsBtnDisabled( false );
+                                    }
+                                } } gettingData={ isGettingData => setIsBtnDisabled( isGettingData ) } />
+                        </Row>
                     </Container>
-                    <LogList ref={ logList => {
-                        if ( shouldApplyFilters && logList !== null ) {
-                            logList.filter( requestData );
-                            setShouldApplyFilters( false );
-                            setIsBtnDisabled( false );
-                        }
-                    } } />
                 </div>
             </Row>
         </Container>
