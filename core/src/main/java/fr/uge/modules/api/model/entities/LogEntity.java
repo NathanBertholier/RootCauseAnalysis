@@ -9,8 +9,8 @@ import java.util.List;
 import java.util.Objects;
 
 @Entity
-//@Table(name = "log", schema = "public", catalog = "rootcause")
-public class Log extends PanacheEntityBase {
+@Table(name = "log", schema = "public", catalog = "rootcause")
+public class LogEntity extends PanacheEntityBase {
     @Id
     @Column(name = "id")
     public long id;
@@ -19,9 +19,9 @@ public class Log extends PanacheEntityBase {
     @Column(name = "datetime")
     public Timestamp datetime;
 
-    @OneToMany(cascade = CascadeType.ALL,fetch = FetchType.EAGER)
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinColumn(name = "idlog")
-    public List<Token> tokens;
+    public List<TokenEntity> tokens;
 
     @OneToOne
     @JoinColumn(name = "id")
@@ -35,20 +35,20 @@ public class Log extends PanacheEntityBase {
         this.id = id;
     }
 
+    public void setTokens(List<TokenEntity> tokens) {
+        this.tokens = tokens;
+    }
+
     public Timestamp getDatetime() {
         return datetime;
     }
 
-    public List<Token> getTokens() {
+    public List<TokenEntity> getTokens() {
         return this.tokens;
     }
 
     public void setDatetime(Timestamp datetime) {
         this.datetime = datetime;
-    }
-
-    public void setTokens(List<Token> tokens) {
-        this.tokens = tokens;
     }
 
     public RawLogEntity getRawLog() {
@@ -63,7 +63,7 @@ public class Log extends PanacheEntityBase {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        Log logEntity = (Log) o;
+        LogEntity logEntity = (LogEntity) o;
         return id == logEntity.id && Objects.equals(datetime, logEntity.datetime);
     }
 
@@ -82,8 +82,8 @@ public class Log extends PanacheEntityBase {
     }
 
     // Partiel pour le moment
-    public static Uni<List<Log>>retrieveLogs(long logId, Timestamp start, Timestamp end, int rows){
-        return Log
+    public static Uni<List<LogEntity>>retrieveLogs(long logId, Timestamp start, Timestamp end, int rows){
+        return LogEntity
                 .find("datetime between ?1 and ?2", start, end)
                 .range(0, rows).list();
     }

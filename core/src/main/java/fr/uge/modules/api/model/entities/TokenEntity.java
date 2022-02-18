@@ -7,7 +7,7 @@ import javax.persistence.*;
 
 @Entity
 @Table(name = "token", schema = "public", catalog = "rootcause")
-public class Token extends PanacheEntityBase {
+public class TokenEntity extends PanacheEntityBase {
     @JsonIgnore
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Id
@@ -61,22 +61,21 @@ public class Token extends PanacheEntityBase {
         this.value = value;
     }
 
+    @Override
+    public String toString() {
+        return "TokenEntity{" +
+                "id=" + id +
+                ", idlog=" + idlog +
+                ", idtokentype=" + idtokentype +
+                ", value='" + value + '\'' +
+                '}';
+    }
+
     public TokenTypeEntity getToken_type() {
         return token_type;
     }
 
     public void setToken_type(TokenTypeEntity token_type) {
         this.token_type = token_type;
-    }
-
-    @Override
-    public String toString() {
-        return "Token{" +
-                "id=" + id +
-                ", idlog=" + idlog +
-                ", token_type=" + token_type +
-                ", idtokentype=" + idtokentype +
-                ", value='" + value + '\'' +
-                '}';
     }
 }
