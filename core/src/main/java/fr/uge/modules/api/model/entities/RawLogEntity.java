@@ -10,4 +10,11 @@ import javax.validation.constraints.NotBlank;
 public class RawLogEntity extends PanacheEntity {
     @NotBlank(message = "Log content cannot be blank")
     public String log;
+
+    @Override
+    public String toString() {
+        return "RawLogEntity{" +
+                "log='" + log + '\'' +
+                '}';
+    }
 }

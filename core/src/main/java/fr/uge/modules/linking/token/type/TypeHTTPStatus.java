@@ -4,30 +4,22 @@ import fr.uge.modules.api.model.TokenModel;
 
 public class TypeHTTPStatus implements TokenType{
 
-    private final String name = "status";
-    private final String regex = "([1-5][0-5][0-9])";
+    private static final String NAME = "status";
+    private static final String REGEX = "([1-5][0-5][0-9])";
 
     @Override
     public String getName() {
-        return name;
+        return NAME;
     }
 
     @Override
     public String getRegex() {
-        return regex;
+        return REGEX;
     }
 
     @Override
     public Integer getTokenTypeId() {
-        return 3;
-    }
-
-    @Override
-    public int matcher(String word) {
-        if(word.matches(regex)){
-            return TokenTypeId.ID_STATUS;
-        }
-        return -1;
+        return TokenTypeId.ID_STATUS.getId();
     }
 
     @Override
