@@ -19,7 +19,7 @@ import java.util.function.Supplier;
 import java.util.logging.Logger;
 import java.util.stream.LongStream;
 
-@Path("/insert/batch")
+@Path("/insertlog")
 public class InsertBatchLog {
     private static final Function<Object, Response> withCreated = entity -> Response.created(URI.create("/insert/batch")).entity(entity).build();
     private static final Supplier<Response> withServerError = () -> Response.serverError().build();
