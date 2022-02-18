@@ -8,9 +8,6 @@ import fr.uge.modules.linking.token.type.TokenType;
 import fr.uge.modules.linking.token.type.TypeDatetime;
 import fr.uge.modules.linking.token.type.TypeHTTPStatus;
 import fr.uge.modules.linking.token.type.TypeIPv4;
-import io.smallrye.mutiny.Uni;
-import io.vertx.mutiny.sqlclient.Row;
-import io.vertx.mutiny.sqlclient.RowIterator;
 
 import java.sql.*;
 import java.time.Duration;
@@ -62,6 +59,7 @@ public class Linking {
             tree = computeProximityTree(target, logs, rp);
         } catch (InterruptedException | ExecutionException e) {
             this.logger.warning("Error while looking for target log." + e);
+            Thread.currentThread().interrupt();
         }
     }
 
