@@ -1,7 +1,7 @@
 package fr.uge.modules.linking;
 
 import fr.uge.modules.api.model.CompleteLog;
-import fr.uge.modules.api.model.entities.TokenEntity;
+import fr.uge.modules.api.model.entities.Token;
 import fr.uge.modules.api.model.report.ReportParameter;
 import fr.uge.modules.linking.token.type.TokenType;
 import fr.uge.modules.linking.token.type.TypeDatetime;
@@ -66,7 +66,7 @@ public class Linking {
         tokenTypes.add(new TypeIPv4());
     }
 
-    private TokenEntity createToken(String type, String value) {
+    private Token createToken(String type, String value) {
         /*
         TokenType tt;
         return switch(type){
@@ -115,7 +115,7 @@ public class Linking {
             fetchLog.setLong(1, idlogtarget);
             ResultSet logTarget = fetchLog.executeQuery();
 
-            ArrayList<TokenEntity> tokenSet = new ArrayList<>();
+            ArrayList<Token> tokenSet = new ArrayList<>();
             logTarget.next();
             //fetching data in the resultset given from query
             LocalDateTime ldt = logTarget.getTimestamp(TYPE_DATE).toLocalDateTime();
@@ -149,7 +149,7 @@ public class Linking {
             long id;
             LocalDateTime ldt;
             List<CompleteLog> lst = new ArrayList<>();
-            List<TokenEntity> tokenSet = new ArrayList<>();
+            List<Token> tokenSet = new ArrayList<>();
             CompleteLog current;
             while (lines.next()) {
                 //init log

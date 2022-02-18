@@ -22,14 +22,9 @@ import java.util.logging.Logger;
 @ApplicationScoped
 public class MonitorInserter {
     private static final String QUEUE_NAME = "logs";
-    private final Properties properties = new Properties();
     private final Logger logger = Logger.getGlobal();
     @ConfigProperty(name = "rabbitmq-host")
     String rabbitmqurl;
-
-    MonitorInserter() throws IOException {
-        this.properties.load(MonitorInserter.class.getClassLoader().getResourceAsStream("init.properties"));
-    }
 
     @Scheduled(every="5s")
     public void getValueFromAPI() {
