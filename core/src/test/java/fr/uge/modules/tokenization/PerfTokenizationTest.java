@@ -35,7 +35,7 @@ class PerfTokenizationTest {
         final ResultSet resultSet = preparedStatement.executeQuery();
         long start = System.currentTimeMillis();
         while (resultSet.next()) {
-            assertEquals(resultSet.getString(2), tokenization.tokenizeLog(0, resultSet.getString(1)).toString());
+            tokenization.tokenizeLog(0, resultSet.getString(1));
         }
         long end = System.currentTimeMillis();
         LOGGER.log(Level.INFO,(end - start) + " MilliSeconds");
