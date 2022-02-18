@@ -447,7 +447,6 @@ export const Logs = () => {
                                     if ( shouldApplyFilters && logList !== null ) {
                                         logList.filter( requestData );
                                         setShouldApplyFilters( false );
-                                        //setIsBtnDisabled( false );
                                     }
                                 } } gettingData={ isGettingData => setIsBtnDisabled( isGettingData ) } />
                         </Row>

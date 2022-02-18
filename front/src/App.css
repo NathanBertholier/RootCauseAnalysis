@@ -139,7 +139,7 @@
  * Log Css
  *******************************/
 
-.logs-container {
+.logs-container, .proximity-container {
   background-color: white;
   width: auto;
   min-height: 70vh;
@@ -155,6 +155,26 @@
 .logs-table-container {
   position: relative;
   padding-bottom: 50px;
+}
+
+/*******************************
+ * Proximity Css
+ *******************************/
+
+.proximity-filters-container {
+  padding-top: 20px;
+  margin-bottom: 20px;
+  padding-left: 5px;
+}
+
+.proximity-filter {
+  width: auto;
+}
+
+.proximity-score-container {
+  text-align: right;
+  font-weight: bold;
+  font-size: 18px;
 }
 
 /*******************************
