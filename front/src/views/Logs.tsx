@@ -1,16 +1,15 @@
 import {Sidebar} from "../components/Sidebar";
-import React, {useEffect, useRef, useState} from "react";
+import React, { useRef, useState} from "react";
 import {LogList, default_request} from "../components/LogList";
 import {Button, Col, Container, Dropdown, DropdownButton, Form, FormControl, Row} from "react-bootstrap";
 import { AiOutlineCloseCircle } from "react-icons/ai";
+import {RequestData, Token} from "../types/token.type"
 import {toast} from "../tools/ToastManager";
 import DateTimePicker from 'react-datetime-picker';
-import DataService from "../services/DataService";
-import {TokenModel, TokensRequest} from "../types/TokensRequest";
 
 type Item = {
     id: number
-    option: "start_date" | "end_date" | "ipv4" | "ipv6" | "statut" | "edgeResponse" | "log_id"
+    option: "start_date" | "end_date" | "token_ip" | "status" | "log_id"
     text: string
     alone: boolean
 }
@@ -18,10 +17,8 @@ type Item = {
 enum Filter {
     START_DATE,
     END_DATE,
-    EDGE_RESPONSE,
-    IPv4,
-    IPv6,
-    STATUT,
+    TOKEN_IP,
+    STATUS,
     LOG_ID
 }
 
@@ -40,60 +37,39 @@ type Input = {
     label: string
     placeholder: string
     patern: string
-    ref: React.MutableRefObject<HTMLInputElement>
     error?: string
     validator: ( field: Field[] ) => void
 }
 
 type Field = DateTimeInput | Input
 
+const default_filter: Item[] = [
+    { id: Filter.START_DATE,    option: "start_date", text: "date début",     alone: false },
+    { id: Filter.END_DATE,      option: "end_date",   text: "date fin",       alone: false },
+    { id: Filter.TOKEN_IP,      option: "token_ip",   text: "IP du token",    alone: false },
+    { id: Filter.STATUS,        option: "status",     text: "Status",         alone: false },
+    { id: Filter.LOG_ID,        option: "log_id",     text: "ID du log",      alone: true }
+];
+
 export const Logs = () => {
-    const [ DEFAULT_FILTERS, setDEFAULT_FILTERS ]           = useState<Item[]>( [] );
     // ui
     const [ isLogIDFilter, setIsLogIDFilter ]               = useState( false );
     const [ isBtnDisabled, setIsBtnDisabled ]               = useState( false );
     const [ rowInputError, setRowInputError ]               = useState( "" );
     const [ uiFields, setUiFields ]                         = useState<Field[]>( [] );
-    const [ filters, setFilters ]                           = useState<Item[]>( DEFAULT_FILTERS );
+    const [ filters, setFilters ]                           = useState<Item[]>( default_filter );
 
     // event
     const [ shouldApplyFilters, setShouldApplyFilters ]     = useState( false );
-    const [ requestData, setRequestData ]                   = useState<TokensRequest>( default_request );
+    const [ requestData, setRequestData ]                   = useState<RequestData>( default_request );
 
     // input value
     const [ startDate, setStartDate]    = useState(new Date());
     const [ endDate, setEndDate]        = useState(new Date());
     const tokenIPInput                  = useRef<HTMLInputElement>(null!);
-    const tokenIPv6Input                = useRef<HTMLInputElement>(null!);
     const statusInput                   = useRef<HTMLInputElement>(null!);
-    const edgeResponseInput             = useRef<HTMLInputElement>(null!);
     const logIDInput                    = useRef<HTMLInputElement>(null!);
     const rowsNumberInput               = useRef<HTMLInputElement>(null!);
-
-    const DEFAULT_FIELDS : Field[] = [
-        {id: Filter.START_DATE, type: "datetime", label: "date de début", value: startDate, setter: (date: Date) => setStartDate( date ) },
-        {id: Filter.END_DATE, type: "datetime", label: "date de fin", value: endDate, setter: (date: Date) => setEndDate( date ) },
-        {id: Filter.EDGE_RESPONSE, type: "text", label: "Edge Response", placeholder: "", patern: "^((Hit)|(RefreshHit)|(Miss)|(LimitExceeded)|(CapacityExceeded)|(Error)|(Redirect))$", validator: data => {
-            let message = getErrorMessage( "Edge Response", edgeResponseInput )
-            setErrorMessage( data, Filter.EDGE_RESPONSE, message );
-        }, ref: edgeResponseInput },
-        {id: Filter.IPv4, type: "text", label: "Adresse IP v4", placeholder: "IP v4", patern: "(([01]?[0-9]{1,2}|2[0-4][0-9]|25[0-5])\\.){3}([01]?[0-9]{1,2}|2[0-4][0-9]|25[0-5])", validator: data => {
-            let message = getErrorMessage( "Adresse IP v4", tokenIPInput )
-            setErrorMessage( data, Filter.IPv4, message );
-        }, ref: tokenIPInput},
-        {id: Filter.IPv6, type: "text", label: "Adresse IP v6", placeholder: "IP v6", patern: "(([0-9a-fA-F]{1,4}:){7,7}[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,7}:|([0-9a-fA-F]{1,4}:){1,6}:[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,5}(:[0-9a-fA-F]{1,4}){1,2}|([0-9a-fA-F]{1,4}:){1,4}(:[0-9a-fA-F]{1,4}){1,3}|([0-9a-fA-F]{1,4}:){1,3}(:[0-9a-fA-F]{1,4}){1,4}|([0-9a-fA-F]{1,4}:){1,2}(:[0-9a-fA-F]{1,4}){1,5}|[0-9a-fA-F]{1,4}:((:[0-9a-fA-F]{1,4}){1,6})|:((:[0-9a-fA-F]{1,4}){1,7}|:)|fe80:(:[0-9a-fA-F]{0,4}){0,4}%[0-9a-zA-Z]{1,}|::(ffff(:0{1,4}){0,1}:){0,1}((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\\.){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])|([0-9a-fA-F]{1,4}:){1,4}:((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\\.){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9]))", validator: data => {
-            let message = getErrorMessage( "Adresse IP v6", tokenIPv6Input )
-            setErrorMessage( data, Filter.IPv6, message );
-        }, ref: tokenIPv6Input},
-        {id: Filter.STATUT, type: "text", label: "Status", placeholder: "", patern: "([1-5][0-5][0-9])", validator: data => {
-            let message = getErrorMessage( "Statut", statusInput )
-            setErrorMessage( data, Filter.STATUT, message );
-        }, ref: statusInput},
-        {id: Filter.LOG_ID, type: "text", label: "Log ID", placeholder: "", patern: "[0-9]*", validator: data => {
-            let message = getErrorMessage( "Log ID", logIDInput )
-            setErrorMessage( data, Filter.LOG_ID, message );
-        }, ref: logIDInput }
-    ]
 
     /******************************************************
      | Event
@@ -103,11 +79,11 @@ export const Logs = () => {
     const handleSelect = (e:string | null) => {
         setFilters( prevState => {
             if ( e === "log_id" && !isLogIDFilter ) {
-                prevState = DEFAULT_FILTERS
+                prevState = default_filter
                 resetUIFields( true );
             }
             else if ( isLogIDFilter ) {
-                prevState = DEFAULT_FILTERS
+                prevState = default_filter
                 resetUIFields( false );
             }
             return prevState.filter(f => f.option !== e);
@@ -116,25 +92,46 @@ export const Logs = () => {
         // ajoute sur la liste des champs
         switch ( e ) {
             case "start_date":
-                addField( DEFAULT_FIELDS[ Filter.START_DATE ] )
+                addField( {id: Filter.START_DATE, type: "datetime", label: "date de début", value: startDate, setter: (date: Date) => setStartDate( date ) } )
                 break;
             case "end_date":
-                addField( DEFAULT_FIELDS[ Filter.END_DATE ] )
+                addField( {id: Filter.END_DATE, type: "datetime", label: "date de fin", value: endDate, setter: (date: Date) => setEndDate( date ) } )
                 break;
-            case "ipv4":
-                addField( DEFAULT_FIELDS[ Filter.IPv4 ] );
+            case "token_ip":
+                addField( {id: Filter.TOKEN_IP, type: "text", label: "Adresse IP", placeholder: "ajouter une IP", patern: "\\b((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)(\\.|$)){4}\\b", validator: data => {
+                    let message = "";
+                    if ( tokenIPInput.current !== null && tokenIPInput.current.value === "" ) {
+                        message = "* Le champ 'Adresse IP' est vide";
+                    }
+                    else if (tokenIPInput.current !== null && !tokenIPInput.current.validity.valid) {
+                        message = "* Le champ 'Adresse IP' est incorrect";
+                    }
+                    setErrorMessage( data, Filter.TOKEN_IP, message );
+                }});
                 break;
-            case "ipv6":
-                addField( DEFAULT_FIELDS[ Filter.IPv6 ] );
-                break;
-            case "statut":
-                addField( DEFAULT_FIELDS[ Filter.STATUT ] )
-                break;
-            case "edgeResponse":
-                addField( DEFAULT_FIELDS[ Filter.EDGE_RESPONSE ] )
+            case "status":
+                addField( {id: Filter.STATUS, type: "text", label: "Status", placeholder: "", patern: "[0-9][0-9][0-9]", validator: data => {
+                        let message = "";
+                        if ( statusInput.current !== null && statusInput.current.value === "" ) {
+                            message = "* Le champ 'Status' est vide";
+                        }
+                        else if (statusInput.current !== null && !statusInput.current.validity.valid) {
+                            message = "* Le champ 'Status' est incorrect";
+                        }
+                        setErrorMessage( data, Filter.STATUS, message );
+                } } )
                 break;
             case "log_id":
-                addField( DEFAULT_FIELDS[ Filter.LOG_ID ] )
+                addField( {id: Filter.LOG_ID, type: "text", label: "Log ID", placeholder: "", patern: "[0-9]*", validator: data => {
+                        let message = "";
+                        if ( logIDInput.current !== null && logIDInput.current.value === "" ) {
+                            message = "* Le champ 'Log ID' est vide";
+                        }
+                        else if (logIDInput.current !== null && !logIDInput.current.validity.valid) {
+                            message = "* Le champ 'Log ID' est incorrect";
+                        }
+                        setErrorMessage( data, Filter.LOG_ID, message );
+                } } )
                 break;
             default:
                 break;
@@ -145,8 +142,7 @@ export const Logs = () => {
     const handleDeleteField = ( e: number ) => {
         setUiFields( prevState => prevState.filter( f => f.id !== e ) )
 
-        // TODo : improve this part
-        let item = DEFAULT_FILTERS.find( item => item.id === e )
+        let item = default_filter.find( item => item.id === e )
         setFilters( prevState => {
             let newArray = [ item as Item,...prevState ]
             return newArray.sort( (x, y) => x.id > y.id ? 1 : -1 )
@@ -171,33 +167,19 @@ export const Logs = () => {
         let id_log : number         = logIDInput.current !== null ? parseInt( logIDInput.current.value ) : 0;
         let rowsNumber : number     = rowsNumberInput.current !== null ? parseInt( rowsNumberInput.current.value ) : 0;
 
-        let tokens: TokenModel = { token_type: -1, token_value: "" };
+        let tokens: Token[] = [];
         if ( tokenIPInput.current !== null ) {
-            console.log("v4");
-            tokens = { token_type: 1, token_value: tokenIPInput.current.value }
-            //tokens.push( { token_type: 1, token_value: tokenIPInput.current.value } );
+            tokens.push( { token_type: "IP", token_value: tokenIPInput.current.value } );
         }
-        if ( tokenIPv6Input.current !== null ) {
-            console.log("v6");
-            tokens = { token_type: 2, token_value: tokenIPv6Input.current.value }
-            //tokens.push(  );
-        }
-
         if ( statusInput.current !== null ) {
-            console.log("status");
-            tokens = { token_type: 3, token_value: statusInput.current.value }
+            tokens.push( { token_type: "Status", token_value: statusInput.current.value } );
         }
 
-        if ( edgeResponseInput.current !== null ) {
-            console.log("edge");
-            tokens = { token_type: 5, token_value: edgeResponseInput.current.value }
-        }
-
-        let obj : TokensRequest = {
+        let obj : RequestData = {
             init_datetime: start_datetime,
             end_datetime: end_datetime,
             id: id_log,
-            tokenModel: tokens,
+            tokens: tokens,
             rows: rowsNumber
         }
 
@@ -270,21 +252,21 @@ export const Logs = () => {
             // STATUS
             if ( checkIsEmpty(statusInput) ) {
                 formIsValid = false;
-                setErrorMessage( uiFields, Filter.STATUT, "* Le champ 'Status' est vide" );
+                setErrorMessage( uiFields, Filter.STATUS, "* Le champ 'Status' est vide" );
             }
             else if ( checkIsNotValid( statusInput ) ) {
                 formIsValid = false;
-                setErrorMessage( uiFields, Filter.STATUT, "* Le champ 'Status' ne prend que des nombres à 3 chiffres" );
+                setErrorMessage( uiFields, Filter.STATUS, "* Le champ 'Status' ne prend que des nombres à 3 chiffres" );
             }
 
             // IP - v4
             if ( checkIsEmpty(tokenIPInput) ) {
                 formIsValid = false;
-                setErrorMessage( uiFields, Filter.IPv4, "* Le champ 'Adresse IP' est vide" );
+                setErrorMessage( uiFields, Filter.TOKEN_IP, "* Le champ 'Adresse IP' est vide" );
             }
             else if ( checkIsNotValid(tokenIPInput) ) {
                 formIsValid = false;
-                setErrorMessage( uiFields, Filter.IPv4, "* Le champ 'Adresse IP' est incorrect" );
+                setErrorMessage( uiFields, Filter.TOKEN_IP, "* Le champ 'Adresse IP' est incorrect" );
             }
         }
 
@@ -304,20 +286,22 @@ export const Logs = () => {
         return date.toISOString( ).split("T")[0] + " " + date.toLocaleTimeString( "fr-FR" );
     }
 
-    const getErrorMessage = ( fieldName: string, input: React.MutableRefObject<HTMLInputElement> ) : string => {
-        let message = ""
-        if ( input.current !== null && input.current.value === "" ) {
-            message = "* Le champ '"+ fieldName +"' est vide"
-        }
-        else if (input.current !== null && !input.current.validity.valid) {
-            message = "* Le champ '"+ fieldName +"' est incorrect"
-        }
-        return message
-    }
-
     /******************************************************
      |  View
      *****************************************************/
+
+    const getInputRef = ( field: Field ) => {
+        switch ( field.id ) {
+            case Filter.TOKEN_IP:
+                return tokenIPInput
+            case Filter.STATUS:
+                return statusInput
+            case Filter.LOG_ID:
+                return logIDInput
+            default:
+                return null;
+        }
+    }
 
     const getInput = ( field: Field ) => {
         if (field.id === Filter.START_DATE || field.id === Filter.END_DATE) {
@@ -325,50 +309,8 @@ export const Logs = () => {
             return <DateTimePicker onChange={inputField.setter} value={ inputField.value } format="yyyy-MM-dd hh:mm:ss a" />
         }
         let inputField = field as Input;
-        return <FormControl ref={ inputField.ref } type={ inputField.type } pattern={ inputField.patern } placeholder={inputField.placeholder} onBlur={ () => inputField.validator( uiFields ) } />
+        return <FormControl ref={ getInputRef( inputField ) } type={ inputField.type } pattern={ inputField.patern } placeholder={inputField.placeholder} onBlur={ () => inputField.validator( uiFields ) } />
     }
-
-    // Similar to componentDidMount : create the default filter array
-    useEffect(() => {
-        DataService.getTokenTypes().then((response: any) => {
-            let obj : string[] = response.data
-
-            let array : Item[] = []
-            obj.map( s => {
-                switch ( s ) {
-                    case "Datetime":
-                        array.push( { id: Filter.START_DATE,    option: "start_date",   text: "date début",     alone: false } )
-                        array.push( { id: Filter.END_DATE,      option: "end_date",     text: "date fin",       alone: false }, )
-                        break;
-                    case "IPv4":
-                        array.push( { id: Filter.IPv4,          option: "ipv4",         text: s,                alone: false } )
-                        break;
-                    case "IPv6":
-                        array.push( { id: Filter.IPv6,          option: "ipv6",         text: s,                alone: false } )
-                        break;
-                    case "Statut":
-                        array.push( { id: Filter.STATUT,        option: "statut",       text: s,                alone: false } )
-                        break;
-                    case "EdgeResponse":
-                        array.push( { id: Filter.EDGE_RESPONSE, option: "edgeResponse", text: s,                alone: false } )
-                        break;
-                    default:
-                        break;
-                }
-            } )
-            array.push( { id: Filter.LOG_ID,                    option: "log_id",       text: "ID du log",      alone: true } )
-            array.sort( (x, y) => x.id > y.id ? 1 : -1 )
-            setDEFAULT_FILTERS( array )
-
-        }).catch((e: Error) => {
-            //TODO TOAST
-            console.log(e)
-        });
-    }, []);
-
-    useEffect(() => {
-        setFilters( DEFAULT_FILTERS );
-    }, [DEFAULT_FILTERS] );
 
     return (
         <Container fluid>
