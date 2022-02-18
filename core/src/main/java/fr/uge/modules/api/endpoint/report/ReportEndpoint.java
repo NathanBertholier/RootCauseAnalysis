@@ -2,6 +2,7 @@ package fr.uge.modules.api.endpoint.report;
 
 import fr.uge.modules.api.EnvRetriever;
 import fr.uge.modules.api.model.report.ReportParameter;
+import fr.uge.modules.linking.Linking;
 import fr.uge.modules.synthetization.Synthetization;
 import io.smallrye.mutiny.Uni;
 
@@ -36,6 +37,7 @@ public class ReportEndpoint {
         if(network_size == null) network_size = envRetriever.reportDefaultSize();
 
         ReportParameter reportParameter = new ReportParameter(expanded, delta, cache, proximity_limit, network_size);
+        /*
         LOGGER.log(Level.INFO, "Received request for id " +  idLogTarget + " with parameters: " + reportParameter);
         System.out.println("ReportParameter: " + reportParameter);
 
@@ -44,6 +46,15 @@ public class ReportEndpoint {
                     if(error != null){
                         return Response.status(404).entity("Log not yet tokenized").build();
                     } else return Response.ok(report).build();
+                });
+         */
+
+        var linking = new Linking();
+        return linking.link(idLogTarget, reportParameter)
+                .onItemOrFailure()
+                .transform((map, error) -> {
+                    if(error != null) return Response.serverError().entity(error).build();
+                    else return Response.ok(map).build();
                 });
     }
 }

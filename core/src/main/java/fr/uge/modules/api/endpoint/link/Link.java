@@ -2,6 +2,7 @@ package fr.uge.modules.api.endpoint.link;
 
 import fr.uge.modules.api.model.linking.Computation;
 import fr.uge.modules.api.model.linking.LinksResponse;
+import fr.uge.modules.linking.Linking;
 import io.smallrye.common.constraint.NotNull;
 import io.smallrye.mutiny.Uni;
 

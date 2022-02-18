@@ -1,6 +1,8 @@
 package fr.uge.modules.linking.token.type;
 
-import fr.uge.modules.api.model.TokenModel;
+import fr.uge.modules.api.model.entities.TokenEntity;
+
+import java.util.List;
 
 public class TypeIPv6 implements TokenType{
 
@@ -22,11 +24,13 @@ public class TypeIPv6 implements TokenType{
     }
 
     @Override
-    public float computeProximity(TokenModel t1, TokenModel t2) {
+    public float computeProximity(List<TokenEntity> tokenLeft, List<TokenEntity> tokenRight) {
+        return 0;
+        /*
         if(t1.token_value().equals(t2.token_value())){
             return 100;
         }
-        return 0;
+        return 0;*/
     }
 
 }

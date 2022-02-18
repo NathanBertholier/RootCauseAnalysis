@@ -27,6 +27,7 @@ public class LogEntity extends PanacheEntityBase {
     @JoinColumn(name = "id")
     public RawLogEntity rawLog;
 
+
     public long getId() {
         return id;
     }
@@ -81,11 +82,16 @@ public class LogEntity extends PanacheEntityBase {
                 '}';
     }
 
-    // Partiel pour le moment
-    public static Uni<List<LogEntity>>retrieveLogs(long logId, Timestamp start, Timestamp end, int rows){
-        return LogEntity
-                .find("datetime between ?1 and ?2", start, end)
-                .range(0, rows).list();
-    }
+    public static Uni<List<LogEntity>> retrieveLogs(long logId, Timestamp start, Timestamp end, int rows){
+        if(logId<0){
+            return LogEntity
+                    .find("datetime between ?1 and ?2",start, end)
+                    .range(0, rows).list();
+        }else {
+            return LogEntity
+                    .find("id = ?1", logId)
+                    .range(0,rows).list();
+        }
 
+    }
 }

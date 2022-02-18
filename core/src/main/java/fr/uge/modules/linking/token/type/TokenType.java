@@ -1,8 +1,9 @@
 package fr.uge.modules.linking.token.type;
 
-import fr.uge.modules.api.model.TokenModel;
+import fr.uge.modules.api.model.entities.TokenEntity;
 
 import java.util.Objects;
+import java.util.List;
 
 public interface TokenType {
 
@@ -20,7 +21,7 @@ public interface TokenType {
         return -1;
     }
 
-    float computeProximity(TokenModel t1, TokenModel t2);
+    float computeProximity(List<TokenEntity> tokenLeft, List<TokenEntity> tokenRight);
 
     enum TokenTypeId {
         ID_IPV4(1),

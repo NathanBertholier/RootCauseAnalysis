@@ -18,6 +18,7 @@ import io.smallrye.mutiny.Multi;
 import io.smallrye.mutiny.Uni;
 import org.hibernate.criterion.Projections;
 
+import javax.ws.rs.core.Response;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
@@ -41,12 +42,12 @@ public class Synthetization {
 
     @Blocking
     public static Uni<ReportResponse> getReport(long idRootLog, ReportParameter reportParameter) {
+        /*
         return LogEntity
                 .<LogEntity>findById(idRootLog)
                 .onFailure().recoverWithUni(error -> Uni.createFrom().failure(NoSuchElementException::new))
                 .map(rootLog -> {
                     var logRoot = new CompleteLog(rootLog.id, rootLog.datetime, rootLog.rawLog.log, rootLog.tokens);
-                    var logsChildren = fetchChildren()
                     return getMostSeenTokens(idRootLog)
                             .map(map -> map
                                     .entrySet().stream()
@@ -55,9 +56,11 @@ public class Synthetization {
                                             entry.getValue().token_value(),
                                             entry.getKey()))
                                     .collect(Collectors.toSet()))
-                            .map(mostSeen -> new ReportResponse(logRoot, mostSeen, ));
-                    return new ReportResponse(logRoot, tokensMostSeen, null);
+                            .map(mostSeen -> new ReportResponse(logRoot, mostSeen, null));
+                    return new ReportResponse(logRoot, null, null);
                 });
+         */
+        return Uni.createFrom().nullItem();
     }
 
     private static Uni<Map<Long, TokensMostSeen>> getMostSeenTokens(long idRootLog) {

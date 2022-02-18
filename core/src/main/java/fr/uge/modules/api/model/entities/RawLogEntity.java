@@ -11,6 +11,10 @@ public class RawLogEntity extends PanacheEntity {
     @NotBlank(message = "Log content cannot be blank")
     public String log;
 
+    public String getLog() {
+        return log;
+    }
+
     @Override
     public String toString() {
         return "RawLogEntity{" +
