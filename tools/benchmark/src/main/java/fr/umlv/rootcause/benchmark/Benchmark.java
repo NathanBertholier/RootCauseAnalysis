@@ -1,7 +1,5 @@
 package fr.umlv.rootcause.benchmark;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.cli.*;
 
 import java.io.IOException;
@@ -10,10 +8,10 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.file.*;
+import java.sql.Timestamp;
+import java.time.Instant;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.StringJoiner;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -22,9 +20,12 @@ public class Benchmark {
 
     public static void main(String[] args) throws ParseException, IOException, InterruptedException {
         //use this to try out spamming rabbitmq
-        //args = new String[]{"-l", "100000", "-F", "../logs/", "-b", "50", "-d", "85", "-t", "8"};
+        //args = new String[]{"-l", "100000", "-F", "../logs/", "-b", "50", "-d", "85", "-t", "8", "-u", "http://localhost:80/external/insertlog/batch", "-nT", "2022-02-18 11:57:00"};
+        //args = new String[]{"-l", "100000", "-F", "../logs/", "-b", "50", "-d", "85", "-t", "8", "-u", "http://localhost:80/external/insertlog/batch"};
+
         //use this to output to out.txt in exec folder
         //args = new String[]{"-l", "10000", "-f", "in.txt"};
+
         final Options firstOptions = configFirstParameters();
         final Options options = configParameters(firstOptions);
 
@@ -53,7 +54,6 @@ public class Benchmark {
         } else {
             stream = getStreamFromFile(Paths.get(line.getOptionValue("file")));
         }
-        int lineCount = Integer.parseInt(line.getOptionValue("linesCount"));
 
         List<String> stringList = stream
                 .limit(lineLimit(line))
@@ -70,12 +70,15 @@ public class Benchmark {
         } catch (NoSuchFileException e) {
             System.err.println("File not found, check file path : " + e.getMessage());
         }
-        /*var logSender = new BenchHTTPClient(10);
-        logSender.sendToServer(stringList);*/
-        sendToServer(stringList, Integer.parseInt(line.getOptionValue("threadCount")), Integer.parseInt(line.getOptionValue("batchSize")),Integer.parseInt(line.getOptionValue("delay")));
+        Timestamp ts = null;
+        if(line.hasOption("newTimeStamp")) {
+            ts = Timestamp.valueOf(line.getOptionValue("newTimeStamp"));
+        }
+        String URITarget = "http://localhost:80/external/insertlog/batch";
+        sendToServer(stringList, Integer.parseInt(line.getOptionValue("threadCount")), Integer.parseInt(line.getOptionValue("batchSize")),Integer.parseInt(line.getOptionValue("delay")), ts, URITarget);
     }
 
-    private static void sendToServer(List<String> stringSource, int threadCount, int batchSize, int millisDelay) throws InterruptedException {
+    private static void sendToServer(List<String> stringSource, int threadCount, int batchSize, int millisDelay, Timestamp ts, String URITarget) throws InterruptedException {
 
         Thread[] threads = new Thread[threadCount];
         ArrayList<List<String>> subLists = new ArrayList<>();
@@ -84,7 +87,7 @@ public class Benchmark {
             subLists.add(stringSource.subList(offset*i,offset*(i+1)));
             int finalI = i;
             threads[i] = new Thread(() -> {
-                BenchHTTPClient client = new BenchHTTPClient(batchSize);
+                BenchHTTPClient client = new BenchHTTPClient(batchSize, ts, URITarget);
                 client.sendToServer(subLists.get(finalI),millisDelay);
             });
         }
@@ -164,6 +167,10 @@ public class Benchmark {
 
         final Option threadCountOption = Option.builder("t").longOpt("threadCount").desc("number of threads to use as HTTP senders, this doesn't change the behavior or performance of the rest of the program").hasArg(true).argName("delay").required(true).build();
 
+        final Option newTimeStampOption = Option.builder("nT").longOpt("newTimeStamp").desc("Replace read time stamps with current time stamp").hasArg(true).argName("newTimeStamp").required(false).build();
+
+        final Option URITargetOption = Option.builder("u").longOpt("uriTarget").desc("Replace read time stamps with current time stamp").hasArg(true).argName("uriTarget").required(true).build();
+
         final Options options = new Options();
 
         for (final Option fo : firstOptions.getOptions()) {
@@ -177,6 +184,8 @@ public class Benchmark {
         options.addOption(batchSizeOption);
         options.addOption(delayOption);
         options.addOption(threadCountOption);
+        options.addOption(newTimeStampOption);
+        options.addOption(URITargetOption);
 
         return options;
     }
@@ -186,22 +195,42 @@ class BenchHTTPClient{
 
     private final HttpClient httpClient;
     private final int batchSize;
+    private final boolean modifiedTimestamp;
+    private final Timestamp ts;
+    private final long creation;
+    private final URI sendURI;
 
-    public BenchHTTPClient(int batchSize) {
+    public BenchHTTPClient(int batchSize, Timestamp ts, String URITarget) {
         this.httpClient = HttpClient.newBuilder().version(HttpClient.Version.HTTP_2).followRedirects(HttpClient.Redirect.NORMAL).build();
         this.batchSize = batchSize;
+        this.sendURI = URI.create(URITarget);
+        creation = Timestamp.from(Instant.now()).getTime();
+        if(ts != null){
+            modifiedTimestamp = true;
+            this.ts = ts;
+        }
+        else{
+            this.ts = null;
+            modifiedTimestamp = false;
+        }
     }
 
-    public void sendGet(URI uri) {
-        HttpRequest httpRequest = HttpRequest.newBuilder().uri(uri).GET().build();
-        httpClient.sendAsync(httpRequest, HttpResponse.BodyHandlers.ofString()).thenApply(HttpResponse::body).thenAccept(System.out::println).join();
+    private long getTimeOffset() {
+        return Timestamp.from(Instant.now()).getTime() - creation;
+    }
+
+    public String timeStampToString(Timestamp t) {
+        String str = t.toString().replace(" ","\\t");
+        return str.substring(0,str.indexOf('.'));
     }
 
     public void sendPost(URI uri, List<String> stringList) throws IOException, InterruptedException {
+        String str = prepareRequest(stringList);
         HttpRequest httpRequest = HttpRequest.newBuilder().uri(uri)
-                .POST(HttpRequest.BodyPublishers.ofString(prepareRequest(stringList)))
+                .POST(HttpRequest.BodyPublishers.ofString(str))
                 .header("Accept", "application/json").header("Content-Type", "application/json").build();
-        HttpResponse<String> send = this.httpClient.send(httpRequest, HttpResponse.BodyHandlers.ofString());
+        System.out.println(str);
+        HttpResponse<String> send = httpClient.send(httpRequest, HttpResponse.BodyHandlers.ofString());
         if(send.statusCode() != 200) {
             System.out.println(send.statusCode());
         }
@@ -212,9 +241,16 @@ class BenchHTTPClient{
         String separator = "\"},{\"log\":\"";
         String postfix = "\"}]";
         StringBuilder sb = new StringBuilder();
+
         sb.append(prefix);
         for (String s : stringList){
-            sb.append(s.replace("\t","\\t"));
+            if(modifiedTimestamp) {
+                sb.append(timeStampToString(new Timestamp(ts.getTime() + getTimeOffset())));
+                sb.append(s.substring(19).replace("\t","\\t"));
+            }
+            else {
+                sb.append(s.replace("\t","\\t"));
+            }
             sb.append(separator);
         }
         sb.setLength(sb.length() - separator.length());
@@ -223,9 +259,6 @@ class BenchHTTPClient{
     }
 
     public void sendToServer(List<String> stringList, int millisDelay) {
-        //this.sendGet(URI.create("http://localhost:80/external/tokentypes"));
-        URI sendURI = URI.create("http://localhost:80/external/insertlog/batch");
-
         while (true) {
             try {
                 if(stringList.size() > batchSize) {
