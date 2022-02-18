@@ -22,7 +22,7 @@ public class RawlogProcessor {
 
     @Incoming(value = "logTokenization")
     public Uni<Response> processTokenization(Message<JsonObject> incoming){
-        System.out.println("Incoming: " + incoming);
+        System.out.println("Incoming : " + incoming);
         var rawlog = incoming.getPayload().mapTo(RawLogEntity.class);
         var log = tokenization.tokenizeLog(rawlog.id,
                 rawlog.log);

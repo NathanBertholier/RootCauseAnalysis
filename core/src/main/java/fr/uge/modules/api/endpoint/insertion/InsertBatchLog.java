@@ -19,7 +19,7 @@ import java.util.function.Supplier;
 import java.util.logging.Logger;
 import java.util.stream.LongStream;
 
-@Path("/insert/batch")
+@Path("/insertlog")
 public class InsertBatchLog {
     private static final Function<Object, Response> withCreated = entity -> Response.created(URI.create("/insert/batch")).entity(entity).build();
     private static final Supplier<Response> withServerError = () -> Response.serverError().build();
@@ -34,12 +34,12 @@ public class InsertBatchLog {
     public Uni<Response> insertLog(List<RawLogEntity> inputs) {
         return Panache.withTransaction(
                 () -> RawLogEntity.persist(inputs)
-                        .onItemOrFailure().transform((success, error) -> {
+                        .onItemOrFailure().transform((__, error) -> {
                             if(error != null) {
                                 logger.severe("Errror while inserting: " + error);
                                 return withServerError.get();
                             } else {
-                                logger.info("Inserted: " + inputs);
+                                logger.info("Inserting: " + inputs);
                                 inputs.forEach(rawLogEntity -> emitter.send(rawLogEntity));
                                 return withCreated.apply(asLongStream.apply(inputs));
                             }
