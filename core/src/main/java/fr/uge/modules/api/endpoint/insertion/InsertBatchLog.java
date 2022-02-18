@@ -34,12 +34,12 @@ public class InsertBatchLog {
     public Uni<Response> insertLog(List<RawLogEntity> inputs) {
         return Panache.withTransaction(
                 () -> RawLogEntity.persist(inputs)
-                        .onItemOrFailure().transform((success, error) -> {
+                        .onItemOrFailure().transform((__, error) -> {
                             if(error != null) {
                                 logger.severe("Errror while inserting: " + error);
                                 return withServerError.get();
                             } else {
-                                logger.info("Inserted: " + inputs);
+                                logger.info("Inserting: " + inputs);
                                 inputs.forEach(rawLogEntity -> emitter.send(rawLogEntity));
                                 return withCreated.apply(asLongStream.apply(inputs));
                             }
