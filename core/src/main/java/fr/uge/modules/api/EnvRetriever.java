@@ -6,11 +6,11 @@ import javax.enterprise.context.ApplicationScoped;
 
 @ApplicationScoped
 public class EnvRetriever {
-    @ConfigProperty(name = "REPORT.EXPANDED") boolean DEFAULT_EXPANDED;
-    @ConfigProperty(name = "REPORT.NO_CACHE") boolean DEFAULT_CACHE;
-    @ConfigProperty(name = "REPORT.DELTA") long DEFAULT_DELTA;
-    @ConfigProperty(name = "REPORT.PROXIMITY_LIMIT") int DEFAULT_PROX_LIMIT;
-    @ConfigProperty(name = "REPORT.NETWORK_SIZE") int DEFAULT_NET_SIZE;
+    @ConfigProperty(name = "report.default.expanded") boolean DEFAULT_EXPANDED;
+    @ConfigProperty(name = "report.default.cache") boolean DEFAULT_CACHE;
+    @ConfigProperty(name = "report.default.delta") long DEFAULT_DELTA;
+    @ConfigProperty(name = "report.default.proximity_limit") int DEFAULT_PROX_LIMIT;
+    @ConfigProperty(name = "report.default.network_size") int DEFAULT_NET_SIZE;
 
     public boolean reportDefaultExpanded(){ return DEFAULT_EXPANDED; }
     public boolean reportDefaultCache(){ return DEFAULT_CACHE; }
