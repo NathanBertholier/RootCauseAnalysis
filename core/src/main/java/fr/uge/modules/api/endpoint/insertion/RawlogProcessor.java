@@ -17,16 +17,15 @@ import java.util.logging.Logger;
 public class RawlogProcessor {
     private final Logger LOGGER = Logger.getGlobal();
     private final Tokenization tokenization = new Tokenization();
-
     //@Inject
     //Tokenization tokenization;
 
     @Incoming(value = "logTokenization")
     public Uni<Response> processTokenization(Message<JsonObject> incoming){
-        System.out.println(incoming);
+        System.out.println("Incoming : " + incoming);
         var rawlog = incoming.getPayload().mapTo(RawLogEntity.class);
-        var log = tokenization.tokenizeLog(rawlog.getId(),
-                rawlog.getValue());
+        var log = tokenization.tokenizeLog(rawlog.id,
+                rawlog.log);
 
         incoming.ack();
         return Panache.withTransaction(log::persist)

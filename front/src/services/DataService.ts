@@ -1,9 +1,14 @@
-import http from "../http-common"
-import { ResponseData, RequestData } from "../types/token.type"
+//import http from "../http-common"
+import {TokensRequest} from "../types/TokensRequest";
+import axios from "axios";
 
 class DataService {
-    getAll( request: RequestData ) {
-        return http.post<Array<ResponseData>>("/tokens", request );
+    getAll( request: TokensRequest ) {
+        return axios.post("/tokens", request );
+    }
+
+    getTokenTypes() {
+        return axios.get( "/tokentypes" );
     }
 }
 export default new DataService();
