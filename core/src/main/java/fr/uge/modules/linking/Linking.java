@@ -39,7 +39,10 @@ public class Linking {
     public void link(long id, ReportParameter rp) {
         logs.clear();
         try {
-            var log = LogEntity.<LogEntity>findById(id).subscribeAsCompletionStage().get();
+            //TODO : if log doest exists
+            var log = LogEntity.<LogEntity>findById(id)
+                    .onFailure().invoke(x -> logger.log(Level.SEVERE, "Log not found with ID " + id, x))
+                    .subscribeAsCompletionStage().get();
             System.out.println(log);
             this.target = new CompleteLog(log,
                     log.getRawLog());
@@ -68,27 +71,6 @@ public class Linking {
 
     public SortedMap<Float, LogEntity> getTree() {
         return tree;
-    }
-
-    private Uni<CompleteLog> rowToLog(RowIterator<Row> iterator) {
-        if(!iterator.hasNext()) return Uni.createFrom().nullItem();
-        else {
-            var row = iterator.next();
-            return Uni.createFrom().item(() -> {
-                var idLog = row.getLong("id");
-                /*
-                var tokens = getTokens(idLog);
-                try {
-                    return new DatabaseLog(idLog, true, LocalDateTime.now(), tokens.subscribeAsCompletionStage().get());
-                } catch (InterruptedException | ExecutionException e) {
-                    logger.log(Level.SEVERE, e.getMessage());
-                    System.out.println("Error: " + e);
-                    return null;
-                }
-                 */
-                return null;
-            });
-        }
     }
 
     private void fillHashmap(List<TokenEntity> tokens, HashMap<Integer, List<TokenEntity>> tokensToFill) {

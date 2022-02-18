@@ -1,12 +1,9 @@
 package fr.uge.modules.api.endpoint.report;
 
-import fr.uge.modules.api.model.ReportResponse;
+import fr.uge.modules.api.EnvRetriever;
 import fr.uge.modules.api.model.report.ReportParameter;
-import fr.uge.modules.linking.Linking;
 import fr.uge.modules.synthetization.Synthetization;
-import io.smallrye.common.annotation.Blocking;
 import io.smallrye.mutiny.Uni;
-import org.eclipse.microprofile.config.inject.ConfigProperty;
 
 import javax.inject.Inject;
 import javax.ws.rs.*;
@@ -44,11 +41,7 @@ public class Report {
         LOGGER.log(Level.INFO, "Received request for id " +  idLogTarget + " with parameters: " + reportParameter);
         System.out.println("ReportParameter: " + reportParameter);
         var report = Synthetization.getReport(idLogTarget, reportParameter);
-        return Uni.createFrom().item(Response.ok().entity(reportParameter).build());
-        //var report = Synthetization.getReport(idLogTarget, reportParameter);
-        var link = new Linking();
-        link.link(idLogTarget, reportParameter);
 
-        return Uni.createFrom().item(null);
+        return Uni.createFrom().item(Response.ok().entity(reportParameter).build());
     }
 }
