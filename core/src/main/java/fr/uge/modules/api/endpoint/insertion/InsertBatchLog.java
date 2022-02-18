@@ -6,6 +6,10 @@ import io.smallrye.mutiny.Uni;
 import org.eclipse.microprofile.reactive.messaging.Channel;
 import org.eclipse.microprofile.reactive.messaging.Emitter;
 
+import javax.inject.Inject;
+import javax.validation.ConstraintViolation;
+import javax.validation.Valid;
+import javax.validation.Validator;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -14,10 +18,13 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.net.URI;
 import java.util.List;
+import java.util.Set;
 import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.function.Supplier;
 import java.util.logging.Logger;
 import java.util.stream.LongStream;
+import java.util.stream.Stream;
 
 @Path("/insertlog")
 public class InsertBatchLog {
@@ -27,19 +34,29 @@ public class InsertBatchLog {
 
     private static final Logger logger = Logger.getGlobal();
     @Channel("logs") Emitter<RawLogEntity> emitter;
+    @Inject Validator rawLogValidator;
 
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Uni<Response> insertLog(List<RawLogEntity> inputs) {
+        var violations = inputs.stream()
+                .map(rawLogValidator::validate)
+                .filter(Predicate.not(Set::isEmpty))
+                .flatMap(s -> s.stream().distinct())
+                .map(ConstraintViolation::getMessage)
+                .toList();
+
+        if(!violations.isEmpty()) return Uni.createFrom().item(Response.status(400).entity(violations).build());
+
         return Panache.withTransaction(
                 () -> RawLogEntity.persist(inputs)
-                        .onItemOrFailure().transform((__, error) -> {
+                        .onItemOrFailure().transform((success, error) -> {
                             if(error != null) {
                                 logger.severe("Errror while inserting: " + error);
                                 return withServerError.get();
                             } else {
-                                logger.info("Inserting: " + inputs);
+                                logger.info("Inserted: " + inputs);
                                 inputs.forEach(rawLogEntity -> emitter.send(rawLogEntity));
                                 return withCreated.apply(asLongStream.apply(inputs));
                             }
