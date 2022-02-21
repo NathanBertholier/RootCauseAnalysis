@@ -74,7 +74,7 @@ public class Benchmark {
         if(line.hasOption("newTimeStamp")) {
             ts = Timestamp.valueOf(line.getOptionValue("newTimeStamp"));
         }
-        String URITarget = "http://localhost:80/external/insertlog/batch";
+        String URITarget = line.getOptionValue("uriTarget");
         sendToServer(stringList, Integer.parseInt(line.getOptionValue("threadCount")), Integer.parseInt(line.getOptionValue("batchSize")),Integer.parseInt(line.getOptionValue("delay")), ts, URITarget);
     }
 
@@ -229,7 +229,6 @@ class BenchHTTPClient{
         HttpRequest httpRequest = HttpRequest.newBuilder().uri(uri)
                 .POST(HttpRequest.BodyPublishers.ofString(str))
                 .header("Accept", "application/json").header("Content-Type", "application/json").build();
-        System.out.println(str);
         HttpResponse<String> send = httpClient.send(httpRequest, HttpResponse.BodyHandlers.ofString());
         if(send.statusCode() != 200) {
             System.out.println(send.statusCode());
