@@ -1,8 +1,8 @@
 {
-  "rabbit_version":"3.9.11",
-  "rabbitmq_version":"3.9.11",
+  "rabbit_version":"3.9.13",
+  "rabbitmq_version":"3.9.13",
   "product_name":"RabbitMQ",
-  "product_version":"3.9.11",
+  "product_version":"3.9.13",
   "users":[
     {
       "name":"guest",
@@ -47,51 +47,21 @@
   ],
   "queues":[
     {
-      "name":"tokens",
+      "name":"token",
       "vhost":"/",
       "durable":true,
       "auto_delete":false,
       "arguments":{
         "x-dead-letter-exchange":"DLX",
-        "x-dead-letter-routing-key":"tokens"
-      }
-    },
-    {
-      "name":"logTokenization",
-      "vhost":"/",
-      "durable":true,
-      "auto_delete":false,
-      "arguments":{
-        "x-dead-letter-exchange":"DLX",
-        "x-dead-letter-routing-key":"logTokenization"
-      }
-    },
-    {
-      "name":"logRaw",
-      "vhost":"/",
-      "durable":true,
-      "auto_delete":false,
-      "arguments":{
-        "x-dead-letter-exchange":"DLX",
-        "x-dead-letter-routing-key":"logRaw"
-      }
-    },
-    {
-      "name":"logs",
-      "vhost":"/",
-      "durable":true,
-      "auto_delete":false,
-      "arguments":{
-        "x-dead-letter-exchange":"DLX",
-        "x-dead-letter-routing-key":"logs"
+        "x-dead-letter-routing-key":"token"
       }
     }
   ],
   "exchanges":[
     {
-      "name":"logRaw",
+      "name":"token-out",
       "vhost":"/",
-      "type":"fanout",
+      "type":"topic",
       "durable":true,
       "auto_delete":false,
       "internal":false,
@@ -100,29 +70,7 @@
       }
     },
     {
-      "name":"logTokenization",
-      "vhost":"/",
-      "type":"fanout",
-      "durable":true,
-      "auto_delete":false,
-      "internal":false,
-      "arguments":{
-
-      }
-    },
-    {
-      "name":"logs",
-      "vhost":"/",
-      "type":"fanout",
-      "durable":true,
-      "auto_delete":false,
-      "internal":false,
-      "arguments":{
-
-      }
-    },
-    {
-      "name":"tokens",
+      "name":"token-in",
       "vhost":"/",
       "type":"topic",
       "durable":true,
@@ -135,30 +83,20 @@
   ],
   "bindings":[
     {
-      "source":"logs",
+      "source":"token-in",
       "vhost":"/",
-      "destination":"logRaw",
+      "destination":"token",
       "destination_type":"queue",
-      "routing_key":"",
+      "routing_key":"#",
       "arguments":{
 
       }
     },
     {
-      "source":"logs",
+      "source":"token-out",
       "vhost":"/",
-      "destination":"logTokenization",
-      "destination_type":"queue",
-      "routing_key":"",
-      "arguments":{
-
-      }
-    },
-    {
-      "source":"tokens",
-      "vhost":"/",
-      "destination":"tokens",
-      "destination_type":"queue",
+      "destination":"token-in",
+      "destination_type":"exchange",
       "routing_key":"",
       "arguments":{
 
