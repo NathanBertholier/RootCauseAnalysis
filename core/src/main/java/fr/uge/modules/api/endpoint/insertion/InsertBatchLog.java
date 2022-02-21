@@ -3,12 +3,12 @@ package fr.uge.modules.api.endpoint.insertion;
 import fr.uge.modules.api.model.entities.RawLogEntity;
 import io.quarkus.hibernate.reactive.panache.Panache;
 import io.smallrye.mutiny.Uni;
+import io.smallrye.reactive.messaging.annotations.Merge;
 import org.eclipse.microprofile.reactive.messaging.Channel;
 import org.eclipse.microprofile.reactive.messaging.Emitter;
 
 import javax.inject.Inject;
 import javax.validation.ConstraintViolation;
-import javax.validation.Valid;
 import javax.validation.Validator;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
@@ -24,7 +24,6 @@ import java.util.function.Predicate;
 import java.util.function.Supplier;
 import java.util.logging.Logger;
 import java.util.stream.LongStream;
-import java.util.stream.Stream;
 
 @Path("/insertlog")
 public class InsertBatchLog {
@@ -33,7 +32,9 @@ public class InsertBatchLog {
     private static final Function<List<RawLogEntity>, LongStream> asLongStream = inputs -> LongStream.of(inputs.stream().mapToLong(r -> r.id).toArray());
 
     private static final Logger logger = Logger.getGlobal();
-    @Channel("logs") Emitter<RawLogEntity> emitter;
+
+    @Channel("token-out") Emitter<RawLogEntity> emitter;
+
     @Inject Validator rawLogValidator;
 
     @POST
@@ -53,7 +54,7 @@ public class InsertBatchLog {
                 () -> RawLogEntity.persist(inputs)
                         .onItemOrFailure().transform((success, error) -> {
                             if(error != null) {
-                                logger.severe("Errror while inserting: " + error);
+                                logger.severe("Error while inserting: " + error);
                                 return withServerError.get();
                             } else {
                                 logger.info("Inserted: " + inputs);

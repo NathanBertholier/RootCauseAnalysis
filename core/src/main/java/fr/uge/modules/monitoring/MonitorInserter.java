@@ -1,4 +1,4 @@
-package fr.uge.db.insert.monitoring;
+package fr.uge.modules.monitoring;
 
 import com.google.gson.JsonParser;
 import fr.uge.modules.api.model.entities.MonitoringEntity;
@@ -21,7 +21,7 @@ import java.util.logging.Logger;
 
 @ApplicationScoped
 public class MonitorInserter {
-    private static final String QUEUE_NAME = "logs";
+    private static final String QUEUE_NAME = "token-out";
     private final Properties properties = new Properties();
     private final Logger logger = Logger.getGlobal();
     @ConfigProperty(name = "rabbitmq-host")

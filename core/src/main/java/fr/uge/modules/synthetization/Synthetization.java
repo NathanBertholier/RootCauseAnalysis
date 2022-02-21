@@ -3,7 +3,7 @@ package fr.uge.modules.synthetization;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import fr.uge.db.insert.monitoring.MonitorInserter;
+import fr.uge.modules.monitoring.MonitorInserter;
 import fr.uge.modules.api.model.ReportResponse;
 import fr.uge.modules.api.model.TokensMostSeen;
 import fr.uge.modules.api.model.CompleteLog;
