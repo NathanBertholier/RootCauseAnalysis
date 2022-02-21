@@ -47,7 +47,6 @@ public class Tokenization {
         log.setId(id);
         log.setDatetime(convertStringToTimestamp(dateString + " " + timeString));
         log.setTokens(tokens);
-        System.out.println(log);
         return log;
     }
 
