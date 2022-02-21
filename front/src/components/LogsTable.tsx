@@ -33,7 +33,6 @@ export class LogsTable extends Component<LogsTableProp>{
     filter( request: TokensRequest ) {
         // TODO : probably other root and format
         DataService.getAll(request).then((response: any) => {
-            console.log(response);
             let logs : Log[] = response.data
             this.setState( {
                 list: logs
