@@ -199,3 +199,15 @@
   margin-left: 10px;
   font-size: 18px;
 }
+
+/*******************************
+ * Generic table
+ *******************************/
+
+.nodata-table {
+  background-color: #d9dbe0;
+  height: 200px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}

@@ -64,6 +64,7 @@ export default function GenericTable<T extends MinTableItem>( props: TableProps<
                 </thead>
                 <tbody>{props.items.map( renderRow )}</tbody>
             </Table>
+            <div className={`nodata-table ${ props.items.length !== 0 ? "d-none" : ""}`}>{props.items.length === 0 ? "No data": ""}</div>
         </div>
     )
 }

@@ -1,5 +1,6 @@
 //import http from "../http-common"
 import {TokensRequest} from "../types/TokensRequest";
+import {LinkRequest} from "../types/LinkRequest";
 import axios from "axios";
 
 class DataService {
@@ -11,8 +12,8 @@ class DataService {
         return axios.get( "/tokentypes" );
     }
 
-    getLink() {
-        return axios.get( "/link?delta=1&id1=1&id2=1" )
+    getLink( request : LinkRequest ) {
+        return axios.get( "/link", request )
     }
 }
 export default new DataService();
