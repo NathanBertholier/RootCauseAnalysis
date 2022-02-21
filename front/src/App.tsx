@@ -6,7 +6,7 @@ import {Performance} from "./views/Performance";
 import {Logs} from "./views/Logs";
 import {Report} from "./views/Report";
 import {ProximityCalc} from "./views/ProximityCalc";
-import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
+import { HashRouter as Router, Route, Switch } from "react-router-dom";
 
 function App() {
     return (
