@@ -169,8 +169,8 @@ export const Logs = () => {
 
         let start_datetime : string = (uiFields.find( field => field.id === Filter.START_DATE ) !== undefined) ? getDate( startDate ) : "";
         let end_datetime : string   = (uiFields.find( field => field.id === Filter.END_DATE ) !== undefined) ? getDate( endDate ) : "";
-        let id_log : number         = logIDInput.current !== null ? parseInt( logIDInput.current.value ) : 0;
-        let rowsNumber : number     = rowsNumberInput.current !== null ? parseInt( rowsNumberInput.current.value ) : 0;
+        let id_log : number         = logIDInput.current !== null ? parseInt( logIDInput.current.value ) : -1;
+        let rowsNumber : number     = rowsNumberInput.current !== null ? parseInt( rowsNumberInput.current.value ) : 30;
 
         let tokens: TokenModel = { token_type: -1, token_value: "" };
         if ( tokenIPInput.current !== null ) {
