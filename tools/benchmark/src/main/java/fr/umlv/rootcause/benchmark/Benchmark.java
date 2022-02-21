@@ -74,7 +74,7 @@ public class Benchmark {
         if(line.hasOption("newTimeStamp")) {
             ts = Timestamp.valueOf(line.getOptionValue("newTimeStamp"));
         }
-        String URITarget = "http://localhost:80/external/insertlog/batch";
+        String URITarget = line.getOptionValue("uriTarget");
         sendToServer(stringList, Integer.parseInt(line.getOptionValue("threadCount")), Integer.parseInt(line.getOptionValue("batchSize")),Integer.parseInt(line.getOptionValue("delay")), ts, URITarget);
     }
 
@@ -229,7 +229,6 @@ class BenchHTTPClient{
         HttpRequest httpRequest = HttpRequest.newBuilder().uri(uri)
                 .POST(HttpRequest.BodyPublishers.ofString(str))
                 .header("Accept", "application/json").header("Content-Type", "application/json").build();
-        System.out.println(str);
         HttpResponse<String> send = httpClient.send(httpRequest, HttpResponse.BodyHandlers.ofString());
         if(send.statusCode() != 200) {
             System.out.println(send.statusCode());
@@ -259,7 +258,6 @@ class BenchHTTPClient{
     }
 
     public void sendToServer(List<String> stringList, int millisDelay) {
-        while (true) {
             try {
                 if(stringList.size() > batchSize) {
                     for(List<String> list : cutList(stringList,batchSize)) {
@@ -274,7 +272,6 @@ class BenchHTTPClient{
             } catch (IOException | InterruptedException e) {
                 e.printStackTrace();
             }
-        }
     }
     private List<List<String>> cutList(List<String> originalList, int partitionSize) {
         List<List<String>> partitions = new ArrayList<>();

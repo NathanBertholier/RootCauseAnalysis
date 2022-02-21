@@ -26,10 +26,8 @@ public class MonitorInserter {
     private final Logger logger = Logger.getGlobal();
     @ConfigProperty(name = "rabbitmq-host")
     String rabbitmqurl;
-
-    MonitorInserter() throws IOException {
-        this.properties.load(MonitorInserter.class.getClassLoader().getResourceAsStream("init.properties"));
-    }
+    @ConfigProperty(name = "rabbitmqmonitor-port")
+    String rabbitmqport;
 
     @Scheduled(every="5s")
     public void getValueFromAPI() {
@@ -37,7 +35,7 @@ public class MonitorInserter {
         try {
             String sURL = "http://"
                     + rabbitmqurl
-                    + ":15672/api/exchanges/%2f/"
+                    + ":"+rabbitmqport+"/api/exchanges/%2f/"
                     + QUEUE_NAME;
 
             URL url = new URL(sURL);
