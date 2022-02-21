@@ -58,7 +58,6 @@ public class Tokenization {
                 TokenEntity token = new TokenEntity();
                 token.setIdtokentype(type);
                 token.setValue(word);
-                System.out.println(token);
                 tokenEntities.add(token);
             }
         }

@@ -48,7 +48,9 @@ public class InsertBatchLog {
                 .map(ConstraintViolation::getMessage)
                 .toList();
 
-        if(!violations.isEmpty()) return Uni.createFrom().item(Response.status(400).entity(violations).build());
+        if(!violations.isEmpty()) {
+            return Uni.createFrom().item(Response.status(400).entity(violations).build());
+        }
 
         return Panache.withTransaction(
                 () -> RawLogEntity.persist(inputs)
