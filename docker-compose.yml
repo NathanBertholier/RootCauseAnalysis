@@ -32,7 +32,7 @@ services:
     image: grafana/grafana
     container_name: "grafana"
     ports:
-      - "3001:3000"
+      - "${GRAFANA_PORT}:3000"
     networks:
       - root-cause-net
     volumes:
@@ -45,15 +45,17 @@ services:
     container_name: "RootCause"
     restart: always
     ports:
-      - "80:8080"
+      - "${QUARKUS_PORT}:8081"
     depends_on:
           - "rabbitmq"
     networks:
       - root-cause-net
     environment:
-      DELTA: ${DELTA}
-      PROXIMITY_LIMIT: ${PROXIMITY_LIMIT}
-      NETWORK_SIZE: ${NETWORK_SIZE}
+      REPORT_EXPANDED: ${REPORT_EXPANDED}
+      REPORT_NO_CACHE: ${REPORT_NO_CACHE}
+      REPORT_DELTA: ${REPORT_DELTA}
+      REPORT_PROXIMITY_LIMIT: ${REPORT_PROXIMITY_LIMIT}
+      REPORT_NETWORK_SIZE: ${REPORT_NETWORK_SIZE}
 
 networks:
   root-cause-net:
