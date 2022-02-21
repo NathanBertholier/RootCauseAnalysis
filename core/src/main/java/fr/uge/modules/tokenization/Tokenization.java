@@ -3,17 +3,16 @@ package fr.uge.modules.tokenization;
 import fr.uge.modules.api.model.entities.LogEntity;
 import fr.uge.modules.api.model.entities.TokenEntity;
 import fr.uge.modules.linking.token.type.*;
+import io.quarkus.logging.Log;
+import org.jboss.logging.Logger;
 
 import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.util.*;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 public class Tokenization {
-    private static final Logger LOGGER = Logger.getGlobal();
     private final List<TokenType> tokenTypes = new ArrayList<>();
     private final TypeTime time = new TypeTime();
     private final TypeDate date = new TypeDate();
@@ -47,7 +46,6 @@ public class Tokenization {
         log.setId(id);
         log.setDatetime(convertStringToTimestamp(dateString + " " + timeString));
         log.setTokens(tokens);
-        System.out.println(log);
         return log;
     }
 
@@ -67,7 +65,7 @@ public class Tokenization {
         try {
             return new Timestamp(this.formatter.parse(strDate).getTime());
         } catch (ParseException e) {
-            LOGGER.log(Level.WARNING, "Incorrect timestamp ",e);
+            Log.log(Logger.Level.WARN, "Incorrect timestamp ", e);
         }
         return Timestamp.from(Instant.now());
     }

@@ -18,7 +18,6 @@ import java.util.Base64;
 import java.util.Properties;
 import java.util.logging.Logger;
 
-
 @ApplicationScoped
 public class MonitorInserter {
     private static final String QUEUE_NAME = "token-out";
