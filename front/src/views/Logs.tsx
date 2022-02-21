@@ -31,7 +31,7 @@ type DateTimeInput = {
     type: "datetime"
     label: string
     value: Date
-    setter: (date: Date) => void
+    setter: (field: Field[], date: Date) => void
     error?: string
 }
 
@@ -72,8 +72,14 @@ export const Logs = () => {
     const rowsNumberInput               = useRef<HTMLInputElement>(null!);
 
     const DEFAULT_FIELDS : Field[] = [
-        {id: Filter.START_DATE, type: "datetime", label: "Date de début", value: startDate, setter: (date: Date) => setStartDate( date ) },
-        {id: Filter.END_DATE, type: "datetime", label: "Date de fin", value: endDate, setter: (date: Date) => setEndDate( date ) },
+        {id: Filter.START_DATE, type: "datetime", label: "Date de début", value: startDate, setter: (data,date) => {
+            updateDateTimeValueField( data, Filter.START_DATE, date );
+            setStartDate( date );
+        },},
+        {id: Filter.END_DATE, type: "datetime", label: "Date de fin", value: endDate, setter: (data,date) => {
+            updateDateTimeValueField( data, Filter.END_DATE, date );
+            setEndDate( date )
+        } },
         {id: Filter.EDGE_RESPONSE, type: "text", label: "Edge Response", placeholder: "", patern: "^((Hit)|(RefreshHit)|(Miss)|(LimitExceeded)|(CapacityExceeded)|(Error)|(Redirect))$", validator: data => {
             let message = getErrorMessage( "Edge Response", edgeResponseInput )
             setErrorMessage( data, Filter.EDGE_RESPONSE, message );
@@ -225,6 +231,13 @@ export const Logs = () => {
         setUiFields( prevState => [...prevState, field ] )
     }
 
+    const updateDateTimeValueField = ( data: Field[], fieldId: Filter, value: Date ) => {
+        let copy = [...data];
+        let index: number = copy.findIndex( x => x.id === fieldId );
+        (copy[ index ] as DateTimeInput).value = value;
+        setUiFields( copy )
+    }
+
     // set l'erreur pour un champs spécifique
     const setErrorMessage = ( data: Field[], filterID: Filter, message: string ) => {
         let newArray = [...data];
@@ -319,7 +332,7 @@ export const Logs = () => {
     const getInput = ( field: Field ) => {
         if (field.id === Filter.START_DATE || field.id === Filter.END_DATE) {
             let inputField = field as DateTimeInput;
-            return <DateTimePicker onChange={inputField.setter} value={ inputField.value } format="yyyy-MM-dd hh:mm:ss a" />
+            return <DateTimePicker onChange={v => inputField.setter(uiFields, v) } value={ inputField.value } format="yyyy-MM-dd hh:mm:ss a" />
         }
         let inputField = field as Input;
         return <FormControl ref={ inputField.ref } type={ inputField.type } pattern={ inputField.patern } placeholder={inputField.placeholder} onBlur={ () => inputField.validator( uiFields ) } />
