@@ -258,7 +258,6 @@ class BenchHTTPClient{
     }
 
     public void sendToServer(List<String> stringList, int millisDelay) {
-        while (true) {
             try {
                 if(stringList.size() > batchSize) {
                     for(List<String> list : cutList(stringList,batchSize)) {
@@ -273,7 +272,6 @@ class BenchHTTPClient{
             } catch (IOException | InterruptedException e) {
                 e.printStackTrace();
             }
-        }
     }
     private List<List<String>> cutList(List<String> originalList, int partitionSize) {
         List<List<String>> partitions = new ArrayList<>();
