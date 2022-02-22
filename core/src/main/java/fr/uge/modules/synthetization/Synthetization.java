@@ -44,22 +44,4 @@ public class Synthetization {
                     }).invoke(tokensMostSeen -> map.put(idTokenType, tokensMostSeen)).await().indefinitely();
                 }));
     }
-
-    private static ArrayNode getProximity(SortedMap<Float, CompleteLog> map) {
-    /*
-        ArrayNode prox = mapper.createArrayNode();
-        map.forEach((k, v) -> {
-            ObjectNode log = mapper.createObjectNode();
-            log.put("id", v.id());
-            log.put("proximity", k);
-            prox.add(log);
-        });
-        return prox;
-     */
-        return null;
-    }
-
-    private static CompleteLog[] fetchChildren() {
-        return null;
-    }
 }
