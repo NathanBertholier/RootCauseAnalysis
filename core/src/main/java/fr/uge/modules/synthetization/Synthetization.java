@@ -45,20 +45,6 @@ public class Synthetization {
                 }));
     }
 
-    /*
-    return Multi.createFrom().items(logs.stream().flatMap(log -> log.tokens.stream()))
-                .group().by(TokenEntity::getIdtokentype)
-                .collect().in(TreeMap::new, ((map, multi) -> {
-                    var idTokenType = multi.key();
-                    multi.collect().asList().chain(entities -> {
-                        var tokenTypeName = entities.stream().findAny().orElseThrow().token_type.name;
-                        var values = entities.stream().map(t -> t.value).toList();
-                        var size = entities.size();
-                        return Uni.createFrom().item(new TokensMostSeen(tokenTypeName, values, size));
-                    }).invoke(tokensMostSeen -> map.put(idTokenType, tokensMostSeen)).await().indefinitely();
-                }));
-     */
-
     private static ArrayNode getProximity(SortedMap<Float, CompleteLog> map) {
     /*
         ArrayNode prox = mapper.createArrayNode();
