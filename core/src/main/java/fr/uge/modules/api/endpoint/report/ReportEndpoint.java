@@ -2,14 +2,13 @@ package fr.uge.modules.api.endpoint.report;
 
 import fr.uge.modules.api.EnvRetriever;
 import fr.uge.modules.api.model.report.ReportParameter;
-import fr.uge.modules.linking.Linking;
+import fr.uge.modules.linking.ReportLinking;
 import fr.uge.modules.synthetization.Synthetization;
 import io.smallrye.mutiny.Uni;
 
 import javax.inject.Inject;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Response;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
@@ -49,8 +48,7 @@ public class ReportEndpoint {
                 });
          */
 
-        var linking = new Linking();
-        return linking.link(idLogTarget, reportParameter)
+        return Synthetization.getReport(idLogTarget, reportParameter)
                 .onItemOrFailure()
                 .transform((map, error) -> {
                     if(error != null) return Response.serverError().entity(error).build();

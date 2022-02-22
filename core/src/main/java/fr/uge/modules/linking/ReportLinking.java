@@ -8,6 +8,7 @@ import fr.uge.modules.linking.token.type.TokenType;
 import fr.uge.modules.linking.token.type.TypeDatetime;
 import fr.uge.modules.linking.token.type.TypeHTTPStatus;
 import fr.uge.modules.linking.token.type.TypeIPv4;
+import io.smallrye.common.annotation.Blocking;
 import io.smallrye.mutiny.Uni;
 
 import java.sql.Timestamp;
@@ -15,11 +16,11 @@ import java.time.Duration;
 import java.util.*;
 import java.util.logging.Logger;
 
-public class Linking {
+public class ReportLinking {
     private final Logger logger = Logger.getLogger(this.getClass().getName());
     private final HashMap<Integer, TokenType> tokensType = new HashMap<>();
 
-    public Linking() {
+    public ReportLinking() {
         this.addInTokensType(TokenType.TokenTypeId.ID_IPV4.getId(), new TypeIPv4());
         this.addInTokensType(TokenType.TokenTypeId.ID_STATUS.getId(), new TypeHTTPStatus());
     }
@@ -28,32 +29,30 @@ public class Linking {
         tokensType.compute(id, (k,v) -> tokenType);
     }
 
-    public Uni<SortedMap<Float, LogEntity>> link(long id, ReportParameter rp) {
+    public Uni<SortedMap<Float, LogEntity>> linkReport(long id, ReportParameter rp) {
         return LogEntity.<LogEntity>findById(id)
-                .map(logEntity -> new CompleteLog(logEntity.id, logEntity.datetime, logEntity.rawLog.log, logEntity.tokens))
                 .chain(completeLog -> {
-                    var datetime = completeLog.datetime();
+                    var datetime = completeLog.datetime;
+                    var start = Timestamp.valueOf(datetime.toLocalDateTime().minus(Duration.ofSeconds(rp.delta())));
                     return LogEntity.<LogEntity>find("id != ?1 and datetime between ?2 and ?3", id,
-                            Timestamp.valueOf(datetime.toLocalDateTime().minus(Duration.ofSeconds(rp.delta()))),
-                            datetime).list()
+                                    start, datetime).list()
                             .map(list -> computeProximityTree(completeLog, list, rp));
                 });
     }
 
     private void fillHashmap(List<TokenEntity> tokens, HashMap<Integer, List<TokenEntity>> tokensToFill) {
-        tokens.forEach(token -> {
-            tokensToFill.computeIfAbsent(token.getIdtokentype(),
-                    k -> new ArrayList<>());
-            tokensToFill.get(token.getIdtokentype()).add(token);
-        });
+        tokens.forEach(token -> tokensToFill
+                .computeIfAbsent(token.getIdtokentype(), k -> new ArrayList<>())
+                .add(token)
+        );
     }
 
-    public SortedMap<Float, LogEntity> computeProximityTree(CompleteLog logTarget, List<LogEntity> logWithinDelta, ReportParameter rp){
+    public SortedMap<Float, LogEntity> computeProximityTree(LogEntity logTarget, List<LogEntity> logWithinDelta, ReportParameter rp){
         TreeMap<Float, LogEntity> redBlack = new TreeMap<>(Collections.reverseOrder());
-        var targetDatetime = logTarget.datetime();
+        var targetDatetime = logTarget.datetime;
 
         HashMap<Integer, List<TokenEntity>> tokenTarget = new HashMap<>();
-        fillHashmap(logTarget.tokens(), tokenTarget);
+        fillHashmap(logTarget.tokens, tokenTarget);
 
         var delta = rp.delta();
 
@@ -87,23 +86,6 @@ public class Linking {
         redBlack.forEach((k,v) -> System.out.println(k + " LOG " + v));
         redBlack.forEach((k,v) -> System.out.println(k));
         return redBlack;
-    }
-
-    /**
-     * NOT IMPLEMENTED YET
-     * Computes proximity between log of id1 and log of id2 for all the tokens in tokenTypes
-     * @param id1 target log //A VALIDER
-     * @param id2 other log
-     * @return A JSON format String containing the proximities for each token
-     */
-    public String computeLinks(long id1, long id2) {
-        StringBuilder sb = new StringBuilder();
-        sb.append("{");
-        /*for (TokenType tt : tokenTypes) {
-            sb.append(tt.getName()).append(" : ");
-        }*/
-        sb.append("}");
-        return sb.toString();
     }
 
 }
