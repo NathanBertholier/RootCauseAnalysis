@@ -35,7 +35,7 @@ deploy:
     - docker push 192.168.4.102:5050/rootteam/rootcause:${TAG}
     - docker push 192.168.4.102:5050/rootteam/rootcause:latest
     - cd /root/RootCause
-    - docker-compose up --force-recreate --build -d > logs/$(date +'%d-%m-%y_%H-%M-%S').txt
+    - docker-compose up --force-recreate --build -d
   only:
     - tags
 
