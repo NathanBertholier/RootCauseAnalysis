@@ -1,24 +1,18 @@
 package fr.uge.modules.synthetization;
 
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import fr.uge.modules.api.model.CompleteLog;
 import fr.uge.modules.api.model.ReportResponse;
 import fr.uge.modules.api.model.TokensMostSeen;
-import fr.uge.modules.api.model.TokensResponse;
 import fr.uge.modules.api.model.entities.LogEntity;
 import fr.uge.modules.api.model.entities.TokenEntity;
-import fr.uge.modules.api.model.entities.TokenTypeEntity;
 import fr.uge.modules.api.model.report.ReportParameter;
 import fr.uge.modules.linking.LogsLinking;
 import fr.uge.modules.linking.ReportLinking;
-import io.smallrye.common.annotation.Blocking;
-import io.smallrye.mutiny.GroupedMulti;
 import io.smallrye.mutiny.Multi;
 import io.smallrye.mutiny.Uni;
 
-import java.util.*;
+import java.util.List;
+import java.util.TreeMap;
 import java.util.logging.Logger;
-import java.util.stream.Collectors;
 
 public class Synthetization {
     private static final ReportLinking reportLinking = new ReportLinking();
