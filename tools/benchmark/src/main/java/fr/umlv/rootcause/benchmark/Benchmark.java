@@ -22,6 +22,7 @@ public class Benchmark {
         //use this to try out spamming rabbitmq
         //args = new String[]{"-l", "100000", "-F", "../logs/", "-b", "50", "-d", "85", "-t", "8", "-u", "http://localhost:80/external/insertlog/batch", "-nT", "2022-02-18 11:57:00"};
         //args = new String[]{"-l", "100000", "-F", "../logs/", "-b", "50", "-d", "85", "-t", "8", "-u", "http://localhost:80/external/insertlog/batch"};
+        //args = new String[]{"-l", "100000", "-F", "../logs/", "-b", "50", "-d", "85", "-t", "8", "-u", "http://localhost:80/external/insertlog/batch", "-lo"};
 
         //use this to output to out.txt in exec folder
         //args = new String[]{"-l", "10000", "-f", "in.txt"};
@@ -74,11 +75,11 @@ public class Benchmark {
         if(line.hasOption("newTimeStamp")) {
             ts = Timestamp.valueOf(line.getOptionValue("newTimeStamp"));
         }
-        String URITarget = "http://localhost:80/external/insertlog/batch";
-        sendToServer(stringList, Integer.parseInt(line.getOptionValue("threadCount")), Integer.parseInt(line.getOptionValue("batchSize")),Integer.parseInt(line.getOptionValue("delay")), ts, URITarget);
+        String URITarget = line.getOptionValue("uriTarget");
+        sendToServer(stringList, Integer.parseInt(line.getOptionValue("threadCount")), Integer.parseInt(line.getOptionValue("batchSize")),Integer.parseInt(line.getOptionValue("delay")), ts, URITarget, line.hasOption("loopOnData"));
     }
 
-    private static void sendToServer(List<String> stringSource, int threadCount, int batchSize, int millisDelay, Timestamp ts, String URITarget) throws InterruptedException {
+    private static void sendToServer(List<String> stringSource, int threadCount, int batchSize, int millisDelay, Timestamp ts, String URITarget, boolean loop) throws InterruptedException {
 
         Thread[] threads = new Thread[threadCount];
         ArrayList<List<String>> subLists = new ArrayList<>();
@@ -88,7 +89,7 @@ public class Benchmark {
             int finalI = i;
             threads[i] = new Thread(() -> {
                 BenchHTTPClient client = new BenchHTTPClient(batchSize, ts, URITarget);
-                client.sendToServer(subLists.get(finalI),millisDelay);
+                client.sendToServer(subLists.get(finalI),millisDelay, loop);
             });
         }
 
@@ -171,6 +172,8 @@ public class Benchmark {
 
         final Option URITargetOption = Option.builder("u").longOpt("uriTarget").desc("Replace read time stamps with current time stamp").hasArg(true).argName("uriTarget").required(true).build();
 
+        final Option loopOption = Option.builder("lo").longOpt("loopOnData").desc("Using this option will make the sender loop on the data loaded, instead of shutting down after sending all lines read").hasArg(false).required(false).build();
+
         final Options options = new Options();
 
         for (final Option fo : firstOptions.getOptions()) {
@@ -186,6 +189,7 @@ public class Benchmark {
         options.addOption(threadCountOption);
         options.addOption(newTimeStampOption);
         options.addOption(URITargetOption);
+        options.addOption(loopOption);
 
         return options;
     }
@@ -229,7 +233,6 @@ class BenchHTTPClient{
         HttpRequest httpRequest = HttpRequest.newBuilder().uri(uri)
                 .POST(HttpRequest.BodyPublishers.ofString(str))
                 .header("Accept", "application/json").header("Content-Type", "application/json").build();
-        System.out.println(str);
         HttpResponse<String> send = httpClient.send(httpRequest, HttpResponse.BodyHandlers.ofString());
         if(send.statusCode() != 200) {
             System.out.println(send.statusCode());
@@ -258,23 +261,22 @@ class BenchHTTPClient{
         return sb.toString();
     }
 
-    public void sendToServer(List<String> stringList, int millisDelay) {
-        while (true) {
+    public void sendToServer(List<String> stringList, int millisDelay, boolean loop) {
+        do {
             try {
-                if(stringList.size() > batchSize) {
-                    for(List<String> list : cutList(stringList,batchSize)) {
-                        this.sendPost(sendURI,list);
+                if (stringList.size() > batchSize) {
+                    for (List<String> list : cutList(stringList, batchSize)) {
+                        this.sendPost(sendURI, list);
                         Thread.sleep(millisDelay);
                     }
-                }
-                else {
-                    this.sendPost(sendURI,stringList);
+                } else {
+                    this.sendPost(sendURI, stringList);
                     Thread.sleep(millisDelay);
                 }
             } catch (IOException | InterruptedException e) {
                 e.printStackTrace();
             }
-        }
+        } while(loop);
     }
     private List<List<String>> cutList(List<String> originalList, int partitionSize) {
         List<List<String>> partitions = new ArrayList<>();

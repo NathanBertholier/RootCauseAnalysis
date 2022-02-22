@@ -1,4 +1,4 @@
-package fr.uge.db.insert.monitoring;
+package fr.uge.modules.monitoring;
 
 import com.google.gson.JsonParser;
 import fr.uge.modules.api.model.entities.MonitoringEntity;
@@ -18,18 +18,15 @@ import java.util.Base64;
 import java.util.Properties;
 import java.util.logging.Logger;
 
-
 @ApplicationScoped
 public class MonitorInserter {
-    private static final String QUEUE_NAME = "logs";
+    private static final String QUEUE_NAME = "token-out";
     private final Properties properties = new Properties();
     private final Logger logger = Logger.getGlobal();
     @ConfigProperty(name = "rabbitmq-host")
     String rabbitmqurl;
-
-    MonitorInserter() throws IOException {
-        this.properties.load(MonitorInserter.class.getClassLoader().getResourceAsStream("init.properties"));
-    }
+    @ConfigProperty(name = "rabbitmqmonitor-port")
+    String rabbitmqport;
 
     @Scheduled(every="5s")
     public void getValueFromAPI() {
@@ -37,7 +34,7 @@ public class MonitorInserter {
         try {
             String sURL = "http://"
                     + rabbitmqurl
-                    + ":15672/api/exchanges/%2f/"
+                    + ":"+rabbitmqport+"/api/exchanges/%2f/"
                     + QUEUE_NAME;
 
             URL url = new URL(sURL);
