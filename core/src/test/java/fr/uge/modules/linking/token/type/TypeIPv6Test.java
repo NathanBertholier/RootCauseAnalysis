@@ -74,24 +74,36 @@ class TypeIPv6Test {
 
         assertAll(
             // empty array
-            () -> assertEquals(0,   typeIPv6.computeProximity( new ArrayList<>(){ { add( firstIPv6 ); } },      new ArrayList<>() ) ),
-            () -> assertEquals(0,   typeIPv6.computeProximity( new ArrayList<>(),                               new ArrayList<>(){ { add(firstIPv6); } } ) ),
-            () -> assertEquals(0,   typeIPv6.computeProximity( new ArrayList<>(),                               new ArrayList<>() ) ),
+            () -> assertEquals(0,   typeIPv6.computeProximity( new ArrayList<>(){ { add( firstIPv6 ); } },
+                    new ArrayList<>() ) ),
+            () -> assertEquals(0,   typeIPv6.computeProximity( new ArrayList<>(),
+                    new ArrayList<>(){ { add(firstIPv6); } } ) ),
+            () -> assertEquals(0,   typeIPv6.computeProximity( new ArrayList<>(),
+                    new ArrayList<>() ) ),
 
             // Case 1 element
-            () -> assertEquals(100, typeIPv6.computeProximity( new ArrayList<>(){ { add( firstIPv6 ); } },      new ArrayList<>(){ { add( firstIPv6 ); } } ) ),
-            () -> assertEquals(100, typeIPv6.computeProximity( new ArrayList<>(){ { add( secondtIPv6 ); } },    new ArrayList<>(){ { add(secondtIPv6); } } ) ),
-            () -> assertEquals(0,   typeIPv6.computeProximity( new ArrayList<>(){ { add( firstIPv6 ); } },      new ArrayList<>(){ { add(secondtIPv6); } } ) ),
+            () -> assertEquals(100, typeIPv6.computeProximity( new ArrayList<>(){ { add( firstIPv6 ); } },
+                    new ArrayList<>(){ { add( firstIPv6 ); } } ) ),
+            () -> assertEquals(100, typeIPv6.computeProximity( new ArrayList<>(){ { add( secondtIPv6 ); } },
+                    new ArrayList<>(){ { add(secondtIPv6); } } ) ),
+            () -> assertEquals(0,   typeIPv6.computeProximity( new ArrayList<>(){ { add( firstIPv6 ); } },
+                    new ArrayList<>(){ { add(secondtIPv6); } } ) ),
 
             // Case 2 element
-            () -> assertEquals(100, typeIPv6.computeProximity( new ArrayList<>(){ { add( firstIPv6 ); } },                          new ArrayList<>(){ { add( firstIPv6 );add(secondtIPv6); } } ) ),
-            () -> assertEquals(50, typeIPv6.computeProximity( new ArrayList<>(){ { add( firstIPv6 ); add( secondtIPv6 ); } },       new ArrayList<>(){ { add(firstIPv6); } } ) ),
-            () -> assertEquals(100,   typeIPv6.computeProximity( new ArrayList<>(){ { add( firstIPv6 ); add( secondtIPv6 ); } },    new ArrayList<>(){ { add(secondtIPv6);add(firstIPv6); } } ) ),
+            () -> assertEquals(100, typeIPv6.computeProximity( new ArrayList<>(){ { add( firstIPv6 ); } },
+                    new ArrayList<>(){ { add( firstIPv6 );add(secondtIPv6); } } ) ),
+            () -> assertEquals(50, typeIPv6.computeProximity( new ArrayList<>(){ { add( firstIPv6 ); add( secondtIPv6 ); } },
+                    new ArrayList<>(){ { add(firstIPv6); } } ) ),
+            () -> assertEquals(100,   typeIPv6.computeProximity( new ArrayList<>(){ { add( firstIPv6 ); add( secondtIPv6 ); } },
+                    new ArrayList<>(){ { add(secondtIPv6);add(firstIPv6); } } ) ),
 
             // Case 3 element
-            () -> assertEquals(100.f/3, typeIPv6.computeProximity( new ArrayList<>(){ { add( firstIPv6 );add( secondtIPv6 );add( thirdIPv6 ); } },  new ArrayList<>(){ { add( firstIPv6 ); } } ) ),
-            () -> assertEquals(200.f/3, typeIPv6.computeProximity( new ArrayList<>(){ { add( firstIPv6 );add( secondtIPv6 );add( thirdIPv6 ); } },  new ArrayList<>(){ { add( firstIPv6 );add(thirdIPv6); } } ) ),
-            () -> assertEquals(100, typeIPv6.computeProximity( new ArrayList<>(){ { add( firstIPv6 );add( secondtIPv6 );add( thirdIPv6 ); } },      new ArrayList<>(){ { add( thirdIPv6 );add(secondtIPv6);add( firstIPv6 ); } } ) )
+            () -> assertEquals(100d/3, typeIPv6.computeProximity( new ArrayList<>(){ { add( firstIPv6 );add( secondtIPv6 );add( thirdIPv6 ); } },
+                    new ArrayList<>(){ { add( firstIPv6 ); } } ) ),
+            () -> assertEquals(200d/3, typeIPv6.computeProximity( new ArrayList<>(){ { add( firstIPv6 );add( secondtIPv6 );add( thirdIPv6 ); } },
+                    new ArrayList<>(){ { add( firstIPv6 );add(thirdIPv6); } } ) ),
+            () -> assertEquals(100, typeIPv6.computeProximity( new ArrayList<>(){ { add( firstIPv6 );add( secondtIPv6 );add( thirdIPv6 ); } },
+                    new ArrayList<>(){ { add( thirdIPv6 );add(secondtIPv6);add( firstIPv6 ); } } ) )
 
         );
     }

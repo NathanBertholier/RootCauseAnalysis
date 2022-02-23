@@ -2,10 +2,7 @@ package fr.uge.modules.linking.token.type;
 
 import fr.uge.modules.api.model.entities.TokenEntity;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Objects;
 import java.util.stream.IntStream;
 
 public class TypeIPv4 implements TokenType {

@@ -1,6 +1,5 @@
 package fr.uge.modules.linking;
 
-import fr.uge.modules.api.model.CompleteLog;
 import fr.uge.modules.api.model.entities.LogEntity;
 import fr.uge.modules.api.model.entities.TokenEntity;
 import fr.uge.modules.api.model.report.ReportParameter;
@@ -8,7 +7,6 @@ import fr.uge.modules.linking.token.type.TokenType;
 import fr.uge.modules.linking.token.type.TypeDatetime;
 import fr.uge.modules.linking.token.type.TypeHTTPStatus;
 import fr.uge.modules.linking.token.type.TypeIPv4;
-import io.smallrye.common.annotation.Blocking;
 import io.smallrye.mutiny.Uni;
 
 import java.sql.Timestamp;
@@ -59,7 +57,6 @@ public class ReportLinking {
         HashMap<Integer, List<TokenEntity>> tokenToLink = new HashMap<>();
         this.tokensType.forEach((id,v) -> tokenToLink.computeIfAbsent(id, k -> new ArrayList<>()));
 
-        System.out.println(delta);
         logWithinDelta.forEach(log -> {
             float proximity = TypeDatetime.computeDateTimeProximity(log.datetime, targetDatetime, delta);
             log.getTokens().forEach(token -> tokenToLink.get(token.getIdtokentype()).add(token));
@@ -71,7 +68,6 @@ public class ReportLinking {
 
             proximity /= (tokenTarget.size() + 1); // NUMBER OF TOKENS CONSIDERATE + TIMESTAMP
 
-            System.out.println(proximity);
             if(redBlack.size() > rp.network_size() - 1) {
                 if (proximity > redBlack.lastKey()) {
                     redBlack.pollLastEntry();
@@ -82,7 +78,6 @@ public class ReportLinking {
             }
             tokenToLink.forEach((k,v) -> v.clear());
         });
-        System.out.println(redBlack);
         redBlack.forEach((k,v) -> System.out.println(k + " LOG " + v));
         redBlack.forEach((k,v) -> System.out.println(k));
         return redBlack;

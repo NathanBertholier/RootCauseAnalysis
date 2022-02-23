@@ -4,7 +4,6 @@ import fr.uge.modules.api.model.entities.TokenEntity;
 
 import java.util.Objects;
 import java.util.List;
-import java.util.Optional;
 
 public interface TokenType {
 

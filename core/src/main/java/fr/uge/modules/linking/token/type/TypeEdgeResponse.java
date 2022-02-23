@@ -26,26 +26,27 @@ public class TypeEdgeResponse implements TokenType {
     }
 
     @Override
-    public float computeProximity(List<TokenEntity> tokenLeft, List<TokenEntity> tokenRight) {
-        if ( tokenLeft.isEmpty() || tokenRight.isEmpty() ) return 50;
+    public double computeProximity(List<TokenEntity> tokenLeft, List<TokenEntity> tokenRight) {
+        if (tokenLeft.isEmpty() || tokenRight.isEmpty()) return 50;
 
-        float proximity = tokenLeft.stream().mapToLong( tokenL -> {
-            String leftValue = tokenL.getValue();
-            return tokenRight.stream().mapToLong( tokenR -> {
-                String rightValue = tokenR.getValue();
-                if ( leftValue.equals( rightValue ) ) {
-                    return 100;
-                }
-                else if ( (( ERRORS.contains( leftValue ) && ERRORS.contains( rightValue ) ) || ( !ERRORS.contains( leftValue ) && !ERRORS.contains( rightValue ) ) ) ) {
-                    return 95;
-                }
-                else if ( !ERRORS.contains( leftValue ) && ERRORS.contains( rightValue ) ) {
-                    return 25;
-                }
-                return 0;
-            } ).reduce(0, Long::max);
-        } ).reduce(0, Long::sum);
-
-        return proximity / tokenLeft.size();
+        return tokenLeft.stream()
+                .map(TokenEntity::getValue)
+                .mapToDouble(leftValue -> tokenRight.stream()
+                        .map(TokenEntity::getValue)
+                        .mapToDouble(rightValue -> {
+                            if (leftValue.equals(rightValue)) {
+                                return 100;
+                            }
+                            else if (((ERRORS.contains(leftValue)
+                                    && ERRORS.contains(rightValue)) || (!ERRORS.contains(leftValue)
+                                    && !ERRORS.contains(rightValue)))) {
+                                return 95;
+                            }
+                            else if (!ERRORS.contains(leftValue) && ERRORS.contains(rightValue)) {
+                                return 25;
+                            }
+                            return 0;
+                        }).reduce(0, Double::max))
+                .reduce(0, Double::sum) / tokenLeft.size();
     }
 }
