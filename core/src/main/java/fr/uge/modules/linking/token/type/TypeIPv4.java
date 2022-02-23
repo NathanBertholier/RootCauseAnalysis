@@ -2,7 +2,9 @@ package fr.uge.modules.linking.token.type;
 
 import fr.uge.modules.api.model.entities.TokenEntity;
 
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.IntStream;
 
 public class TypeIPv4 implements TokenType {
 
@@ -35,9 +37,36 @@ public class TypeIPv4 implements TokenType {
         return (cardBetween(t1, t2) / t1.length()) * 100;
     }
 
+    private static double jagguard(String t1, String t2) {
+        var toto = t1.split("\\.");
+        var titi = t2.split("\\.");
+        System.out.println(titi.length);
+        if(toto[0].equals(titi[1])) {
+
+        } else if(toto[0].equals(titi[1])) {
+
+        }
+            Arrays.stream(titi).forEach(System.out::println);
+        return IntStream.range(0, 4).filter(i -> !toto[i].equals(titi[i]))
+                .mapToDouble(i -> switch (i) {
+                    case 1 -> 20;
+                    case 2 -> 85;
+                    case 3 -> 95;
+                    default -> 0;
+                }).findFirst().orElse(100);
+    }
+
     public float computeProximity(List<TokenEntity> tokenLeft, List<TokenEntity> tokenRight) {
-        return 0;
-        //return jaccard(tokenLeft.getValue(), tokenRight.getValue());
+        if(tokenLeft.isEmpty() || tokenRight.isEmpty()) {
+            return 50;
+        }
+        tokenRight.forEach(System.out::println);
+        return (float) tokenLeft.stream()
+                .map(TokenEntity::getValue)
+                .mapToDouble(leftIP -> tokenRight.stream()
+                        .map(TokenEntity::getValue)
+                        .mapToDouble(rightIP -> jagguard(leftIP, rightIP))
+                        .max().orElse(0)).max().orElseThrow();
     }
 
 }

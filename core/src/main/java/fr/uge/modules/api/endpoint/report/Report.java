@@ -1,14 +1,15 @@
 package fr.uge.modules.api.endpoint.report;
 
 import fr.uge.modules.api.EnvRetriever;
+import fr.uge.modules.api.model.entities.LogEntity;
 import fr.uge.modules.api.model.report.ReportParameter;
-import fr.uge.modules.synthetization.Synthetization;
+import fr.uge.modules.linking.Linking;
 import io.smallrye.mutiny.Uni;
 
 import javax.inject.Inject;
 import javax.ws.rs.*;
-import javax.ws.rs.core.Response;
 import java.sql.SQLException;
+import java.util.SortedMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -23,7 +24,7 @@ public class Report {
     @GET
     @Consumes(APPLICATION_JSON)
     @Produces(APPLICATION_JSON)
-    public Uni<Response> getReport(
+    public Uni<SortedMap<Float, LogEntity>> getReport(
             @PathParam("id") long idLogTarget,
             @QueryParam("expanded") Boolean expanded,
             @QueryParam("delta") Long delta,
@@ -39,9 +40,9 @@ public class Report {
 
         ReportParameter reportParameter = new ReportParameter(expanded, delta, cache, proximity_limit, network_size);
         LOGGER.log(Level.INFO, "Received request for id " +  idLogTarget + " with parameters: " + reportParameter);
-        System.out.println("ReportParameter: " + reportParameter);
-        var report = Synthetization.getReport(idLogTarget, reportParameter);
-
-        return Uni.createFrom().item(Response.ok().entity(reportParameter).build());
+        //var report = Synthetization.getReport(idLogTarget, reportParameter);
+        var link = new Linking();
+        return link.linkReport(idLogTarget, reportParameter);
+        ///return Uni.createFrom().item(Response.ok().entity(reportParameter).build());
     }
 }
