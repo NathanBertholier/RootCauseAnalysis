@@ -4,10 +4,7 @@ import fr.uge.modules.api.model.CompleteLog;
 import fr.uge.modules.api.model.entities.LogEntity;
 import fr.uge.modules.api.model.entities.TokenEntity;
 import fr.uge.modules.api.model.report.ReportParameter;
-import fr.uge.modules.linking.token.type.TokenType;
-import fr.uge.modules.linking.token.type.TypeDatetime;
-import fr.uge.modules.linking.token.type.TypeHTTPStatus;
-import fr.uge.modules.linking.token.type.TypeIPv4;
+import fr.uge.modules.linking.token.type.*;
 
 import java.sql.*;
 import java.time.Duration;
@@ -26,7 +23,9 @@ public class Linking {
 
     public Linking() {
         this.addInTokensType(TokenType.TokenTypeId.ID_IPV4.getId(), new TypeIPv4());
+        this.addInTokensType(TokenType.TokenTypeId.ID_IPV6.getId(), new TypeIPv6());
         this.addInTokensType(TokenType.TokenTypeId.ID_STATUS.getId(), new TypeHTTPStatus());
+        this.addInTokensType(TokenType.TokenTypeId.ID_EDGERESPONSE.getId(), new TypeEdgeResponse());
     }
 
     private void addInTokensType(Integer id, TokenType tokenType) {
