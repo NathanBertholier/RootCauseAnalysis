@@ -36,7 +36,7 @@ public class TypeIPv4 implements TokenType {
     }
 
     public float computeProximity(List<TokenEntity> tokenLeft, List<TokenEntity> tokenRight) {
-        return 0;
+        return 2;
         //return jaccard(tokenLeft.getValue(), tokenRight.getValue());
     }
 
