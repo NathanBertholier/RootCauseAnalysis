@@ -2,9 +2,11 @@ package fr.uge.modules.linking.token.type;
 
 import fr.uge.modules.api.model.entities.TokenEntity;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.IntStream;
 
 public class TypeIPv4 implements TokenType {
 
@@ -24,68 +26,29 @@ public class TypeIPv4 implements TokenType {
         return TokenTypeId.ID_IPV4.getId();
     }
 
-    private static float cardBetween(String t1, String t2){
-        int res = 0;
-        for(int i = 0; i < Math.min(t1.length(),t2.length()); i++){
-            if(t1.charAt(i) == t2.charAt(i))
-                res++;
-        }
-        return res;
-    }
+    private static double calculIp(String t1, String t2) {
+        var sIP1 = t1.split("\\.");
+        var sIP2 = t2.split("\\.");
 
-    private static float jaccard(String t1, String t2){
-        return (cardBetween(t1, t2) / t1.length()) * 100;
-    }
-
-    private static double jagguard(String t1, String t2) {
-        System.out.println("TOKEN MATCH : " + t1 + " VS " + t2);
-        var toto = t1.split("\\.");
-        var titi = t2.split("\\.");
-        System.out.println(titi.length);
-
-        int i = 0;
-        while (toto[i].equals(titi[i]) && i++ < (toto.length - 1)) {
-        }
-
-        var va =  switch (i) {
-            case 1 -> 20;
-            case 2 -> 85;
-            case 3 -> 95;
-            case 4 -> 100;
-            default -> 0;
-        };
-
-        System.out.println(va);
-        return va;
-        /*Arrays.stream(titi).forEach(System.out::println);
-        return IntStream.range(0, 4).filter(i -> !toto[i].equals(titi[i]))
+        return IntStream.range(0, 4).filter(i -> !sIP1[i].equals(sIP2[i]))
                 .mapToDouble(i -> switch (i) {
                     case 1 -> 20;
                     case 2 -> 85;
                     case 3 -> 95;
                     default -> 0;
-                }).findFirst().orElse(100);*/
+                }).findFirst().orElse(100);
     }
 
     public double computeProximity(List<TokenEntity> tokenLeft, List<TokenEntity> tokenRight) {
         if(tokenLeft.isEmpty() || tokenRight.isEmpty()) {
             return 50;
         }
-        HashMap<String, Double> valuesKnow = new HashMap<>();
-        tokenLeft.stream()
-                .map(TokenEntity::getValue)
-                .forEach(leftIP -> tokenRight.stream()
-                        .map(TokenEntity::getValue)
-                        .forEach(rightIP -> {
-                            var value = jagguard(leftIP, rightIP);
-                            valuesKnow.compute(rightIP, (k,v) -> {
-                                if(Objects.isNull(v) || v < value) {
-                                    return value;
-                                }
-                                return v;
-                            });
-                        }));
-        return valuesKnow.values().stream().reduce((k, u) -> (k + u) / 2).orElseThrow();
+        return tokenLeft.stream()
+                    .map(TokenEntity::getValue)
+                    .mapToDouble(leftIP -> tokenRight.stream()
+                            .map(TokenEntity::getValue)
+                            .mapToDouble(rightIP -> calculIp(leftIP, rightIP))
+                            .reduce(0, Double::max))
+                .reduce(0, Double::sum) / tokenLeft.size();
     }
-
 }
