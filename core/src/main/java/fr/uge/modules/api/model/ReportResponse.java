@@ -1,25 +1,20 @@
 package fr.uge.modules.api.model;
 
+import fr.uge.modules.api.model.entities.LogEntity;
+import fr.uge.modules.api.model.entities.TokenEntity;
+
 import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
-public record ReportResponse(CompleteLog log, TokensMostSeen[] tokensReports, CompleteLog[] logs) {
-    @Override
-    public boolean equals(Object obj) {
-        if(!(obj instanceof ReportResponse reportResponse)) return false;
-        else return reportResponse.log.equals(log) && Arrays.equals(reportResponse.tokensReports, tokensReports) && Arrays.equals(reportResponse.logs, logs);
-    }
-
-    @Override
-    public int hashCode() {
-        return log.hashCode() ^ Arrays.hashCode(tokensReports) ^ Arrays.hashCode(logs);
-    }
-
+public record ReportResponse(LogEntity log, Map<Integer, TokensMostSeen> tokensReports, List<LogEntity> logs) {
     @Override
     public String toString() {
         return "ReportResponse{" +
                 "log=" + log +
-                ", tokens=" + Arrays.toString(tokensReports) +
-                ", logs=" + Arrays.toString(logs) +
+                ", tokensReports=" + tokensReports +
+                ", logs=" + logs +
                 '}';
     }
 }

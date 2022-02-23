@@ -21,6 +21,7 @@ public class Tokenization {
 
     public Tokenization() {
         tokenTypes.add(new TypeIPv4());
+        tokenTypes.add( new TypeIPv6() );
         tokenTypes.add(new TypeHTTPStatus());
         tokenTypes.add(new TypeEdgeResponse());
     }
