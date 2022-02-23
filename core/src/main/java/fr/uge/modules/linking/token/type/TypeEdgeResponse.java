@@ -26,13 +26,26 @@ public class TypeEdgeResponse implements TokenType {
     }
 
     @Override
-    public double computeProximity(List<TokenEntity> tokenLeft, List<TokenEntity> tokenRight) {
-        return 0;/*
-        if (t1.equals(t2)) {
-            return 100;
-        } else if (ERRORS.contains(t1.token_value()) && ERRORS.contains(t2.token_value())) {
-            return 50;
-        }
-        return 0;*/
+    public float computeProximity(List<TokenEntity> tokenLeft, List<TokenEntity> tokenRight) {
+        if ( tokenLeft.isEmpty() || tokenRight.isEmpty() ) return 50;
+
+        float proximity = tokenLeft.stream().mapToLong( tokenL -> {
+            String leftValue = tokenL.getValue();
+            return tokenRight.stream().mapToLong( tokenR -> {
+                String rightValue = tokenR.getValue();
+                if ( leftValue.equals( rightValue ) ) {
+                    return 100;
+                }
+                else if ( (( ERRORS.contains( leftValue ) && ERRORS.contains( rightValue ) ) || ( !ERRORS.contains( leftValue ) && !ERRORS.contains( rightValue ) ) ) ) {
+                    return 95;
+                }
+                else if ( !ERRORS.contains( leftValue ) && ERRORS.contains( rightValue ) ) {
+                    return 25;
+                }
+                return 0;
+            } ).reduce(0, Long::max);
+        } ).reduce(0, Long::sum);
+
+        return proximity / tokenLeft.size();
     }
 }
