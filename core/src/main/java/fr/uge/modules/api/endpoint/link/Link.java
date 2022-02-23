@@ -2,14 +2,18 @@ package fr.uge.modules.api.endpoint.link;
 
 import fr.uge.modules.api.EnvRetriever;
 import fr.uge.modules.api.model.CompleteLog;
+import fr.uge.modules.api.model.entities.LogEntity;
 import fr.uge.modules.api.model.linking.LinksResponse;
 import fr.uge.modules.linking.LogsLinking;
+import fr.uge.modules.linking.strategy.LinkingStrategy;
 import fr.uge.modules.linking.strategy.StandardStrategy;
 import io.smallrye.common.constraint.NotNull;
 import io.smallrye.mutiny.Uni;
 
 import javax.inject.Inject;
 import javax.ws.rs.*;
+
+import java.math.BigDecimal;
 
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 
@@ -26,10 +30,9 @@ public class Link {
             @QueryParam("delta") Long delta){
         if(delta == null) delta = envRetriever.reportDefaultDelta();
 
-        var uni1 = CompleteLog.fromId(id_log_first);
-        var uni2 = CompleteLog.fromId(id_log_second);
-
-        var linker = new LogsLinking();
-        return linker.computeLinks(uni1, uni2, new StandardStrategy());
+        final var finalDelta = delta;
+        return LogEntity.<LogEntity>findById(id_log_first)
+                .chain(log1 -> LogEntity.<LogEntity>findById(id_log_second)
+                        .chain(log2 -> LogsLinking.computeLinks(log1, log2, finalDelta)));
     }
 }

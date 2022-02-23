@@ -1,23 +1,51 @@
 package fr.uge.modules.linking;
 
-import fr.uge.modules.api.model.CompleteLog;
 import fr.uge.modules.api.model.entities.LogEntity;
+import fr.uge.modules.api.model.entities.TokenEntity;
 import fr.uge.modules.api.model.linking.LinksResponse;
-import fr.uge.modules.linking.strategy.LinkingStrategy;
+import fr.uge.modules.linking.token.type.TokenType;
 import io.smallrye.mutiny.Uni;
 
 import java.sql.Timestamp;
 import java.time.Duration;
-import java.util.List;
+import java.util.*;
+import java.util.concurrent.atomic.AtomicReference;
 
 // TODO
 public class LogsLinking {
     /**
      * Computes proximity between log of id1 and log of id2 for all the tokens in tokenTypes
+     * @param log1
+     * @param log2
+     * @param delta
+     * @return
      */
-    public static Uni<LinksResponse> computeLinks(Uni<CompleteLog> log1, Uni<CompleteLog> log2, LinkingStrategy strategy) {
-        return strategy.computeLinks(log1, log2)
-                .map(result -> new LinksResponse(null, result));
+    public static Uni<LinksResponse> computeLinks(LogEntity log1, LogEntity log2, long delta) {
+        var map1 = fromLog(log1);
+        var map2 = fromLog(log2);
+
+        return Uni.createFrom().item(map1.entrySet().stream().mapToDouble((entry) -> {
+            var key = entry.getKey();
+            var value = entry.getValue();
+
+            var toCompare = map2.getOrDefault(key, new ArrayList<>());
+            return TokenType.fromId(key).computeProximity(value, toCompare);
+        }).sum()).map(result -> new LinksResponse(Collections.emptyList(), result));
+    }
+
+    /***
+     * Returns a Map of <TokenTypeId, List<TokenEntity>> that groups every type of token of a log with its entities
+     * @param log
+     * @return a map of token entities associated with its type id
+     */
+    private static Map<Integer, List<TokenEntity>> fromLog(LogEntity log){
+        var map = new HashMap<Integer, List<TokenEntity>>();
+        log.tokens.forEach(token -> map.compute(token.idtokentype, (tokenType, entities) -> {
+            if(entities == null) entities = new ArrayList<>();
+            entities.add(token);
+            return entities;
+        }));
+        return map;
     }
 
     /**
