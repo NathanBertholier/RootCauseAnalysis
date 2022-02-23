@@ -32,7 +32,7 @@ public class InsertBatchLog {
 
     private static final Logger logger = Logger.getGlobal();
 
-    @Channel("token-out") Emitter<List<RawLogEntity>> emitter;
+    @Channel("token-out") Emitter<RawLogEntity> emitter;
 
     @Inject Validator rawLogValidator;
 
@@ -59,7 +59,7 @@ public class InsertBatchLog {
                                 return withServerError.get();
                             } else {
                                 logger.info("Inserted: " + inputs);
-                                emitter.send(inputs);
+                                inputs.forEach(emitter::send);
                                 return withCreated.apply(asLongStream.apply(inputs));
                             }
                         })

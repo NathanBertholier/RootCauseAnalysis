@@ -34,8 +34,8 @@ public class TokenQueueProcessor {
 
     @Merge
     @Incoming(value = "batch-processor")
-    public Uni<Void> processBatch(Message<List<LogEntity>> logs) {
-        return Panache.withTransaction(() -> LogEntity.persist(logs.getPayload()))
+    public Uni<Void> processBatch(List<LogEntity> logs) {
+        return Panache.withTransaction(() -> LogEntity.persist(logs))
                 .onFailure()
                 .invoke(() -> LOGGER.log(Level.SEVERE, "Error while inserting log id in database"))
                 .replaceWithVoid();
