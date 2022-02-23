@@ -38,29 +38,39 @@ public class TypeIPv4 implements TokenType {
     }
 
     private static double jagguard(String t1, String t2) {
+        System.out.println("TOKEN MATCH : " + t1 + " VS " + t2);
         var toto = t1.split("\\.");
         var titi = t2.split("\\.");
         System.out.println(titi.length);
-        if(toto[0].equals(titi[1])) {
 
-        } else if(toto[0].equals(titi[1])) {
-
+        int i = 0;
+        while (toto[i].equals(titi[i]) && i++ < (toto.length - 1)) {
         }
-            Arrays.stream(titi).forEach(System.out::println);
+
+        var va =  switch (i) {
+            case 1 -> 20;
+            case 2 -> 85;
+            case 3 -> 95;
+            case 4 -> 100;
+            default -> 0;
+        };
+
+        System.out.println(va);
+        return va;
+        /*Arrays.stream(titi).forEach(System.out::println);
         return IntStream.range(0, 4).filter(i -> !toto[i].equals(titi[i]))
                 .mapToDouble(i -> switch (i) {
                     case 1 -> 20;
                     case 2 -> 85;
                     case 3 -> 95;
                     default -> 0;
-                }).findFirst().orElse(100);
+                }).findFirst().orElse(100);*/
     }
 
     public float computeProximity(List<TokenEntity> tokenLeft, List<TokenEntity> tokenRight) {
         if(tokenLeft.isEmpty() || tokenRight.isEmpty()) {
             return 50;
         }
-        tokenRight.forEach(System.out::println);
         return (float) tokenLeft.stream()
                 .map(TokenEntity::getValue)
                 .mapToDouble(leftIP -> tokenRight.stream()
