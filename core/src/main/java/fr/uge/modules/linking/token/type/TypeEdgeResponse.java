@@ -29,10 +29,9 @@ public class TypeEdgeResponse implements TokenType {
     public float computeProximity(List<TokenEntity> tokenLeft, List<TokenEntity> tokenRight) {
         if ( tokenLeft.isEmpty() || tokenRight.isEmpty() ) return 50;
 
-        float proximity = 0;
-        for (TokenEntity tokenL : tokenLeft) {
+        float proximity = tokenLeft.stream().mapToLong( tokenL -> {
             String leftValue = tokenL.getValue();
-            proximity += tokenRight.stream().mapToLong( tokenR -> {
+            return tokenRight.stream().mapToLong( tokenR -> {
                 String rightValue = tokenR.getValue();
                 if ( leftValue.equals( rightValue ) ) {
                     return 100;
@@ -45,7 +44,7 @@ public class TypeEdgeResponse implements TokenType {
                 }
                 return 0;
             } ).reduce(0, Long::max);
-        }
+        } ).reduce(0, Long::sum);
 
         return proximity / tokenLeft.size();
     }
