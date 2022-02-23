@@ -21,7 +21,7 @@ public interface TokenType {
         return -1;
     }
 
-    float computeProximity(List<TokenEntity> tokenLeft, List<TokenEntity> tokenRight);
+    double computeProximity(List<TokenEntity> tokenLeft, List<TokenEntity> tokenRight);
 
     enum TokenTypeId {
         ID_IPV4(1),

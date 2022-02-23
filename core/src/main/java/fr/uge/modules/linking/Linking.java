@@ -26,7 +26,7 @@ public class Linking {
         tokensType.compute(id, (k,v) -> tokenType);
     }
 
-    public Uni<SortedMap<Float, LogEntity>> linkReport(long id, ReportParameter rp) {
+    public Uni<SortedMap<Double, LogEntity>> linkReport(long id, ReportParameter rp) {
         return LogEntity.<LogEntity>findById(id)
                 .chain(completeLog -> {
                     var datetime = completeLog.datetime;
@@ -46,8 +46,8 @@ public class Linking {
         });
     }
 
-    public SortedMap<Float, LogEntity> computeProximityTree(LogEntity logTarget, List<LogEntity> logWithinDelta, ReportParameter rp){
-        TreeMap<Float, LogEntity> redBlack = new TreeMap<>(Collections.reverseOrder());
+    public SortedMap<Double, LogEntity> computeProximityTree(LogEntity logTarget, List<LogEntity> logWithinDelta, ReportParameter rp){
+        TreeMap<Double, LogEntity> redBlack = new TreeMap<>(Collections.reverseOrder());
         var targetDatetime = logTarget.getDatetime();
 
         HashMap<Integer, List<TokenEntity>> tokenTarget = new HashMap<>();
@@ -59,7 +59,7 @@ public class Linking {
         this.tokensType.forEach((id,v) -> tokenToLink.computeIfAbsent(id, k -> new ArrayList<>()));
 
         logWithinDelta.forEach(log -> {
-            float proximity = TypeDatetime.computeDateTimeProximity(log.getDatetime().toLocalDateTime(), targetDatetime.toLocalDateTime(), delta);
+            double proximity = TypeDatetime.computeDateTimeProximity(log.getDatetime().toLocalDateTime(), targetDatetime.toLocalDateTime(), delta);
             log.getTokens().forEach(token -> tokenToLink.get(token.getIdtokentype()).add(token));
 
             proximity += tokenTarget.keySet().stream()

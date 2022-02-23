@@ -25,7 +25,7 @@ public class TypeHTTPStatus implements TokenType{
     }
 
     @Override
-    public float computeProximity(List<TokenEntity> tokenLeft, List<TokenEntity> tokenRight) {
+    public double computeProximity(List<TokenEntity> tokenLeft, List<TokenEntity> tokenRight) {
         return 0;
         /*var leftVal = tokenLeft.getValue();
         var rightVal = tokenRight.getValue();

@@ -2,9 +2,9 @@ package fr.uge.modules.linking.token.type;
 
 import fr.uge.modules.api.model.entities.TokenEntity;
 
-import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
-import java.util.stream.IntStream;
+import java.util.Objects;
 
 public class TypeIPv4 implements TokenType {
 
@@ -67,16 +67,25 @@ public class TypeIPv4 implements TokenType {
                 }).findFirst().orElse(100);*/
     }
 
-    public float computeProximity(List<TokenEntity> tokenLeft, List<TokenEntity> tokenRight) {
+    public double computeProximity(List<TokenEntity> tokenLeft, List<TokenEntity> tokenRight) {
         if(tokenLeft.isEmpty() || tokenRight.isEmpty()) {
             return 50;
         }
-        return (float) tokenLeft.stream()
+        HashMap<String, Double> valuesKnow = new HashMap<>();
+        tokenLeft.stream()
                 .map(TokenEntity::getValue)
-                .mapToDouble(leftIP -> tokenRight.stream()
+                .forEach(leftIP -> tokenRight.stream()
                         .map(TokenEntity::getValue)
-                        .mapToDouble(rightIP -> jagguard(leftIP, rightIP))
-                        .max().orElse(0)).max().orElseThrow();
+                        .forEach(rightIP -> {
+                            var value = jagguard(leftIP, rightIP);
+                            valuesKnow.compute(rightIP, (k,v) -> {
+                                if(Objects.isNull(v) || v < value) {
+                                    return value;
+                                }
+                                return v;
+                            });
+                        }));
+        return valuesKnow.values().stream().reduce((k, u) -> (k + u) / 2).orElseThrow();
     }
 
 }

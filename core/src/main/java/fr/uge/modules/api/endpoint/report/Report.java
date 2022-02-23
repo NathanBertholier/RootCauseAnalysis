@@ -24,7 +24,7 @@ public class Report {
     @GET
     @Consumes(APPLICATION_JSON)
     @Produces(APPLICATION_JSON)
-    public Uni<SortedMap<Float, LogEntity>> getReport(
+    public Uni<SortedMap<Double, LogEntity>> getReport(
             @PathParam("id") long idLogTarget,
             @QueryParam("expanded") Boolean expanded,
             @QueryParam("delta") Long delta,
