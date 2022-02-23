@@ -29,7 +29,7 @@
 .sidebar .item {
   color: #aaaeba;
   text-decoration: none;
-  padding: 15px 0px;
+  padding: 15px 0;
 }
 
 .item-icon {
@@ -57,7 +57,9 @@
 #content-wrapper {
   width: 80%;
   margin-left: 20%;
-  padding: 0px;
+  padding: 0;
+  min-height: 100vh;
+  background-color: #d9dbe0;
 }
 
 .black-icon {
@@ -66,11 +68,146 @@
 
 .title {
   text-align: left;
-  margin-left: 20px;
+  margin: 15px 10px 40px;
 }
 
 .logTable {
-  margin-bottom: 0px;
-  margin-left: 20px;
-  width: calc(100% - 20px);
+  margin-bottom: 0;
+}
+
+.custom-input {
+  width: 60px;
+  display: inline-block;
+  margin-left: 10px;
+}
+
+.custom-filter-btn {
+  margin-left: 10px;
+  vertical-align: baseline;
+}
+
+.add-filter-btn, .filter-container, .number-row-filter-container {
+  margin-bottom: 20px;
+}
+
+.input-labels {
+  text-align: right;
+  margin-top: 7px;
+}
+
+.disabled {
+  color: #aaaeba !important;
+  border-color: #aaaeba;
+}
+
+.error {
+  color: red;
+  font-size: 12px;
+}
+
+.form-error {
+  text-align: left;
+}
+
+.row-number-error, .form-error {
+  padding-top: 10px;
+}
+
+.react-datetime-picker {
+  padding: 0;
+}
+
+.react-datetime-picker .react-datetime-picker__wrapper {
+  border-radius: 0.25rem;
+  padding: 5px;
+}
+
+.graph-container {
+  margin-bottom: 30px;
+  background-color: white;
+  border-radius: 10px;
+  padding: 15px 10px 25px;
+  margin-right: 10px;
+}
+
+.graph-title {
+  text-align: left;
+  font-size: 30px;
+  margin-bottom: 30px;
+}
+/*******************************
+ * Log Css
+ *******************************/
+
+.logs-container, .proximity-container {
+  background-color: white;
+  width: auto;
+  min-height: 70vh;
+  border-radius: 10px;
+  margin-right: 50px;
+  margin-left: 15px;
+}
+
+.logs-filters-container {
+  padding-top: 30px;
+}
+
+.logs-table-container {
+  position: relative;
+  padding-bottom: 50px;
+}
+
+/*******************************
+ * Proximity Css
+ *******************************/
+
+.proximity-filters-container {
+  padding-top: 20px;
+  margin-bottom: 20px;
+  padding-left: 5px;
+}
+
+.proximity-filter {
+  width: auto;
+}
+
+.proximity-score-container {
+  text-align: right;
+  font-weight: bold;
+  font-size: 18px;
+}
+
+/*******************************
+ * Loader overlay
+ *******************************/
+
+.spinner-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: black;
+  opacity: 0.5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+}
+
+.loader-message {
+  margin-left: 10px;
+  font-size: 18px;
+}
+
+/*******************************
+ * Generic table
+ *******************************/
+
+.nodata-table {
+  background-color: #d9dbe0;
+  height: 200px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
