@@ -51,7 +51,7 @@ public class MonitorInserter {
                     .onFailure().invoke(() -> this.logger.severe("ERROR while inserting in database monitoring"))
                     .await().indefinitely();
 
-        } catch (IndexOutOfBoundsException e)  {
+        } catch (Exception e)  {
             logger.warning("No log was inserted into the queue yet");
         }
     }
