@@ -65,4 +65,14 @@ public class MonitoringEntity extends PanacheEntityBase {
     public int hashCode() {
         return Objects.hash(datetime, deliver, publish, avgRate);
     }
+
+    @Override
+    public String toString() {
+        return "MonitoringEntity{" +
+                "datetime=" + datetime +
+                ", deliver=" + deliver +
+                ", publish=" + publish +
+                ", avgRate=" + avgRate +
+                '}';
+    }
 }
