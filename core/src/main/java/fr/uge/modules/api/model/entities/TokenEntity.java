@@ -53,8 +53,8 @@ public class TokenEntity extends PanacheEntityBase {
         this.idtokentype = idtokentype;
     }
 
-    public String[] getValue() {
-        return new String[]{value};
+    public String getValue() {
+        return value;
     }
 
     public void setValue(String value) {

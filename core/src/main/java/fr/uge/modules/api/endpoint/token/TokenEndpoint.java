@@ -22,6 +22,6 @@ public class TokenEndpoint {
     // Uni<List<CL>> instead of Uni<TokenResponse> for JSON output
     public Uni<List<CompleteLog>> getTokens(TokenRequest tokenRequest){
         return TokenRetriever.fromLogs(TokenRetriever.getTokens(tokenRequest))
-                .map(tokenresponse -> Arrays.stream(tokenresponse.logDemonstrators()).toList());
+                .map(TokensResponse::logDemonstrators);
     }
 }
