@@ -25,12 +25,19 @@ public class TypeIPv6 implements TokenType{
 
     @Override
     public float computeProximity(List<TokenEntity> tokenLeft, List<TokenEntity> tokenRight) {
-        return 0;
-        /*
-        if(t1.token_value().equals(t2.token_value())){
-            return 100;
+        if ( tokenLeft.isEmpty() || tokenRight.isEmpty() ) return 0;
+
+        float proximity = 0;
+        for (TokenEntity tokenL : tokenLeft) {
+            for ( TokenEntity tokenR : tokenRight ) {
+                if ( tokenL.getValue().equals( tokenR.getValue() ) ) {
+                    proximity += 100;
+                    break;
+                }
+            }
         }
-        return 0;*/
+
+        return proximity / tokenLeft.size();
     }
 
 }

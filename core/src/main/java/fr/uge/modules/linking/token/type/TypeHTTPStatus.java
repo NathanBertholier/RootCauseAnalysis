@@ -26,16 +26,27 @@ public class TypeHTTPStatus implements TokenType{
 
     @Override
     public float computeProximity(List<TokenEntity> tokenLeft, List<TokenEntity> tokenRight) {
-        return 0;
-/*        var leftVal = tokenLeft.getValue();
-        var rightVal = tokenRight.getValue();
-        if(leftVal.equals(rightVal)) {
-            return 100;
-        } else if(leftVal.startsWith(rightVal.substring(0,1))){
-            return 80;
-        } else {
-            return 0;
-        }*/
-    }
+        if ( tokenLeft.isEmpty() || tokenRight.isEmpty() ) return 0;
+        float proximity = 0;
+        for (TokenEntity tokenL : tokenLeft) {
+            var firstLeftChar = tokenL.getValue().substring(0,1);
+            for ( TokenEntity tokenR : tokenRight ) {
+                var firstRightChar = tokenR.getValue().substring(0,1);
+                if ( tokenL.getValue().equals( tokenR.getValue() ) ) {
+                    return 100;
+                }
+                else if ( firstLeftChar.equals( firstRightChar ) ) {
+                    proximity = 95;
+                }
+                else if ( proximity < 90 && ( firstLeftChar.equals( "4" ) || firstLeftChar.equals( "5" ) ) && ( firstRightChar.equals( "4" ) || firstRightChar.equals( "5" ) ) ) {
+                    proximity = 90;
+                }
+                else if ( proximity < 25 && ( firstLeftChar.equals( "2" ) || firstLeftChar.equals( "3" ) ) && ( firstRightChar.equals( "4" ) || firstRightChar.equals( "5" ) ) ) {
+                    proximity = 25;
+                }
+            }
+        }
 
+        return proximity;
+    }
 }
