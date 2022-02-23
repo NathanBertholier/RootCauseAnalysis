@@ -7,13 +7,11 @@ import io.smallrye.mutiny.Multi;
 import io.smallrye.mutiny.Uni;
 import io.smallrye.reactive.messaging.annotations.Merge;
 import io.vertx.core.json.JsonObject;
-import org.eclipse.microprofile.reactive.messaging.Outgoing;
-import org.hibernate.reactive.mutiny.Mutiny;
-import org.eclipse.microprofile.reactive.messaging.Incoming;
+import org.eclipse.microprofile.reactive.messaging.Message;
 import org.jboss.logmanager.Level;
-
+import org.eclipse.microprofile.reactive.messaging.Outgoing;
+import org.eclipse.microprofile.reactive.messaging.Incoming;
 import javax.enterprise.context.ApplicationScoped;
-import javax.inject.Inject;
 
 import java.time.Duration;
 import java.util.List;
@@ -23,9 +21,6 @@ import java.util.logging.Logger;
 public class TokenQueueProcessor {
     private final Logger LOGGER = Logger.getGlobal();
     private final Tokenization tokenization = new Tokenization();
-
-    @Inject
-    Mutiny.SessionFactory sessionFactory;
 
     @Incoming(value = "token-in")
     @Outgoing(value = "batch-processor")
@@ -37,8 +32,8 @@ public class TokenQueueProcessor {
                 .every(Duration.ofMillis(3000));
     }
 
-    @Incoming(value = "batch-processor")
     @Merge
+    @Incoming(value = "batch-processor")
     public Uni<Void> processBatch(List<LogEntity> logs) {
         return Panache.withTransaction(() -> LogEntity.persist(logs))
                 .onFailure()

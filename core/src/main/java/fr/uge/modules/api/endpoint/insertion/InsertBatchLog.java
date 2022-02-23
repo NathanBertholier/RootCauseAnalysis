@@ -3,7 +3,6 @@ package fr.uge.modules.api.endpoint.insertion;
 import fr.uge.modules.api.model.entities.RawLogEntity;
 import io.quarkus.hibernate.reactive.panache.Panache;
 import io.smallrye.mutiny.Uni;
-import io.smallrye.reactive.messaging.annotations.Merge;
 import org.eclipse.microprofile.reactive.messaging.Channel;
 import org.eclipse.microprofile.reactive.messaging.Emitter;
 

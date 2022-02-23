@@ -15,7 +15,7 @@ export const Row = ({ id, datetime, tokens, content } : Log ) => {
                 { tokens.map( (token, index ) => {
                     return <Collapse in={isUnfold} key={index}>
                         <div id="example-collapse-text">
-                            {token.token_type} : { token.value }
+                            {token.token_type.name} : { token.value }
                         </div>
                     </Collapse>
 
