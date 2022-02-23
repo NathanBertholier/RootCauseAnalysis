@@ -4,6 +4,7 @@ import fr.uge.modules.api.model.entities.TokenEntity;
 
 import java.util.Objects;
 import java.util.List;
+import java.util.Optional;
 
 public interface TokenType {
 
@@ -22,6 +23,16 @@ public interface TokenType {
     }
 
     float computeProximity(List<TokenEntity> tokenLeft, List<TokenEntity> tokenRight);
+
+    static TokenType fromId(int id){
+        return switch (id){
+            case 1 -> new TypeIPv4();
+            case 2 -> new TypeIPv6();
+            case 3 -> new TypeHTTPStatus();
+            case 4 -> new TypeDatetime();
+            default -> new TypeEdgeResponse();
+        };
+    }
 
     enum TokenTypeId {
         ID_IPV4(1),

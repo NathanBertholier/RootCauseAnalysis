@@ -21,28 +21,23 @@
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 0,
+  "id": 1,
   "links": [],
   "liveNow": false,
   "panels": [
     {
       "fieldConfig": {
         "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
           "mappings": [],
-          "max": 7450,
           "thresholds": {
             "mode": "absolute",
             "steps": [
               {
-                "color": "green",
+                "color": "blue",
                 "value": null
-              },
-              {
-                "color": "#EAB839",
-                "value": 75
-              },
-              {
-                "color": "red",
-                "value": 85
               }
             ]
           }
@@ -57,6 +52,9 @@
       },
       "id": 6,
       "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
         "orientation": "auto",
         "reduceOptions": {
           "calcs": [
@@ -65,10 +63,9 @@
           "fields": "",
           "values": false
         },
-        "showThresholdLabels": false,
-        "showThresholdMarkers": false
+        "textMode": "auto"
       },
-      "pluginVersion": "8.3.6",
+      "pluginVersion": "8.4.1",
       "targets": [
         {
           "datasource": {
@@ -79,13 +76,13 @@
           "group": [],
           "metricColumn": "none",
           "rawQuery": false,
-          "rawSql": "SELECT\n  datetime AS \"time\",\n  avg_rate\nFROM monitoring\nWHERE\n  $__timeFilter(datetime)\nORDER BY 1",
+          "rawSql": "SELECT\n  datetime AS \"time\",\n  messages\nFROM monitoring\nORDER BY 1",
           "refId": "A",
           "select": [
             [
               {
                 "params": [
-                  "avg_rate"
+                  "messages"
                 ],
                 "type": "column"
               }
@@ -94,17 +91,11 @@
           "table": "monitoring",
           "timeColumn": "datetime",
           "timeColumnType": "timestamp",
-          "where": [
-            {
-              "name": "$__timeFilter",
-              "params": [],
-              "type": "macro"
-            }
-          ]
+          "where": []
         }
       ],
-      "title": "Panel Title",
-      "type": "gauge"
+      "title": "Messages",
+      "type": "stat"
     },
     {
       "fieldConfig": {
@@ -147,10 +138,6 @@
               {
                 "color": "green",
                 "value": null
-              },
-              {
-                "color": "red",
-                "value": 80
               }
             ]
           }
@@ -158,7 +145,7 @@
         "overrides": []
       },
       "gridPos": {
-        "h": 9,
+        "h": 8,
         "w": 12,
         "x": 12,
         "y": 0
@@ -171,7 +158,8 @@
           "placement": "bottom"
         },
         "tooltip": {
-          "mode": "single"
+          "mode": "single",
+          "sort": "none"
         }
       },
       "targets": [
@@ -184,95 +172,17 @@
           "group": [],
           "metricColumn": "none",
           "rawQuery": false,
-          "rawSql": "SELECT\n  datetime AS \"time\",\n  avg_rate\nFROM monitoring\nWHERE\n  $__timeFilter(datetime)\nORDER BY 1",
+          "rawSql": "SELECT\n  datetime AS \"time\",\n  publish,\n  deliver\nFROM monitoring\nORDER BY 1",
           "refId": "A",
           "select": [
             [
               {
                 "params": [
-                  "avg_rate"
+                  "publish"
                 ],
                 "type": "column"
               }
-            ]
-          ],
-          "table": "monitoring",
-          "timeColumn": "datetime",
-          "timeColumnType": "timestamp",
-          "where": [
-            {
-              "name": "$__timeFilter",
-              "params": [],
-              "type": "macro"
-            }
-          ]
-        }
-      ],
-      "title": "Panel Title",
-      "type": "timeseries"
-    },
-    {
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "palette-classic"
-          },
-          "custom": {
-            "hideFrom": {
-              "legend": false,
-              "tooltip": false,
-              "viz": false
-            }
-          },
-          "mappings": []
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 9,
-        "w": 12,
-        "x": 0,
-        "y": 8
-      },
-      "id": 4,
-      "options": {
-        "displayLabels": [
-          "value",
-          "percent"
-        ],
-        "legend": {
-          "displayMode": "list",
-          "placement": "bottom",
-          "values": [
-            "value"
-          ]
-        },
-        "pieType": "pie",
-        "reduceOptions": {
-          "calcs": [
-            "lastNotNull"
-          ],
-          "fields": "",
-          "values": false
-        },
-        "tooltip": {
-          "mode": "single"
-        }
-      },
-      "pluginVersion": "8.3.6",
-      "targets": [
-        {
-          "datasource": {
-            "type": "postgres",
-            "uid": "PDCFE74EBFE0DF657"
-          },
-          "format": "time_series",
-          "group": [],
-          "metricColumn": "none",
-          "rawQuery": true,
-          "rawSql": "SELECT\n  datetime AS \"time\",\n  deliver,\n  publish\nFROM monitoring\nWHERE\n  $__timeFilter(datetime)\nORDER BY 1",
-          "refId": "A",
-          "select": [
+            ],
             [
               {
                 "params": [
@@ -285,21 +195,95 @@
           "table": "monitoring",
           "timeColumn": "datetime",
           "timeColumnType": "timestamp",
-          "where": [
-            {
-              "name": "$__timeFilter",
-              "params": [],
-              "type": "macro"
-            }
-          ]
+          "where": []
         }
       ],
-      "title": "Panel Title",
-      "type": "piechart"
+      "title": "Incoming Outcoming varations",
+      "type": "timeseries"
+    },
+    {
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 9,
+        "w": 24,
+        "x": 0,
+        "y": 8
+      },
+      "id": 4,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "textMode": "auto"
+      },
+      "pluginVersion": "8.4.1",
+      "targets": [
+        {
+          "datasource": {
+            "type": "postgres",
+            "uid": "PDCFE74EBFE0DF657"
+          },
+          "format": "time_series",
+          "group": [],
+          "metricColumn": "none",
+          "rawQuery": false,
+          "rawSql": "SELECT\n  datetime AS \"time\",\n  publish,\n  deliver\nFROM monitoring\nORDER BY 1",
+          "refId": "A",
+          "select": [
+            [
+              {
+                "params": [
+                  "publish"
+                ],
+                "type": "column"
+              }
+            ],
+            [
+              {
+                "params": [
+                  "deliver"
+                ],
+                "type": "column"
+              }
+            ]
+          ],
+          "table": "monitoring",
+          "timeColumn": "datetime",
+          "timeColumnType": "timestamp",
+          "where": []
+        }
+      ],
+      "title": "Publish Deliver repartiion",
+      "type": "stat"
     }
   ],
   "refresh": "5s",
-  "schemaVersion": 34,
+  "schemaVersion": 35,
   "style": "dark",
   "tags": [],
   "templating": {
@@ -311,7 +295,7 @@
   },
   "timepicker": {},
   "timezone": "",
-  "title": "rate",
+  "title": "Rootcause",
   "uid": "nMC1qBank",
   "version": 1,
   "weekStart": ""

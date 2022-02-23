@@ -1,26 +1,28 @@
 package fr.uge.modules.api.model;
 
 import java.util.Arrays;
+import java.util.List;
+import java.util.Objects;
 
-public record TokensMostSeen(String token_type, String[] token_value, long count) {
+public record TokensMostSeen(String token_type, List<String> token_values, long count) {
     @Override
-    public boolean equals(Object obj) {
-        if(!(obj instanceof TokensMostSeen tokensReport)) return false;
-        else return tokensReport.count == count &&
-                tokensReport.token_type.equals(token_type) &&
-                Arrays.equals(tokensReport.token_value, token_value);
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        TokensMostSeen that = (TokensMostSeen) o;
+        return count == that.count && token_type.equals(that.token_type) && token_values.equals(that.token_values);
     }
 
     @Override
     public int hashCode() {
-        return token_type.hashCode() ^ Arrays.hashCode(token_value) ^ Long.hashCode(count);
+        return Objects.hash(token_type, token_values, count);
     }
 
     @Override
     public String toString() {
-        return "TokensReport{" +
+        return "TokensMostSeen{" +
                 "token_type='" + token_type + '\'' +
-                ", token_value=" + Arrays.toString(token_value) +
+                ", token_values=" + token_values +
                 ", count=" + count +
                 '}';
     }

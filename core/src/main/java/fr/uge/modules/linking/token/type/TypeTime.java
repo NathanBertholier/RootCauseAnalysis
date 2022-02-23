@@ -7,7 +7,7 @@ import java.util.List;
 public class TypeTime implements TokenType{
 
     private static final String NAME = "time";
-    private static final String REGEX = "([2][0-3]|[0-1][0-9]|[1-9]):[0-5][0-9]:([0-5][0-9]|[6][0])";
+    private static final String REGEX = "([2][0-3]|[0-1][0-9]|[1-9]):[0-5][0-9]:([0-5][0-9]|[6][0])(.([0-9])*){0,1}";
 
     @Override
     public String getName() {

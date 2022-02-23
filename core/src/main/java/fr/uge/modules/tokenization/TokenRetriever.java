@@ -22,7 +22,7 @@ public class TokenRetriever {
 
     public static Uni<TokensResponse> fromLogs(Uni<List<LogEntity>> logs){
         return logs.map(list ->
-            list.stream().map(log -> new CompleteLog(log.id,log.rawLog.log, log.datetime.toLocalDateTime(), log.tokens)).toArray(CompleteLog[]::new)
+            list.stream().map(log -> new CompleteLog(log.id, log.datetime, log.rawLog.log, log.tokens)).toList()
         ).map(TokensResponse::new);
     }
 }

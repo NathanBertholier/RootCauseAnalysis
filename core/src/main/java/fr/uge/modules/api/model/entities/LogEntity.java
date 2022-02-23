@@ -1,5 +1,6 @@
 package fr.uge.modules.api.model.entities;
 
+import fr.uge.modules.api.model.CompleteLog;
 import io.quarkus.hibernate.reactive.panache.PanacheEntityBase;
 import io.smallrye.mutiny.Uni;
 
