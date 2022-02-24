@@ -4,7 +4,6 @@ import fr.uge.modules.api.model.entities.TokenEntity;
 
 import java.util.Objects;
 import java.util.List;
-import java.util.Optional;
 
 public interface TokenType {
 
@@ -22,7 +21,7 @@ public interface TokenType {
         return -1;
     }
 
-    float computeProximity(List<TokenEntity> tokenLeft, List<TokenEntity> tokenRight);
+    double computeProximity(List<TokenEntity> tokenLeft, List<TokenEntity> tokenRight);
 
     static TokenType fromId(int id){
         return switch (id){

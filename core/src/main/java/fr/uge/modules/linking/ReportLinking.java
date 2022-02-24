@@ -34,7 +34,7 @@ public class ReportLinking {
         return LogEntity.<LogEntity>findById(id)
                 .chain(root ->
                     LogsLinking.linkedLogs(root, reportParameter)
-                            .map(set -> new ReportResponse(root, ))
+                            .map(set -> new ReportResponse(root, new HashSet<>(), set)) // pour merge
                 );
     }
 
@@ -57,7 +57,6 @@ public class ReportLinking {
         HashMap<Integer, List<TokenEntity>> tokenToLink = new HashMap<>();
         this.tokensType.forEach((id,v) -> tokenToLink.computeIfAbsent(id, k -> new ArrayList<>()));
 
-        System.out.println(delta);
         logWithinDelta.forEach(log -> {
             float proximity = TypeDatetime.computeDateTimeProximity(log.datetime, targetDatetime, delta);
             log.getTokens().forEach(token -> tokenToLink.get(token.getIdtokentype()).add(token));
@@ -69,7 +68,6 @@ public class ReportLinking {
 
             proximity /= (tokenTarget.size() + 1); // NUMBER OF TOKENS CONSIDERATE + TIMESTAMP
 
-            System.out.println(proximity);
             if(redBlack.size() > rp.network_size() - 1) {
                 if (proximity > redBlack.lastKey()) {
                     redBlack.pollLastEntry();
@@ -80,7 +78,6 @@ public class ReportLinking {
             }
             tokenToLink.forEach((k,v) -> v.clear());
         });
-        System.out.println(redBlack);
         redBlack.forEach((k,v) -> System.out.println(k + " LOG " + v));
         redBlack.forEach((k,v) -> System.out.println(k));
         return redBlack;
