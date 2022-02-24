@@ -21,6 +21,7 @@ public class TokenEndpoint {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Uni<List<LogEntity>> getTokens(TokenRequest tokenRequest){
+        System.out.println(tokenRequest);
         return TokenRetriever.getTokens(tokenRequest);
     }
 }

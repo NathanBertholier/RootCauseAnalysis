@@ -1,8 +1,6 @@
 package fr.uge.modules.api.model.entities;
 
-import fr.uge.modules.api.model.CompleteLog;
 import io.quarkus.hibernate.reactive.panache.PanacheEntityBase;
-import io.smallrye.mutiny.Uni;
 
 import javax.persistence.*;
 import java.sql.Timestamp;
@@ -91,18 +89,5 @@ public class LogEntity extends PanacheEntityBase {
                 ", datetime=" + datetime +
                 ", tokens=" + tokens +
                 '}';
-    }
-
-    public static Uni<List<LogEntity>> retrieveLogs(long logId, Timestamp start, Timestamp end, int rows){
-        if(logId<0){
-            return LogEntity
-                    .find("datetime between ?1 and ?2",start, end)
-                    .range(0, rows).list();
-        }else {
-            return LogEntity
-                    .find("id = ?1", logId)
-                    .range(0,rows).list();
-        }
-
     }
 }
