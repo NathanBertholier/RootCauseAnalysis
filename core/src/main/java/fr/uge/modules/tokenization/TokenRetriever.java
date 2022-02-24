@@ -13,14 +13,10 @@ public class TokenRetriever {
         var rows = Objects.requireNonNullElse(tokenRequest.rows(), 30) - 1;
         StringBuilder sQuery = new StringBuilder();
         sQuery.append("select l from LogEntity l where 1 = 1 ");
-        System.out.println(sQuery);
-
 
         var end = tokenRequest.end_datetime();
         var start = tokenRequest.init_datetime();
 
-        System.out.println(end);
-        System.out.println(start);
         if(end.isEmpty()) {
             if(!start.isEmpty()) {
                   sQuery.append(" and ")
@@ -50,8 +46,6 @@ public class TokenRetriever {
                     .find(sQuery + "and id = ?1", id)
                     .range(0,rows).list();
         }
-        System.out.println(sQuery);
-
         return getTokensWithoutId(sQuery, tokenRequest.tokens(), rows);
 
 
@@ -76,8 +70,6 @@ public class TokenRetriever {
                     .append(tokens.get(i - 1).token_type()));
             sQuery.append(" ) ");
         }
-        System.out.println(sQuery);
-
         return LogEntity.find(sQuery.toString())
                 .range(0, rows)
                 .list();
