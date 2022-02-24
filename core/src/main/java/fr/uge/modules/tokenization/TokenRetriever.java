@@ -1,8 +1,6 @@
 package fr.uge.modules.tokenization;
 
-import fr.uge.modules.api.model.CompleteLog;
 import fr.uge.modules.api.model.TokenRequest;
-import fr.uge.modules.api.model.TokensResponse;
 import fr.uge.modules.api.model.entities.LogEntity;
 import io.smallrye.mutiny.Uni;
 
@@ -10,6 +8,8 @@ import java.sql.Timestamp;
 import java.util.List;
 
 public class TokenRetriever {
+    // STart not empty -> all from date to today
+    // End not empty -> all from begingin to end value
     public static Uni<List<LogEntity>> getTokens(TokenRequest tokenRequest){
         var start = Timestamp.valueOf(tokenRequest.init_datetime());
         var end = Timestamp.valueOf(tokenRequest.end_datetime());
@@ -18,11 +18,5 @@ public class TokenRetriever {
 
         var betweenDates = LogEntity.retrieveLogs(id, start, end, rows);
         return betweenDates;
-    }
-
-    public static Uni<TokensResponse> fromLogs(Uni<List<LogEntity>> logs){
-        return logs.map(list ->
-            list.stream().map(log -> new CompleteLog(log.id, log.datetime, log.rawLog.log, log.tokens)).toList()
-        ).map(TokensResponse::new);
     }
 }

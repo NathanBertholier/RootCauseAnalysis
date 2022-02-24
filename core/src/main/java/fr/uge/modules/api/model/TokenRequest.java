@@ -1,4 +1,6 @@
 package fr.uge.modules.api.model;
 
-public record TokenRequest(String init_datetime, String end_datetime, long id, TokenModel tokenModel, int rows) {
+import fr.uge.modules.api.model.entities.TokenEntity;
+
+public record TokenRequest(String init_datetime, String end_datetime, long id, TokenEntity token, int rows) {
 }
