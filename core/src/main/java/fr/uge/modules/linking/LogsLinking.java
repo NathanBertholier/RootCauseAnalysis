@@ -10,10 +10,12 @@ import io.smallrye.mutiny.Uni;
 import java.sql.Timestamp;
 import java.time.Duration;
 import java.util.*;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 // TODO
 public class LogsLinking {
+    private static final Logger LOGGER = Logger.getLogger(LogsLinking.class.getName());
     /**
      * Computes proximity between log of id1 and log of id2 for all the tokens in tokenTypes
      * @param log1
@@ -63,6 +65,6 @@ public class LogsLinking {
                     Timestamp.valueOf(datetime.toLocalDateTime().minus(Duration.ofSeconds(reportParameter.delta()))),
                     datetime).list()
                 .map(list -> reportLinking.computeProximityTree(root, list, reportParameter))
-                .onFailure().invoke(error -> System.out.println("Error: " + error));
+                .onFailure().invoke(error -> LOGGER.severe("Error: " + error));
     }
 }

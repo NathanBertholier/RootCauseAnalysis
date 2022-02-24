@@ -5,10 +5,7 @@ import fr.uge.modules.api.model.ReportResponse;
 import fr.uge.modules.api.model.entities.LogEntity;
 import fr.uge.modules.api.model.entities.TokenEntity;
 import fr.uge.modules.api.model.report.ReportParameter;
-import fr.uge.modules.linking.token.type.TokenType;
-import fr.uge.modules.linking.token.type.TypeDatetime;
-import fr.uge.modules.linking.token.type.TypeHTTPStatus;
-import fr.uge.modules.linking.token.type.TypeIPv4;
+import fr.uge.modules.linking.token.type.*;
 import io.smallrye.common.annotation.Blocking;
 import io.smallrye.mutiny.Uni;
 
@@ -23,6 +20,9 @@ public class ReportLinking {
 
     public ReportLinking() {
         this.addInTokensType(TokenType.TokenTypeId.ID_IPV4.getId(), new TypeIPv4());
+        this.addInTokensType(TokenType.TokenTypeId.ID_IPV6.getId(), new TypeIPv6());
+        this.addInTokensType(TokenType.TokenTypeId.ID_DATETIME.getId(), new TypeDatetime());
+        this.addInTokensType(TokenType.TokenTypeId.ID_EDGERESPONSE.getId(), new TypeEdgeResponse());
         this.addInTokensType(TokenType.TokenTypeId.ID_STATUS.getId(), new TypeHTTPStatus());
     }
 
@@ -40,7 +40,7 @@ public class ReportLinking {
 
     private void fillHashmap(List<TokenEntity> tokens, HashMap<Integer, List<TokenEntity>> tokensToFill) {
         tokens.forEach(token -> tokensToFill
-                .computeIfAbsent(token.getIdtokentype(), k -> new ArrayList<>())
+                .computeIfAbsent(token.getIdtokentype(), ArrayList::new)
                 .add(token)
         );
     }
