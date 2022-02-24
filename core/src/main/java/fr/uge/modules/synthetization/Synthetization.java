@@ -18,7 +18,7 @@ public class Synthetization {
 
     public static Uni<ReportResponse> getReport(long idRootLog, ReportParameter reportParameter) {
         return LogEntity.<LogEntity>findById(idRootLog)
-                .chain(log -> LogsLinking.linkedLogs(log, reportParameter.delta())
+                .chain(log -> LogsLinking.linkedLogs(log, reportParameter)
                         .chain(logEntities -> getMostSeenTokens(logEntities)
                                 .map(sorted -> new ReportResponse(log, sorted, logEntities))
                         )

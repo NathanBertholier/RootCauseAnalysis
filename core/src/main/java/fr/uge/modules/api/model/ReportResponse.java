@@ -8,13 +8,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-public record ReportResponse(LogEntity log, Map<Integer, TokensMostSeen> tokensReports, List<LogEntity> logs) {
+public record ReportResponse(LogEntity log, Set<TokensMostSeen> tokensReports, Set<LogEntity> relevantLogs) {
     @Override
     public String toString() {
         return "ReportResponse{" +
                 "log=" + log +
                 ", tokensReports=" + tokensReports +
-                ", logs=" + logs +
+                ", relevantLogs=" + relevantLogs +
                 '}';
     }
 }
