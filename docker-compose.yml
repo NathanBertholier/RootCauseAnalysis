@@ -39,6 +39,7 @@ services:
       - ./DockerVolumes/Grafana/Setup/provisioning:/etc/grafana/provisioning
       - ./DockerVolumes/Grafana/Setup/dashboards:/var/lib/grafana/dashboards
       - ./DockerVolumes/Grafana/Setup/grafana.ini:/etc/grafana/grafana.ini
+      - ./DockerVolumes/Nginx/certs:/var/ssl/certs/
 
   rootcause:
     build: .
