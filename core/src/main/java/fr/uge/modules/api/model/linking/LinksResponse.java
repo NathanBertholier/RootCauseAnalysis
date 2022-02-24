@@ -3,7 +3,7 @@ package fr.uge.modules.api.model.linking;
 import java.math.BigDecimal;
 import java.util.List;
 
-public record LinksResponse(List<Computation> computations, BigDecimal proximity) {
+public record LinksResponse(List<Computation> computations, double proximity) {
     @Override
     public String toString() {
         return "LinksResponse{" +

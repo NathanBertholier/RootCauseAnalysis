@@ -5,6 +5,7 @@ import io.quarkus.hibernate.reactive.panache.Panache;
 import io.smallrye.mutiny.Uni;
 import org.eclipse.microprofile.reactive.messaging.Channel;
 import org.eclipse.microprofile.reactive.messaging.Emitter;
+import org.eclipse.microprofile.reactive.messaging.OnOverflow;
 
 import javax.inject.Inject;
 import javax.validation.ConstraintViolation;
@@ -32,7 +33,9 @@ public class InsertBatchLog {
 
     private static final Logger logger = Logger.getGlobal();
 
-    @Channel("token-out") Emitter<RawLogEntity> emitter;
+    @Channel("token-out")
+    @OnOverflow(OnOverflow.Strategy.UNBOUNDED_BUFFER)
+    Emitter<RawLogEntity> emitter;
 
     @Inject Validator rawLogValidator;
 

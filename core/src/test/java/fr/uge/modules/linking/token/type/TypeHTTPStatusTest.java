@@ -1,12 +1,12 @@
 package fr.uge.modules.linking.token.type;
 
-import fr.uge.modules.api.model.TokenModel;
+import fr.uge.modules.api.model.entities.TokenEntity;
 import org.junit.jupiter.api.Test;
 
+import java.util.ArrayList;
 import java.util.Random;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 
 public class TypeHTTPStatusTest {
     @Test
@@ -37,12 +37,46 @@ public class TypeHTTPStatusTest {
     }
     @Test
     void proximity() {
-        TypeHTTPStatus typeHTTPStatus = new TypeHTTPStatus();/*
+
+        // TODO : here some test case maybe add more
+        TypeHTTPStatus typeHTTPStatus = new TypeHTTPStatus();
+        TokenEntity tokenStatus200 = new TokenEntity();
+        tokenStatus200.setValue("200");
+        TokenEntity tokenStatus204 = new TokenEntity();
+        tokenStatus204.setValue("204");
+        TokenEntity tokenStatus300 = new TokenEntity();
+        tokenStatus300.setValue("300");
+        TokenEntity tokenStatus400 = new TokenEntity();
+        tokenStatus400.setValue("400");
+        TokenEntity tokenStatus402 = new TokenEntity();
+        tokenStatus402.setValue("402");
+        TokenEntity tokenStatus500 = new TokenEntity();
+        tokenStatus500.setValue("500");
+
         assertAll(
-                () -> assertEquals(100, typeHTTPStatus.computeProximity(new TokenModel(typeHTTPStatus.getTokenTypeId(), "208"), new TokenModel(typeHTTPStatus.getTokenTypeId(), "208"))),
-                () -> assertEquals(80, typeHTTPStatus.computeProximity(new TokenModel(typeHTTPStatus.getTokenTypeId(), "208"), new TokenModel(typeHTTPStatus.getTokenTypeId(), "206"))),
-                () -> assertEquals(0, typeHTTPStatus.computeProximity(new TokenModel(typeHTTPStatus.getTokenTypeId(), "200"), new TokenModel(typeHTTPStatus.getTokenTypeId(), "500")))
-        );*/
+                // empty array
+                () -> assertEquals( 0, typeHTTPStatus.computeProximity(new ArrayList<>(), new ArrayList<>(){ { add( tokenStatus200 ); } } ) ),
+                () -> assertEquals( 0, typeHTTPStatus.computeProximity(new ArrayList<>(){ { add( tokenStatus200 ); }}, new ArrayList<>() ) ),
+                () -> assertEquals( 0, typeHTTPStatus.computeProximity(new ArrayList<>(), new ArrayList<>() ) ),
+                // 100% identical
+                () -> assertEquals( 100, typeHTTPStatus.computeProximity(new ArrayList<>(){ { add( tokenStatus200 ); }}, new ArrayList<>(){ { add( tokenStatus200 ); } } ) ),
+                () -> assertEquals( 100, typeHTTPStatus.computeProximity(new ArrayList<>(){ { add( tokenStatus300 ); }}, new ArrayList<>(){ { add( tokenStatus300 ); } } ) ),
+                () -> assertEquals( 100, typeHTTPStatus.computeProximity(new ArrayList<>(){ { add( tokenStatus400 ); }}, new ArrayList<>(){ { add( tokenStatus400 ); } } ) ),
+                () -> assertEquals( 100, typeHTTPStatus.computeProximity(new ArrayList<>(){ { add( tokenStatus500 ); }}, new ArrayList<>(){ { add( tokenStatus500 ); } } ) ),
+                () -> assertEquals( 100, typeHTTPStatus.computeProximity(new ArrayList<>(){ { add( tokenStatus402 ); }}, new ArrayList<>(){ { add( tokenStatus402 ); } } ) ),
+
+                //4xx ou 5xx
+                () -> assertEquals( 95, typeHTTPStatus.computeProximity(new ArrayList<>(){ { add( tokenStatus400 ); }}, new ArrayList<>(){ { add( tokenStatus402 ); } } ) ),
+                () -> assertEquals( 90, typeHTTPStatus.computeProximity(new ArrayList<>(){ { add( tokenStatus400 ); }}, new ArrayList<>(){ { add( tokenStatus500 ); } } ) ),
+                () -> assertEquals( 90, typeHTTPStatus.computeProximity(new ArrayList<>(){ { add( tokenStatus500 ); }}, new ArrayList<>(){ { add( tokenStatus402 ); } } ) ),
+                () -> assertEquals( 0, typeHTTPStatus.computeProximity(new ArrayList<>(){ { add( tokenStatus400 ); }}, new ArrayList<>(){ { add( tokenStatus200 ); } } ) ),
+                () -> assertEquals( 0, typeHTTPStatus.computeProximity(new ArrayList<>(){ { add( tokenStatus400 ); }}, new ArrayList<>(){ { add( tokenStatus300 ); } } ) ),
+
+                //2xx ou 3xx
+                () -> assertEquals( 95, typeHTTPStatus.computeProximity(new ArrayList<>(){ { add( tokenStatus204 ); }}, new ArrayList<>(){ { add( tokenStatus200 ); } } ) ),
+                () -> assertEquals( 25, typeHTTPStatus.computeProximity(new ArrayList<>(){ { add( tokenStatus204 ); }}, new ArrayList<>(){ { add( tokenStatus402 ); } } ) ),
+                () -> assertEquals( 25, typeHTTPStatus.computeProximity(new ArrayList<>(){ { add( tokenStatus204 ); }}, new ArrayList<>(){ { add( tokenStatus500 ); } } ) )
+        );
 
     }
 }

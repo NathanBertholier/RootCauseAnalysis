@@ -10,8 +10,7 @@ import java.net.http.HttpResponse;
 import java.nio.file.*;
 import java.sql.Timestamp;
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -22,7 +21,7 @@ public class Benchmark {
         //use this to try out spamming rabbitmq
         //args = new String[]{"-l", "100000", "-F", "../logs/", "-b", "50", "-d", "85", "-t", "8", "-u", "http://localhost:80/external/insertlog/batch", "-nT", "2022-02-18 11:57:00"};
         //args = new String[]{"-l", "100000", "-F", "../logs/", "-b", "50", "-d", "85", "-t", "8", "-u", "http://localhost:80/external/insertlog/batch"};
-        //args = new String[]{"-l", "100000", "-F", "../logs/", "-b", "50", "-d", "85", "-t", "8", "-u", "http://localhost:80/external/insertlog/batch", "-lo"};
+        args = new String[]{"-l", "62000", "-F", "C:\\Users\\natha\\Documents\\rootcause\\tools\\benchmark\\src\\main\\resources", "-b", "100", "-d", "300", "-t", "10", "-u", "http://localhost:8081/insertlog","-lo"};
 
         //use this to output to out.txt in exec folder
         //args = new String[]{"-l", "10000", "-f", "in.txt"};
@@ -76,19 +75,31 @@ public class Benchmark {
             ts = Timestamp.valueOf(line.getOptionValue("newTimeStamp"));
         }
         String URITarget = line.getOptionValue("uriTarget");
-        sendToServer(stringList, Integer.parseInt(line.getOptionValue("threadCount")), Integer.parseInt(line.getOptionValue("batchSize")),Integer.parseInt(line.getOptionValue("delay")), ts, URITarget, line.hasOption("loopOnData"));
+        int threadCount = Integer.parseInt(line.getOptionValue("threadCount"));
+        int batchSize = Integer.parseInt(line.getOptionValue("batchSize"));
+        int delay = Integer.parseInt(line.getOptionValue("delay"));
+        boolean loopOnData = line.hasOption("loopOnData");
+        Path statPath = Path.of(line.getOptionValue("statPath"));
+
+        sendToServer(stringList, threadCount, batchSize, delay, ts, URITarget, loopOnData, statPath);
     }
 
-    private static void sendToServer(List<String> stringSource, int threadCount, int batchSize, int millisDelay, Timestamp ts, String URITarget, boolean loop) throws InterruptedException {
+    private static void sendToServer(List<String> stringSource, int threadCount, int batchSize, int millisDelay, Timestamp ts, String URITarget, boolean loop, Path statPath) throws InterruptedException {
 
         Thread[] threads = new Thread[threadCount];
         ArrayList<List<String>> subLists = new ArrayList<>();
+
         for (int i = 0; i < threadCount; i++){
             int offset = stringSource.size()/threadCount;
             subLists.add(stringSource.subList(offset*i,offset*(i+1)));
             int finalI = i;
             threads[i] = new Thread(() -> {
-                BenchHTTPClient client = new BenchHTTPClient(batchSize, ts, URITarget);
+                BenchHTTPClient client;
+                if(finalI == 0){
+                    client = new BenchHTTPClient(batchSize, ts, URITarget, statPath);
+                } else {
+                    client = new BenchHTTPClient(batchSize, ts, URITarget, null);
+                }
                 client.sendToServer(subLists.get(finalI),millisDelay, loop);
             });
         }
@@ -97,6 +108,7 @@ public class Benchmark {
             t.start();
             Thread.sleep(millisDelay/threadCount);
         }
+
 
         for(Thread t : threads) {
             t.join();
@@ -174,6 +186,8 @@ public class Benchmark {
 
         final Option loopOption = Option.builder("lo").longOpt("loopOnData").desc("Using this option will make the sender loop on the data loaded, instead of shutting down after sending all lines read").hasArg(false).required(false).build();
 
+        final Option statOption = Option.builder("s").longOpt("statPath").desc("Using this option will activate HTTP response time logging, a path for the stat file will be required as well. The application will update the file every 10 seconds and statistics are only collected on thread 0").hasArg(true).required(false).build();
+
         final Options options = new Options();
 
         for (final Option fo : firstOptions.getOptions()) {
@@ -190,6 +204,7 @@ public class Benchmark {
         options.addOption(newTimeStampOption);
         options.addOption(URITargetOption);
         options.addOption(loopOption);
+        options.addOption(statOption);
 
         return options;
     }
@@ -197,18 +212,23 @@ public class Benchmark {
 
 class BenchHTTPClient{
 
+    private final Map<Integer,List<Long>> responseTimes;
     private final HttpClient httpClient;
     private final int batchSize;
     private final boolean modifiedTimestamp;
     private final Timestamp ts;
     private final long creation;
     private final URI sendURI;
+    private final Path statPath;
+    private final Thread statThread;
 
-    public BenchHTTPClient(int batchSize, Timestamp ts, String URITarget) {
+    public BenchHTTPClient(int batchSize, Timestamp ts, String URITarget, Path statPath) {
         this.httpClient = HttpClient.newBuilder().version(HttpClient.Version.HTTP_2).followRedirects(HttpClient.Redirect.NORMAL).build();
         this.batchSize = batchSize;
         this.sendURI = URI.create(URITarget);
-        creation = Timestamp.from(Instant.now()).getTime();
+        this.creation = Timestamp.from(Instant.now()).getTime();
+
+        this.statPath = statPath;
         if(ts != null){
             modifiedTimestamp = true;
             this.ts = ts;
@@ -216,6 +236,35 @@ class BenchHTTPClient{
         else{
             this.ts = null;
             modifiedTimestamp = false;
+        }
+        if(statPath != null) {
+            responseTimes = Collections.synchronizedMap(new HashMap<>());
+            this.statThread = new Thread( () -> {
+                try {
+                    while (true) {
+                        Thread.sleep(15000);
+                        StringBuilder builder = new StringBuilder();
+                        synchronized (responseTimes) {
+                            for(Map.Entry<Integer, List<Long>> entry : responseTimes.entrySet()) {
+                                builder.append(entry.getKey());
+                                builder.append(System.lineSeparator());
+                                builder.append(entry.getValue().stream().map(l -> l.toString()).collect(Collectors.joining(";")));
+                                builder.append(System.lineSeparator());
+                            }
+                        }
+                        Files.write(statPath, builder.toString().getBytes());
+                    }
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            });
+
+        }
+        else {
+            responseTimes = null;
+            statThread = null;
         }
     }
 
@@ -229,14 +278,31 @@ class BenchHTTPClient{
     }
 
     public void sendPost(URI uri, List<String> stringList) throws IOException, InterruptedException {
+
+        long start = 0;
+        if(statPath != null) {
+            start = System.currentTimeMillis();
+        }
         String str = prepareRequest(stringList);
         HttpRequest httpRequest = HttpRequest.newBuilder().uri(uri)
                 .POST(HttpRequest.BodyPublishers.ofString(str))
                 .header("Accept", "application/json").header("Content-Type", "application/json").build();
         HttpResponse<String> send = httpClient.send(httpRequest, HttpResponse.BodyHandlers.ofString());
-        if(send.statusCode() != 200) {
+        if(send.statusCode() != 201) {
             System.out.println(send.statusCode());
         }
+        if(statPath != null){
+            long resTime = System.currentTimeMillis() - start;
+            responseTimes.compute(send.statusCode(),(k,v) ->
+            {
+                if(v == null) {
+                    v = new ArrayList<>();
+                }
+                v.add(resTime);
+                return v;
+            });
+        }
+
     }
 
     private String prepareRequest(List<String> stringList) {
@@ -262,6 +328,10 @@ class BenchHTTPClient{
     }
 
     public void sendToServer(List<String> stringList, int millisDelay, boolean loop) {
+        if(statPath != null) {
+            statThread.start();
+        }
+
         do {
             try {
                 if (stringList.size() > batchSize) {
