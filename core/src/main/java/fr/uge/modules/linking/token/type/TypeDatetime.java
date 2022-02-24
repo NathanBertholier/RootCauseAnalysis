@@ -4,8 +4,6 @@ import fr.uge.modules.api.model.entities.TokenEntity;
 
 import java.security.SecureRandom;
 import java.sql.Timestamp;
-import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Random;
 
@@ -31,7 +29,7 @@ public class TypeDatetime implements TokenType{
     }
 
     @Override
-    public float computeProximity(List<TokenEntity> tokenLeft, List<TokenEntity> tokenRight) {
+    public double computeProximity(List<TokenEntity> tokenLeft, List<TokenEntity> tokenRight) {
         return 0;
     }
 

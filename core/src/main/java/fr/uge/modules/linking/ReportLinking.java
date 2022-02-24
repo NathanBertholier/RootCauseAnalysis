@@ -1,13 +1,11 @@
 package fr.uge.modules.linking;
 
 import fr.uge.modules.api.model.CompleteLog;
+import fr.uge.modules.api.model.ReportResponse;
 import fr.uge.modules.api.model.entities.LogEntity;
 import fr.uge.modules.api.model.entities.TokenEntity;
 import fr.uge.modules.api.model.report.ReportParameter;
-import fr.uge.modules.linking.token.type.TokenType;
-import fr.uge.modules.linking.token.type.TypeDatetime;
-import fr.uge.modules.linking.token.type.TypeHTTPStatus;
-import fr.uge.modules.linking.token.type.TypeIPv4;
+import fr.uge.modules.linking.token.type.*;
 import io.smallrye.common.annotation.Blocking;
 import io.smallrye.mutiny.Uni;
 
@@ -17,11 +15,14 @@ import java.util.*;
 import java.util.logging.Logger;
 
 public class ReportLinking {
-    private final Logger logger = Logger.getLogger(this.getClass().getName());
     private final HashMap<Integer, TokenType> tokensType = new HashMap<>();
+    private final Logger logger = Logger.getLogger(this.getClass().getName());
 
     public ReportLinking() {
         this.addInTokensType(TokenType.TokenTypeId.ID_IPV4.getId(), new TypeIPv4());
+        this.addInTokensType(TokenType.TokenTypeId.ID_IPV6.getId(), new TypeIPv6());
+        this.addInTokensType(TokenType.TokenTypeId.ID_DATETIME.getId(), new TypeDatetime());
+        this.addInTokensType(TokenType.TokenTypeId.ID_EDGERESPONSE.getId(), new TypeEdgeResponse());
         this.addInTokensType(TokenType.TokenTypeId.ID_STATUS.getId(), new TypeHTTPStatus());
     }
 
@@ -29,26 +30,23 @@ public class ReportLinking {
         tokensType.compute(id, (k,v) -> tokenType);
     }
 
-    public Uni<SortedMap<Float, LogEntity>> linkReport(long id, ReportParameter rp) {
+    public Uni<ReportResponse> linkReport(long id, ReportParameter reportParameter) {
         return LogEntity.<LogEntity>findById(id)
-                .chain(completeLog -> {
-                    var datetime = completeLog.datetime;
-                    var start = Timestamp.valueOf(datetime.toLocalDateTime().minus(Duration.ofSeconds(rp.delta())));
-                    return LogEntity.<LogEntity>find("id != ?1 and datetime between ?2 and ?3", id,
-                                    start, datetime).list()
-                            .map(list -> computeProximityTree(completeLog, list, rp));
-                });
+                .chain(root ->
+                    LogsLinking.linkedLogs(root, reportParameter)
+                            .map(set -> new ReportResponse(root, new HashSet<>(), set)) // pour merge
+                );
     }
 
     private void fillHashmap(List<TokenEntity> tokens, HashMap<Integer, List<TokenEntity>> tokensToFill) {
         tokens.forEach(token -> tokensToFill
-                .computeIfAbsent(token.getIdtokentype(), k -> new ArrayList<>())
+                .computeIfAbsent(token.getIdtokentype(), ArrayList::new)
                 .add(token)
         );
     }
 
-    public SortedMap<Float, LogEntity> computeProximityTree(LogEntity logTarget, List<LogEntity> logWithinDelta, ReportParameter rp){
-        TreeMap<Float, LogEntity> redBlack = new TreeMap<>(Collections.reverseOrder());
+    public SortedMap<Double, LogEntity> computeProximityTree(LogEntity logTarget, List<LogEntity> logWithinDelta, ReportParameter rp){
+        TreeMap<Double, LogEntity> redBlack = new TreeMap<>(Collections.reverseOrder());
         var targetDatetime = logTarget.datetime;
 
         HashMap<Integer, List<TokenEntity>> tokenTarget = new HashMap<>();
@@ -59,19 +57,17 @@ public class ReportLinking {
         HashMap<Integer, List<TokenEntity>> tokenToLink = new HashMap<>();
         this.tokensType.forEach((id,v) -> tokenToLink.computeIfAbsent(id, k -> new ArrayList<>()));
 
-        System.out.println(delta);
         logWithinDelta.forEach(log -> {
-            float proximity = TypeDatetime.computeDateTimeProximity(log.datetime, targetDatetime, delta);
+            double proximity = TypeDatetime.computeDateTimeProximity(log.datetime, targetDatetime, delta);
             log.getTokens().forEach(token -> tokenToLink.get(token.getIdtokentype()).add(token));
 
             proximity += tokenTarget.keySet().stream()
                     .mapToDouble((k) -> tokensType.get(k)
                             .computeProximity(tokenTarget.get(k),
-                    tokenToLink.get(k))).sum();
+                                    tokenToLink.get(k))).sum();
 
             proximity /= (tokenTarget.size() + 1); // NUMBER OF TOKENS CONSIDERATE + TIMESTAMP
 
-            System.out.println(proximity);
             if(redBlack.size() > rp.network_size() - 1) {
                 if (proximity > redBlack.lastKey()) {
                     redBlack.pollLastEntry();
@@ -82,7 +78,6 @@ public class ReportLinking {
             }
             tokenToLink.forEach((k,v) -> v.clear());
         });
-        System.out.println(redBlack);
         redBlack.forEach((k,v) -> System.out.println(k + " LOG " + v));
         redBlack.forEach((k,v) -> System.out.println(k));
         return redBlack;

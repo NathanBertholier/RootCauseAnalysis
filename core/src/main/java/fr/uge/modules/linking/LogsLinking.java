@@ -3,16 +3,19 @@ package fr.uge.modules.linking;
 import fr.uge.modules.api.model.entities.LogEntity;
 import fr.uge.modules.api.model.entities.TokenEntity;
 import fr.uge.modules.api.model.linking.LinksResponse;
+import fr.uge.modules.api.model.report.ReportParameter;
 import fr.uge.modules.linking.token.type.TokenType;
 import io.smallrye.mutiny.Uni;
 
 import java.sql.Timestamp;
 import java.time.Duration;
 import java.util.*;
-import java.util.concurrent.atomic.AtomicReference;
+import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 // TODO
 public class LogsLinking {
+    private static final Logger LOGGER = Logger.getLogger(LogsLinking.class.getName());
     /**
      * Computes proximity between log of id1 and log of id2 for all the tokens in tokenTypes
      * @param log1
@@ -50,14 +53,18 @@ public class LogsLinking {
 
     /**
      * Retrieves all linked logs of a root one within given delta
-     * @param id
-     * @param delta
+     * @param root
+     * @param reportParameter
      * @return
      */
-    public static Uni<List<LogEntity>> linkedLogs(LogEntity root, long delta){
+    public static Uni<SortedMap<Double, LogEntity>> linkedLogs(LogEntity root, ReportParameter reportParameter){
+        var reportLinking = new ReportLinking();
         var datetime = root.datetime;
-        return LogEntity.<LogEntity>find("id != ?1 and datetime between ?2 and ?3", root.id,
-                        Timestamp.valueOf(datetime.toLocalDateTime().minus(Duration.ofSeconds(delta))),
-                        datetime).list();
+        return LogEntity.<LogEntity>find("id != ?1 and datetime between ?2 and ?3",
+                    root.id,
+                    Timestamp.valueOf(datetime.toLocalDateTime().minus(Duration.ofSeconds(reportParameter.delta()))),
+                    datetime).list()
+                .map(list -> reportLinking.computeProximityTree(root, list, reportParameter))
+                .onFailure().invoke(error -> LOGGER.severe("Error: " + error));
     }
 }

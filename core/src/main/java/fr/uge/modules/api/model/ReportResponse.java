@@ -3,18 +3,15 @@ package fr.uge.modules.api.model;
 import fr.uge.modules.api.model.entities.LogEntity;
 import fr.uge.modules.api.model.entities.TokenEntity;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
-public record ReportResponse(LogEntity log, Map<Integer, TokensMostSeen> tokensReports, List<LogEntity> logs) {
+public record ReportResponse(LogEntity log, Set<TokensMostSeen> tokensReports, SortedMap<Double, LogEntity> relevantLogs) {
     @Override
     public String toString() {
         return "ReportResponse{" +
                 "log=" + log +
                 ", tokensReports=" + tokensReports +
-                ", logs=" + logs +
+                ", relevantLogs=" + relevantLogs +
                 '}';
     }
 }
