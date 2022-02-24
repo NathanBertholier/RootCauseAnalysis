@@ -58,19 +58,22 @@ services:
       REPORT_NETWORK_SIZE: ${REPORT_NETWORK_SIZE}
 
   nginx:
-    depends_on:
-      - rootcause
     container_name: nginx
     image: nginx
+    depends_on:
+      - rootcause
     ports:
       - "80:80"
       - "443:443"
     volumes:
       - ./DockerVolumes/Nginx/nginx.conf:/etc/nginx/nginx.conf
       - ./DockerVolumes/Nginx/certs:/etc/nginx/certs
+    networks:
+      - root-cause-net
 
   #certbot:
 
 networks:
   root-cause-net:
     driver: bridge
+
