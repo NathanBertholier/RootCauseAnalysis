@@ -21,7 +21,7 @@ public class Benchmark {
         //use this to try out spamming rabbitmq
         //args = new String[]{"-l", "100000", "-F", "../logs/", "-b", "50", "-d", "85", "-t", "8", "-u", "http://localhost:80/external/insertlog/batch", "-nT", "2022-02-18 11:57:00"};
         //args = new String[]{"-l", "100000", "-F", "../logs/", "-b", "50", "-d", "85", "-t", "8", "-u", "http://localhost:80/external/insertlog/batch"};
-        args = new String[]{"-l", "62000", "-F", "C:\\Users\\natha\\Documents\\rootcause\\tools\\benchmark\\src\\main\\resources", "-b", "100", "-d", "300", "-t", "10", "-u", "http://localhost:8081/insertlog","-lo"};
+        args = new String[]{"-l", "10000", "-F", "C:\\Users\\natha\\Documents\\rootcause\\tools\\benchmark\\src\\main\\resources", "-b", "2000", "-d", "100", "-t", "10", "-u", "http://localhost/insertlog","-lo"};
 
         //use this to output to out.txt in exec folder
         //args = new String[]{"-l", "10000", "-f", "in.txt"};
@@ -79,7 +79,13 @@ public class Benchmark {
         int batchSize = Integer.parseInt(line.getOptionValue("batchSize"));
         int delay = Integer.parseInt(line.getOptionValue("delay"));
         boolean loopOnData = line.hasOption("loopOnData");
-        Path statPath = Path.of(line.getOptionValue("statPath"));
+
+        Path statPath;
+        if (line.hasOption("statPath")) {
+            statPath = Path.of(line.getOptionValue("statPath"));
+        } else {
+            statPath = Path.of("stat.csv");
+        }
 
         sendToServer(stringList, threadCount, batchSize, delay, ts, URITarget, loopOnData, statPath);
     }
