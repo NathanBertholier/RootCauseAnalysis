@@ -1,16 +1,15 @@
 package fr.uge.modules.api.endpoint.token;
 
-import fr.uge.modules.api.model.CompleteLog;
-import fr.uge.modules.api.model.TokensResponse;
 import fr.uge.modules.api.model.TokenRequest;
+import fr.uge.modules.api.model.entities.LogEntity;
 import fr.uge.modules.tokenization.TokenRetriever;
 import io.smallrye.mutiny.Uni;
 
+import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
-import java.sql.Timestamp;
-import java.util.Arrays;
-import java.util.Collections;
+import javax.ws.rs.Produces;
+import javax.ws.rs.core.MediaType;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -19,9 +18,9 @@ public class TokenEndpoint {
     private static final Logger LOGGER = Logger.getLogger(TokenEndpoint.class.getName());
 
     @POST
-    // Uni<List<CL>> instead of Uni<TokenResponse> for JSON output
-    public Uni<List<CompleteLog>> getTokens(TokenRequest tokenRequest){
-        return TokenRetriever.fromLogs(TokenRetriever.getTokens(tokenRequest))
-                .map(TokensResponse::logDemonstrators);
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Uni<List<LogEntity>> getTokens(TokenRequest tokenRequest){
+        return TokenRetriever.getTokens(tokenRequest);
     }
 }

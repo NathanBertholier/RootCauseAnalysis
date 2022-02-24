@@ -1,7 +1,8 @@
 package fr.uge.modules.api.model;
 
-import java.util.Arrays;
+import fr.uge.modules.api.model.entities.LogEntity;
+
 import java.util.List;
 
-public record TokensResponse(List<CompleteLog> logDemonstrators) {
+public record TokensResponse(List<LogEntity> logDemonstrators) {
 }
