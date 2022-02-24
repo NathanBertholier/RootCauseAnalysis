@@ -15,6 +15,7 @@ import java.util.*;
 import java.util.logging.Logger;
 
 public class ReportLinking {
+
     private final HashMap<Integer, TokenType> tokensType = new HashMap<>();
     private final Logger logger = Logger.getLogger(this.getClass().getName());
 
@@ -28,14 +29,6 @@ public class ReportLinking {
 
     private void addInTokensType(Integer id, TokenType tokenType) {
         tokensType.compute(id, (k,v) -> tokenType);
-    }
-
-    public Uni<ReportResponse> linkReport(long id, ReportParameter reportParameter) {
-        return LogEntity.<LogEntity>findById(id)
-                .chain(root ->
-                    LogsLinking.linkedLogs(root, reportParameter)
-                            .map(set -> new ReportResponse(root, new HashSet<>(), set)) // pour merge
-                );
     }
 
     private void fillHashmap(List<TokenEntity> tokens, HashMap<Integer, List<TokenEntity>> tokensToFill) {
