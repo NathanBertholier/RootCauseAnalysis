@@ -9,8 +9,7 @@ import fr.uge.modules.linking.LogsLinking;
 import io.smallrye.mutiny.Multi;
 import io.smallrye.mutiny.Uni;
 
-import java.util.List;
-import java.util.TreeMap;
+import java.util.*;
 import java.util.logging.Logger;
 
 public class Synthetization {
@@ -19,27 +18,24 @@ public class Synthetization {
     public static Uni<ReportResponse> getReport(long idRootLog, ReportParameter reportParameter) {
         return LogEntity.<LogEntity>findById(idRootLog)
                 .chain(log -> LogsLinking.linkedLogs(log, reportParameter)
-                        .chain(logEntities -> getMostSeenTokens(logEntities)
+                        .chain(logEntities -> getMostSeenTokens(logEntities.values())
                                 .map(sorted -> new ReportResponse(log, sorted, logEntities))
                         )
                 );
     }
 
-    private static Uni<TreeMap<Integer, TokensMostSeen>> getMostSeenTokens(List<LogEntity> logs) {
+    private static Uni<Set<TokensMostSeen>> getMostSeenTokens(Collection<LogEntity> logs) {
+        Comparator<TokensMostSeen> comparator = Comparator.comparingLong(TokensMostSeen::count);
         return Multi.createFrom().items(logs.stream().flatMap(log -> log.tokens.stream()))
                 .group().by(TokenEntity::getIdtokentype)
-                .collect().in(TreeMap::new, ((map, multi) -> {
-                    var idTokenType = multi.key();
-                    multi.collect()
-                            .asList()
-                            .map(Synthetization::fromTokenEntities)
-                            .subscribeAsCompletionStage()
-                            .whenComplete(
-                                    (tokensMostSeen, error) -> {
-                                        if(error != null) LOGGER.severe("Error: " + error);
-                                        else map.putIfAbsent(idTokenType, tokensMostSeen);
-                                    });
-                }));
+                .collect().in(() -> new TreeSet<>(comparator), (set, group) -> group.collect()
+                        .asList()
+                        .map(Synthetization::fromTokenEntities)
+                        .subscribeAsCompletionStage()
+                        .whenComplete(((tokensMostSeen, error) -> {
+                            if(error != null) LOGGER.severe("Error while isnerting " + tokensMostSeen + ": " + error);
+                            else set.add(tokensMostSeen);
+                        })));
     }
 
     private static TokensMostSeen fromTokenEntities(List<TokenEntity> entities){

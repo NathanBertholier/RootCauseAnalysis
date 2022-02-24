@@ -45,8 +45,8 @@ public class ReportLinking {
         );
     }
 
-    public SortedMap<Float, LogEntity> computeProximityTree(LogEntity logTarget, List<LogEntity> logWithinDelta, ReportParameter rp){
-        TreeMap<Float, LogEntity> redBlack = new TreeMap<>(Collections.reverseOrder());
+    public SortedMap<Double, LogEntity> computeProximityTree(LogEntity logTarget, List<LogEntity> logWithinDelta, ReportParameter rp){
+        TreeMap<Double, LogEntity> redBlack = new TreeMap<>(Collections.reverseOrder());
         var targetDatetime = logTarget.datetime;
 
         HashMap<Integer, List<TokenEntity>> tokenTarget = new HashMap<>();
@@ -58,7 +58,7 @@ public class ReportLinking {
         this.tokensType.forEach((id,v) -> tokenToLink.computeIfAbsent(id, k -> new ArrayList<>()));
 
         logWithinDelta.forEach(log -> {
-            float proximity = TypeDatetime.computeDateTimeProximity(log.datetime, targetDatetime, delta);
+            double proximity = TypeDatetime.computeDateTimeProximity(log.datetime, targetDatetime, delta);
             log.getTokens().forEach(token -> tokenToLink.get(token.getIdtokentype()).add(token));
 
             proximity += tokenTarget.keySet().stream()

@@ -2,17 +2,14 @@ package fr.uge.modules.linking;
 
 import fr.uge.modules.api.model.entities.LogEntity;
 import fr.uge.modules.api.model.entities.TokenEntity;
-import fr.uge.modules.api.model.linking.Computation;
 import fr.uge.modules.api.model.linking.LinksResponse;
 import fr.uge.modules.api.model.report.ReportParameter;
 import fr.uge.modules.linking.token.type.TokenType;
-import fr.uge.modules.linking.token.type.TypeDatetime;
 import io.smallrye.mutiny.Uni;
 
 import java.sql.Timestamp;
 import java.time.Duration;
 import java.util.*;
-import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
 // TODO
@@ -58,15 +55,14 @@ public class LogsLinking {
      * @param reportParameter
      * @return
      */
-    public static Uni<Set<LogEntity>> linkedLogs(LogEntity root, ReportParameter reportParameter){
+    public static Uni<SortedMap<Double, LogEntity>> linkedLogs(LogEntity root, ReportParameter reportParameter){
         var reportLinking = new ReportLinking();
-        Comparator<Computation> comparator = Comparator.comparing(Computation::proximity);
         var datetime = root.datetime;
         return LogEntity.<LogEntity>find("id != ?1 and datetime between ?2 and ?3",
                     root.id,
                     Timestamp.valueOf(datetime.toLocalDateTime().minus(Duration.ofSeconds(reportParameter.delta()))),
                     datetime).list()
                 .map(list -> reportLinking.computeProximityTree(root, list, reportParameter))
-                .map(map -> new TreeSet<>(map.values()));
+                .onFailure().invoke(error -> System.out.println("Error: " + error));
     }
 }
