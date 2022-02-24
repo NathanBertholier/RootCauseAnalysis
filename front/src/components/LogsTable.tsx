@@ -18,7 +18,7 @@ type LogsTableProp = {
     gettingData: (x:boolean) => void
 }
 
-export class LogsTable extends Component<LogsTableProp>{
+export class LogsTable extends Component<LogsTableProp, any> {
     state = {
         list: Array<Log>()
     }
@@ -28,7 +28,6 @@ export class LogsTable extends Component<LogsTableProp>{
     }
 
     filter( request: TokensRequest ) {
-        // TODO : probably other root and format
         DataService.getAll(request).then((response: any) => {
             console.log( response )
             let logs : Log[] = response.data
