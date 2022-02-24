@@ -1,7 +1,9 @@
 package fr.uge.modules.linking.token.type;
 
+import fr.uge.modules.api.model.entities.TokenEntity;
 import org.junit.jupiter.api.Test;
 
+import java.util.ArrayList;
 import java.util.Random;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -39,5 +41,41 @@ public class TypeURLTest {
         assertEquals(-1,typeURL.matcher("http://blog.example.com"));
         assertEquals(-1,typeURL.matcher("http://255.255.255.255"));
         assertEquals(-1,typeURL.matcher("255.255.255.255"));
+    }
+
+    @Test
+    void proximity() {
+        TypeURL typeURL = new TypeURL();
+        // TODO : here some test case maybe add more
+        TokenEntity urlPizzaTomate = new TokenEntity();
+        urlPizzaTomate.setValue("https://www.centreon.com/pizza/ingredients/tomate");
+
+        TokenEntity urlPizzaBoeuf = new TokenEntity();
+        urlPizzaBoeuf.setValue("https://www.centreon.com/pizza/ingredients/boeuf");
+
+        TokenEntity urlEssaiGratuit = new TokenEntity();
+        urlEssaiGratuit.setValue("https://www.centreon.com/essai-gratuit/?origine=community&email=marcos.rodrigues@terceiro.rnp.br");
+
+        TokenEntity urlSVG = new TokenEntity();
+        urlSVG.setValue("https://www.centreon.com/current/en/img/undraw_online.svg");
+
+        assertAll(
+                // empty array
+                () -> assertEquals( 50, typeURL.computeProximity(new ArrayList<>(), new ArrayList<>(){ { add( urlPizzaTomate ); } } ) ),
+                () -> assertEquals( 50, typeURL.computeProximity(new ArrayList<>(){ { add( urlPizzaTomate ); } }, new ArrayList<>() ) ),
+                () -> assertEquals( 50, typeURL.computeProximity(new ArrayList<>(), new ArrayList<>() ) ),
+
+                // case 1 element in array
+                () -> assertEquals( 100, typeURL.computeProximity(new ArrayList<>(){ { add( urlPizzaTomate ); } }, new ArrayList<>(){ { add( urlPizzaTomate ); } } ) ),
+                () -> assertEquals( 75, typeURL.computeProximity(new ArrayList<>(){ { add( urlPizzaTomate ); } }, new ArrayList<>(){ { add( urlPizzaBoeuf ); } } ) ),
+
+                () -> assertEquals( 33.33333333333333, typeURL.computeProximity(new ArrayList<>(){ { add( urlEssaiGratuit ); } }, new ArrayList<>(){ { add( urlPizzaBoeuf ); } } ) ),
+
+
+                () -> assertEquals( 25, typeURL.computeProximity(new ArrayList<>(){ { add( urlPizzaTomate );add( urlPizzaBoeuf ); } }, new ArrayList<>(){ { add( urlSVG ); } } ) )
+
+
+        );
+
     }
 }
