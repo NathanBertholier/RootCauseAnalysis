@@ -7,13 +7,10 @@ import {TokensRequest} from "../types/TokensRequest";
 import {Log} from "../types/TokensResponse";
 
 export const default_request : TokensRequest = {
-    "init_datetime": "2010-06-15 00:00:00.000000",
-    "end_datetime": "2040-06-16 00:00:00.000000",
+    "init_datetime": "",
+    "end_datetime": "",
     "id": -1,
-    "tokenModel": {
-        "token_type": 0,
-        "token_value": "string"
-    },
+    "tokens": [],
     "rows": 30
 }
 
