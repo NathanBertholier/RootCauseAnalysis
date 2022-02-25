@@ -17,13 +17,13 @@ public class Tokenization {
     private final List<TokenType> tokenTypes = new ArrayList<>();
     private final TypeTime time = new TypeTime();
     private final TypeDate date = new TypeDate();
+    private final TypeHTTPStatus httpstatus = new TypeHTTPStatus();
     private final SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
     public Tokenization() {
         tokenTypes.add(new TypeURL());
         tokenTypes.add(new TypeIPv4());
         tokenTypes.add(new TypeIPv6());
-        tokenTypes.add(new TypeHTTPStatus());
         tokenTypes.add(new TypeEdgeResponse());
     }
 
@@ -32,10 +32,22 @@ public class Tokenization {
         // Containing the token values
         List<TokenEntity> tokens = new ArrayList<>();
 
+        String[] words = body.split("\t");
         String dateString = "";
         String timeString = "";
 
-        for (String word : body.split("\t")) {
+        if(words.length > 8){
+            var httpToken = this.parseHTTPStatus(words[8]);
+            if(httpToken.isEmpty()){
+                tokenTypes.add(httpstatus);
+            } else {
+                tokens.add(httpToken.get());
+            }
+        } else {
+            tokenTypes.add(httpstatus);
+        }
+
+        for (String word : words) {
             if(date.matcher(word) != -1) {
                 dateString = word;
             } else if(time.matcher(word) != -1) {
@@ -70,7 +82,23 @@ public class Tokenization {
                 token.setIdtokentype(type);
                 token.setValue(word);
                 tokenEntities.add(token);
+                if (type == 3){
+                    tokenTypes.remove(httpstatus);
+                    break;
+                }
             }
+        }
+    }
+
+    private Optional<TokenEntity> parseHTTPStatus(String word) {
+        var type = httpstatus.matcher(word);
+        if(type != -1){
+            TokenEntity token = new TokenEntity();
+            token.setIdtokentype(type);
+            token.setValue(word);
+            return Optional.of(token);
+        } else {
+            return Optional.empty();
         }
     }
 }
