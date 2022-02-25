@@ -43,8 +43,8 @@ public class MonitorInserter {
             var json = new JsonObject(jsonMap);
 
             monitoring.setDatetime(Timestamp.from(Instant.now()));
-            monitoring.setDeliver(json.getJsonObject("message_stats").getJsonObject("ack_details").getFloat("rate"));
-            monitoring.setPublish(json.getJsonObject("message_stats").getJsonObject("publish_details").getFloat("rate"));
+            monitoring.setDeliver(json.getJsonObject("backing_queue_status").getFloat("avg_ack_egress_rate"));
+            monitoring.setPublish(json.getJsonObject("backing_queue_status").getFloat("avg_ack_ingress_rate"));
             monitoring.setMessages(json.getLong("messages"));
 
             Panache.<MonitoringEntity>withTransaction(monitoring::persist)

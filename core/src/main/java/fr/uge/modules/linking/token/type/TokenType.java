@@ -29,7 +29,9 @@ public interface TokenType {
             case 2 -> new TypeIPv6();
             case 3 -> new TypeHTTPStatus();
             case 4 -> new TypeDatetime();
-            default -> new TypeEdgeResponse();
+            case 5 -> new TypeEdgeResponse();
+            case 6 -> new TypeURL();
+            default -> {throw new IllegalStateException("TokenType not recognized");}
         };
     }
 

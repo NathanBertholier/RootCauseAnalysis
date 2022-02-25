@@ -25,6 +25,7 @@ public class ReportLinking {
         this.addInTokensType(TokenType.TokenTypeId.ID_DATETIME.getId(), new TypeDatetime());
         this.addInTokensType(TokenType.TokenTypeId.ID_EDGERESPONSE.getId(), new TypeEdgeResponse());
         this.addInTokensType(TokenType.TokenTypeId.ID_STATUS.getId(), new TypeHTTPStatus());
+        this.addInTokensType(TokenType.TokenTypeId.ID_URL.getId(), new TypeURL());
     }
 
     private void addInTokensType(Integer id, TokenType tokenType) {

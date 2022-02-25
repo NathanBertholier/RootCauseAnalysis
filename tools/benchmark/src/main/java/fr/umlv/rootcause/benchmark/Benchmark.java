@@ -18,11 +18,9 @@ import java.util.stream.Stream;
 public class Benchmark {
 
     public static void main(String[] args) throws ParseException, IOException, InterruptedException {
-        //use this to try out spamming rabbitmq with different parameters
-        //args = new String[]{"-l", "100000", "-F", "../logs/", "-b", "50", "-d", "85", "-t", "8", "-u", "http://localhost:8081/insertlog", "-nT", "2022-02-18 11:57:00"};
-        //args = new String[]{"-l", "100000", "-F", "../logs/", "-b", "50", "-d", "85", "-t", "8", "-u", "http://localhost:8081/insertlog"};
-        //args = new String[]{"-l", "100000", "-F", "../logs/", "-b", "50", "-d", "85", "-t", "8", "-u", "http://localhost:8081/insertlog","-lo","-s","stats.csv"};
-
+        //use this to try out spamming rabbitmq
+        //args = new String[]{"-l", "10000", "-F", "C:\\Users\\natha\\Documents\\rootcause\\tools\\benchmark\\src\\main\\resources", "-b", "100", "-d", "1000", "-t", "10", "-u", "http://localhost/insertlog","-s","stat.csv"};
+         args = new String[]{};
         //use this to output to out.txt in exec folder
         //args = new String[]{"-l", "10000", "-f", "in.txt"};
 
@@ -79,7 +77,13 @@ public class Benchmark {
         int batchSize = Integer.parseInt(line.getOptionValue("batchSize"));
         int delay = Integer.parseInt(line.getOptionValue("delay"));
         boolean loopOnData = line.hasOption("loopOnData");
-        Path statPath = Path.of(line.getOptionValue("statPath"));
+
+        Path statPath;
+        if (line.hasOption("statPath")) {
+            statPath = Path.of(line.getOptionValue("statPath"));
+        } else {
+            statPath = Path.of("stat.csv");
+        }
 
         sendToServer(stringList, threadCount, batchSize, delay, ts, URITarget, loopOnData, statPath);
     }
@@ -186,7 +190,7 @@ public class Benchmark {
 
         final Option loopOption = Option.builder("lo").longOpt("loopOnData").desc("Using this option will make the sender loop on the data loaded, instead of shutting down after sending all lines read").hasArg(false).required(false).build();
 
-        final Option statOption = Option.builder("s").longOpt("statPath").desc("Using this option will activate HTTP response time logging, a path for the stat file will be required as well. The application will update the file every 10 seconds and statistics are only collected on thread 0").hasArg(true).required(false).build();
+        final Option statOption = Option.builder("s").longOpt("statPath").desc("Using this option will activate HTTP response time logging, a path for the stat file will be required as well. The application will update the file every 10 seconds and statistics are only collected on thread 0").required(true).hasArg(true).required(false).build();
 
         final Options options = new Options();
 
@@ -221,6 +225,7 @@ class BenchHTTPClient{
     private final URI sendURI;
     private final Path statPath;
     private final Thread statThread;
+    private boolean sendDone = false;
 
     public BenchHTTPClient(int batchSize, Timestamp ts, String URITarget, Path statPath) {
         this.httpClient = HttpClient.newBuilder().version(HttpClient.Version.HTTP_2).followRedirects(HttpClient.Redirect.NORMAL).build();
@@ -241,7 +246,7 @@ class BenchHTTPClient{
             responseTimes = Collections.synchronizedMap(new HashMap<>());
             this.statThread = new Thread( () -> {
                 try {
-                    while (true) {
+                    while (!sendDone) {
                         Thread.sleep(15000);
                         StringBuilder builder = new StringBuilder();
                         synchronized (responseTimes) {
@@ -288,7 +293,7 @@ class BenchHTTPClient{
                 .POST(HttpRequest.BodyPublishers.ofString(str))
                 .header("Accept", "application/json").header("Content-Type", "application/json").build();
         HttpResponse<String> send = httpClient.send(httpRequest, HttpResponse.BodyHandlers.ofString());
-        if(send.statusCode() != 201) {
+        if(send.statusCode() != 200) {
             System.out.println(send.statusCode());
         }
         if(statPath != null){
@@ -347,6 +352,7 @@ class BenchHTTPClient{
                 e.printStackTrace();
             }
         } while(loop);
+        sendDone = true;
     }
     private List<List<String>> cutList(List<String> originalList, int partitionSize) {
         List<List<String>> partitions = new ArrayList<>();
