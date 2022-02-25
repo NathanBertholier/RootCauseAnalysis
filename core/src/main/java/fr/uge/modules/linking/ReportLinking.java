@@ -13,6 +13,7 @@ import java.util.*;
 import java.util.logging.Logger;
 
 public class ReportLinking {
+
     private final HashMap<Integer, TokenType> tokensType = new HashMap<>();
     private final Logger logger = Logger.getLogger(this.getClass().getName());
 
@@ -26,14 +27,6 @@ public class ReportLinking {
 
     private void addInTokensType(Integer id, TokenType tokenType) {
         tokensType.compute(id, (k,v) -> tokenType);
-    }
-
-    public Uni<ReportResponse> linkReport(long id, ReportParameter reportParameter) {
-        return LogEntity.<LogEntity>findById(id)
-                .chain(root ->
-                    LogsLinking.linkedLogs(root, reportParameter)
-                            .map(set -> new ReportResponse(root, new HashSet<>(), set)) // pour merge
-                );
     }
 
     private void fillHashmap(List<TokenEntity> tokens, HashMap<Integer, List<TokenEntity>> tokensToFill) {
@@ -66,13 +59,15 @@ public class ReportLinking {
 
             proximity /= (tokenTarget.size() + 1); // NUMBER OF TOKENS CONSIDERATE + TIMESTAMP
 
-            if(redBlack.size() > rp.network_size() - 1) {
-                if (proximity > redBlack.lastKey()) {
-                    redBlack.pollLastEntry();
+            if(proximity > rp.proximity_limit()) { // If computed proximity is above the defined limit
+                if (redBlack.size() > rp.network_size() - 1) { // If the map is already ful
+                    if (proximity > redBlack.lastKey()) { // If computed proximity is above the min calculated
+                        redBlack.pollLastEntry(); // Remove the farthest log
+                        redBlack.put(proximity, log);
+                    }
+                } else { // Otherwise (map is not full)
                     redBlack.put(proximity, log);
                 }
-            } else {
-                redBlack.put(proximity, log);
             }
             tokenToLink.forEach((k,v) -> v.clear());
         });
