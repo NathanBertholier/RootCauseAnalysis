@@ -61,13 +61,15 @@ public class ReportLinking {
 
             proximity /= (tokenTarget.size() + 1); // NUMBER OF TOKENS CONSIDERATE + TIMESTAMP
 
-            if(redBlack.size() > rp.network_size() - 1) {
-                if (proximity > redBlack.lastKey()) {
-                    redBlack.pollLastEntry();
+            if(proximity > rp.proximity_limit()) { // If computed proximity is above the defined limit
+                if (redBlack.size() > rp.network_size() - 1) { // If the map is already ful
+                    if (proximity > redBlack.lastKey()) { // If computed proximity is above the min calculated
+                        redBlack.pollLastEntry(); // Remove the farthest log
+                        redBlack.put(proximity, log);
+                    }
+                } else { // Otherwise (map is not full)
                     redBlack.put(proximity, log);
                 }
-            } else {
-                redBlack.put(proximity, log);
             }
             tokenToLink.forEach((k,v) -> v.clear());
         });
