@@ -7,6 +7,6 @@ export type TokensRequest = {
     init_datetime: string
     end_datetime: string
     id: number
-    tokenModel: TokenModel
+    tokens: TokenModel[]
     rows: number
 }

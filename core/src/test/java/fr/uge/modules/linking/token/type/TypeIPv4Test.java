@@ -1,7 +1,10 @@
 package fr.uge.modules.linking.token.type;
 
+import fr.uge.modules.api.model.entities.TokenEntity;
 import org.junit.jupiter.api.Test;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -41,5 +44,36 @@ class TypeIPv4Test {
                 () -> assertEquals(-1, typeIPv4.matcher("192.168.1.34.34")),
                 () -> assertEquals(-1, typeIPv4.matcher("256.256.256.256")),
                 () -> assertEquals(-1, typeIPv4.matcher("192.168.1.256")));
+    }
+
+    @Test
+    void computeProximity() {
+        TypeIPv4 typeIPv4 = new TypeIPv4();
+        TokenEntity t0 = new TokenEntity();
+        TokenEntity t1 = new TokenEntity();
+        TokenEntity t2 = new TokenEntity();
+        TokenEntity t3 = new TokenEntity();
+        TokenEntity t4 = new TokenEntity();
+        TokenEntity t5 = new TokenEntity();
+        t0.value = "10.11.12.13";
+        t1.value = "100.150.150.150";
+        t2.value = "10.150.150.150";
+        t3.value = "10.11.150.150";
+        t4.value = "10.11.12.150";
+        t5.value = "10.11.12.13";
+
+        assertAll(
+                () -> assertEquals(100, typeIPv4.computeProximity(new ArrayList<>(List.of(t0)), new ArrayList<>(List.of(t0)))),
+                () -> assertEquals(100, typeIPv4.computeProximity(new ArrayList<>(List.of(t1)), new ArrayList<>(List.of(t1)))),
+                () -> assertEquals(0, typeIPv4.computeProximity(new ArrayList<>(List.of(t0)), new ArrayList<>(List.of(t1)))),
+                () -> assertEquals(20, typeIPv4.computeProximity(new ArrayList<>(List.of(t0)), new ArrayList<>(List.of(t2)))),
+                () -> assertEquals(85, typeIPv4.computeProximity(new ArrayList<>(List.of(t0)), new ArrayList<>(List.of(t3)))),
+                () -> assertEquals(95, typeIPv4.computeProximity(new ArrayList<>(List.of(t0)), new ArrayList<>(List.of(t4)))),
+                () -> assertEquals(100, typeIPv4.computeProximity(new ArrayList<>(List.of(t0)), new ArrayList<>(List.of(t0, t1)))),
+                () -> assertEquals(50, typeIPv4.computeProximity(new ArrayList<>(List.of(t0, t1)), new ArrayList<>(List.of(t1)))),
+                () -> assertEquals(100, typeIPv4.computeProximity(new ArrayList<>(List.of(t0, t1)), new ArrayList<>(List.of(t0,t1)))),
+                () -> assertEquals(100, typeIPv4.computeProximity(new ArrayList<>(List.of(t1 ,t0)), new ArrayList<>(List.of(t1, t0)))),
+                () -> assertEquals(100, typeIPv4.computeProximity(new ArrayList<>(List.of(t1 ,t1)), new ArrayList<>(List.of(t0, t1))))
+        );
     }
 }

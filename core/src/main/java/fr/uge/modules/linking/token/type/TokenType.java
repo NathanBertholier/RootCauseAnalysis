@@ -21,7 +21,17 @@ public interface TokenType {
         return -1;
     }
 
-    float computeProximity(List<TokenEntity> tokenLeft, List<TokenEntity> tokenRight);
+    double computeProximity(List<TokenEntity> tokenLeft, List<TokenEntity> tokenRight);
+
+    static TokenType fromId(int id){
+        return switch (id){
+            case 1 -> new TypeIPv4();
+            case 2 -> new TypeIPv6();
+            case 3 -> new TypeHTTPStatus();
+            case 4 -> new TypeDatetime();
+            default -> new TypeEdgeResponse();
+        };
+    }
 
     enum TokenTypeId {
         ID_IPV4(1),

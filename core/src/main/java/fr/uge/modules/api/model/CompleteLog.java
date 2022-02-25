@@ -1,44 +1,22 @@
 package fr.uge.modules.api.model;
 
 import fr.uge.modules.api.model.entities.LogEntity;
-import fr.uge.modules.api.model.entities.RawLogEntity;
 import fr.uge.modules.api.model.entities.TokenEntity;
+import io.smallrye.mutiny.Uni;
 
+import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.NoSuchElementException;
 
-public class CompleteLog {
-    private final long id;
-    private final LocalDateTime datetime;
-    private final String content;
-    private final ArrayList<TokenEntity> tokens = new ArrayList<>();
-
-    public CompleteLog(long id, String content, LocalDateTime ldt, List<TokenEntity> tokenSet) {
-        this.content = content;
-        this.id = id;
-        this.datetime = ldt;
-        tokens.addAll(tokenSet);
-    }
-
-    public CompleteLog(LogEntity logEntity, RawLogEntity rawLogEntity) {
-        this(logEntity.getId(), rawLogEntity.getLog(), logEntity.getDatetime().toLocalDateTime(), logEntity.getTokens());
-    }
-
-    public ArrayList<TokenEntity> getTokens() {
-        return tokens;
-    }
-
-    public long getId() {
-        return id;
-    }
-
-    public LocalDateTime getDatetime() {
-        return datetime;
-    }
-
-    public String getContent() {
-        return content;
+public record CompleteLog(long id, Timestamp datetime, String content, List<TokenEntity> tokens) {
+    public static Uni<CompleteLog> fromId(long id) {
+        return LogEntity
+                .<LogEntity>findById(id)
+                .map(log -> new CompleteLog(id, log.datetime, log.rawLog.log, log.tokens))
+                .onFailure().invoke(error -> System.out.println("Error for id " + id + ": " + error))
+                .replaceWithNull();
     }
 
     @Override

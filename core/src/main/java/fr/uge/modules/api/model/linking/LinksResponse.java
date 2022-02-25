@@ -1,23 +1,13 @@
 package fr.uge.modules.api.model.linking;
 
-import java.util.Arrays;
+import java.math.BigDecimal;
+import java.util.List;
 
-public record LinksResponse(Computation[] computations, float proximity) {
-    @Override
-    public boolean equals(Object obj) {
-        if(!(obj instanceof LinksResponse linksResponse)) return false;
-        else return linksResponse.proximity == proximity && Arrays.equals(linksResponse.computations, computations);
-    }
-
-    @Override
-    public int hashCode() {
-        return Float.hashCode(proximity) ^ Arrays.hashCode(computations);
-    }
-
+public record LinksResponse(List<Computation> computations, double proximity) {
     @Override
     public String toString() {
         return "LinksResponse{" +
-                "computations=" + Arrays.toString(computations) +
+                "computations=" + computations +
                 ", proximity=" + proximity +
                 '}';
     }

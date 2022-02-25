@@ -178,29 +178,27 @@ export const Logs = () => {
         let id_log : number         = logIDInput.current !== null ? parseInt( logIDInput.current.value ) : -1;
         let rowsNumber : number     = rowsNumberInput.current !== null ? parseInt( rowsNumberInput.current.value ) : 30;
 
-        let tokens: TokenModel = { token_type: -1, token_value: "" };
+        let tokens: TokenModel[] = [];
         if ( tokenIPInput.current !== null ) {
-            tokens = { token_type: 1, token_value: tokenIPInput.current.value }
-            //tokens.push( { token_type: 1, token_value: tokenIPInput.current.value } );
+            tokens.push( { token_type: 1, token_value: tokenIPInput.current.value } )
         }
         if ( tokenIPv6Input.current !== null ) {
-            tokens = { token_type: 2, token_value: tokenIPv6Input.current.value }
-            //tokens.push(  );
+            tokens.push( { token_type: 2, token_value: tokenIPv6Input.current.value } )
         }
 
         if ( statusInput.current !== null ) {
-            tokens = { token_type: 3, token_value: statusInput.current.value }
+            tokens.push( { token_type: 3, token_value: statusInput.current.value } )
         }
 
         if ( edgeResponseInput.current !== null ) {
-            tokens = { token_type: 5, token_value: edgeResponseInput.current.value }
+            tokens.push( { token_type: 5, token_value: edgeResponseInput.current.value } )
         }
 
         let obj : TokensRequest = {
             init_datetime: start_datetime,
             end_datetime: end_datetime,
             id: id_log,
-            tokenModel: tokens,
+            tokens: tokens,
             rows: rowsNumber
         }
 
