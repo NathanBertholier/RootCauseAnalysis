@@ -38,7 +38,8 @@ public interface TokenType {
         ID_IPV6(2),
         ID_STATUS(3),
         ID_DATETIME(4),
-        ID_EDGERESPONSE(5);
+        ID_EDGERESPONSE(5),
+        ID_URL(6);
 
         private final int id;
 
