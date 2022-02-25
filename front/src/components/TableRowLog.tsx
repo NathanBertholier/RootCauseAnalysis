@@ -1,9 +1,8 @@
-import React from "react";
-import {useState} from "react";
+import React,{useState}  from "react";
 import { Collapse } from "react-bootstrap"
 import  {Log} from "../types/TokensResponse"
 
-export const Row = ({ id, datetime, tokens, content } : Log ) => {
+export const Row = ({ id, datetime, tokens, rawLog } : Log ) => {
     const [ isUnfold, setIsUnfold ] = useState(false);
 
     return (
@@ -21,7 +20,7 @@ export const Row = ({ id, datetime, tokens, content } : Log ) => {
 
                 })}
             </td>
-            <td>{content}</td>
+            <td>{rawLog.log}</td>
         </tr>
     )
 }
