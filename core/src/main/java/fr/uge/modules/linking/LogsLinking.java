@@ -5,6 +5,8 @@ import fr.uge.modules.api.model.entities.TokenEntity;
 import fr.uge.modules.api.model.linking.LinksResponse;
 import fr.uge.modules.api.model.report.ReportParameter;
 import fr.uge.modules.linking.token.type.TokenType;
+import fr.uge.modules.synthetization.GeneratedReport;
+import fr.uge.modules.synthetization.Synthetization;
 import io.smallrye.mutiny.Uni;
 
 import java.sql.Timestamp;
@@ -57,7 +59,7 @@ public class LogsLinking {
      * @param reportParameter
      * @return
      */
-    public static Uni<SortedMap<Double, LogEntity>> linkedLogs(LogEntity root, ReportParameter reportParameter){
+    public static Uni<GeneratedReport> linkedLogs(LogEntity root, ReportParameter reportParameter){
         var reportLinking = new ReportLinking();
         var datetime = root.datetime;
         return LogEntity.<LogEntity>find("id != ?1 and datetime between ?2 and ?3",
@@ -65,6 +67,13 @@ public class LogsLinking {
                     Timestamp.valueOf(datetime.toLocalDateTime().minus(Duration.ofSeconds(reportParameter.delta()))),
                     datetime).list()
                 .map(list -> reportLinking.computeProximityTree(root, list, reportParameter))
+                .map(LogsLinking::oldestFromMap)
                 .onFailure().invoke(error -> LOGGER.severe("Error: " + error));
+    }
+
+    public static GeneratedReport oldestFromMap(SortedMap<Double, LogEntity> map){
+        Comparator<LogEntity> comparator = Comparator.comparing(LogEntity::getDatetime);
+        var rootCause = map.values().stream().sorted(comparator).findFirst().orElseThrow();
+        return new GeneratedReport(rootCause, map);
     }
 }
