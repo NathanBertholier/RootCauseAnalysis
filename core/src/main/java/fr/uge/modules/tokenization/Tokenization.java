@@ -21,6 +21,7 @@ public class Tokenization {
     private final SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
     public Tokenization() {
+        tokenTypes.add(new TypeURL());
         tokenTypes.add(new TypeIPv4());
         tokenTypes.add(new TypeIPv6());
         tokenTypes.add(new TypeEdgeResponse());
