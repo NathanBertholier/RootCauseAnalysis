@@ -10,9 +10,9 @@ import java.util.Optional;
 public interface ConfigurationToken {
     List<TokenType> getTokenType();
 
-    List<TokenEntity> tokenization(List<String> words);
+    List<TokenEntity> getTokensWithIndex(List<String> words);
 
-    List<TokenEntity> parseTokens(List<String> words);
+    List<TokenEntity> getTokens(List<String> words);
 
     Optional<Timestamp> getTimestamp(List<String> words);
 }

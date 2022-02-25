@@ -8,24 +8,27 @@ import javax.inject.Named;
 import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
-@Named("standard")
+@Named("AWS")
 @ApplicationScoped
-public class StandardTokenization implements ConfigurationToken {
+public class AWSTokenization implements ConfigurationToken {
     private final HashMap<TokenType, Integer> tokenTypeIndex = new HashMap<>();
     private final SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
     private final int dateIndex = 0;
     private final int timeIndex = 1;
 
-    public StandardTokenization() {
+    public AWSTokenization() {
+        tokenTypeIndex.put(new TypeHTTPStatus(), 8);
         tokenTypeIndex.put(new TypeIPv4(), -1);
-        tokenTypeIndex.put(new TypeHTTPStatus(), -1);
         tokenTypeIndex.put(new TypeEdgeResponse(), -1);
         tokenTypeIndex.put(new TypeIPv6(), -1);
-        tokenTypeIndex.put(new TypeURL(), -1);
+        tokenTypeIndex.put(new TypeURL(), 0);
     }
 
     @Override
@@ -74,4 +77,3 @@ public class StandardTokenization implements ConfigurationToken {
         }
     }
 }
-
