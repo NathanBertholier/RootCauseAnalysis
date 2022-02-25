@@ -18,10 +18,10 @@ import java.util.stream.Stream;
 public class Benchmark {
 
     public static void main(String[] args) throws ParseException, IOException, InterruptedException {
-        //use this to try out spamming rabbitmq
-        //args = new String[]{"-l", "100000", "-F", "../logs/", "-b", "50", "-d", "85", "-t", "8", "-u", "http://localhost:80/external/insertlog/batch", "-nT", "2022-02-18 11:57:00"};
-        //args = new String[]{"-l", "100000", "-F", "../logs/", "-b", "50", "-d", "85", "-t", "8", "-u", "http://localhost:80/external/insertlog/batch"};
-        args = new String[]{"-l", "62000", "-F", "C:\\Users\\natha\\Documents\\rootcause\\tools\\benchmark\\src\\main\\resources", "-b", "100", "-d", "300", "-t", "10", "-u", "http://localhost:8081/insertlog","-lo"};
+        //use this to try out spamming rabbitmq with different parameters
+        //args = new String[]{"-l", "100000", "-F", "../logs/", "-b", "50", "-d", "85", "-t", "8", "-u", "http://localhost:8081/insertlog", "-nT", "2022-02-18 11:57:00"};
+        //args = new String[]{"-l", "100000", "-F", "../logs/", "-b", "50", "-d", "85", "-t", "8", "-u", "http://localhost:8081/insertlog"};
+        //args = new String[]{"-l", "100000", "-F", "../logs/", "-b", "50", "-d", "85", "-t", "8", "-u", "http://localhost:8081/insertlog","-lo","-s","stats.csv"};
 
         //use this to output to out.txt in exec folder
         //args = new String[]{"-l", "10000", "-f", "in.txt"};
