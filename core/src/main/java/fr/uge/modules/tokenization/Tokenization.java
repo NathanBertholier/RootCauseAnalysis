@@ -31,7 +31,7 @@ public class Tokenization {
         // Containing the token values
         List<TokenEntity> tokens = new ArrayList<>();
 
-        String[] words = body.split("\t");
+        String[] words = body.split("\t|[ ]+");
         String dateString = "";
         String timeString = "";
 
