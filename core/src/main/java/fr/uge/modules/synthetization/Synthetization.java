@@ -13,13 +13,14 @@ import java.util.*;
 import java.util.logging.Logger;
 
 public class Synthetization {
+
     private static final Logger LOGGER = Logger.getLogger(Synthetization.class.getName());
 
     public static Uni<ReportResponse> getReport(long idRootLog, ReportParameter reportParameter) {
         return LogEntity.<LogEntity>findById(idRootLog)
                 .chain(log -> LogsLinking.linkedLogs(log, reportParameter)
-                        .chain(logEntities -> getMostSeenTokens(logEntities.values())
-                                .map(sorted -> new ReportResponse(log, sorted, logEntities))
+                        .chain(generatedReport -> getMostSeenTokens(generatedReport.entities().values())
+                                .map(tokens -> new ReportResponse(generatedReport.rootCause(), tokens, generatedReport.entities()))
                         )
                 );
     }
