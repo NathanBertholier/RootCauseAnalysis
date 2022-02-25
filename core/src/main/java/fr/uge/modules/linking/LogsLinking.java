@@ -4,20 +4,28 @@ import fr.uge.modules.api.model.entities.LogEntity;
 import fr.uge.modules.api.model.entities.TokenEntity;
 import fr.uge.modules.api.model.linking.LinksResponse;
 import fr.uge.modules.api.model.report.ReportParameter;
+import fr.uge.modules.error.EmptyReportError;
+import fr.uge.modules.error.NotYetTokenizedError;
 import fr.uge.modules.linking.token.type.TokenType;
 import fr.uge.modules.synthetization.GeneratedReport;
-import fr.uge.modules.synthetization.Synthetization;
 import io.smallrye.mutiny.Uni;
 
 import java.sql.Timestamp;
 import java.time.Duration;
 import java.util.*;
+import java.util.logging.ConsoleHandler;
+import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.stream.Collectors;
 
 // TODO
 public class LogsLinking {
     private static final Logger LOGGER = Logger.getLogger(LogsLinking.class.getName());
+    private static final Comparator<LogEntity> datetimeComparator = Comparator.comparing(LogEntity::getDatetime);
+
+    static {
+        LOGGER.addHandler(new ConsoleHandler());
+    }
+
     /**
      * Computes proximity between log of id1 and log of id2 for all the tokens in tokenTypes
      * @param log1
@@ -60,20 +68,26 @@ public class LogsLinking {
      * @return
      */
     public static Uni<GeneratedReport> linkedLogs(LogEntity root, ReportParameter reportParameter){
+        LOGGER.log(Level.INFO, "Linking logs to {0}", root);
+        if(Objects.isNull(root)) throw new NotYetTokenizedError();
+
         var reportLinking = new ReportLinking();
         var datetime = root.datetime;
+
         return LogEntity.<LogEntity>find("id != ?1 and datetime between ?2 and ?3",
                     root.id,
                     Timestamp.valueOf(datetime.toLocalDateTime().minus(Duration.ofSeconds(reportParameter.delta()))),
                     datetime).list()
                 .map(list -> reportLinking.computeProximityTree(root, list, reportParameter))
                 .map(LogsLinking::oldestFromMap)
-                .onFailure().invoke(error -> LOGGER.severe("Error: " + error));
+                .invoke(generatedReport -> LOGGER.log(Level.INFO, "Generated report: ", generatedReport))
+                .onFailure().invoke(error -> LOGGER.log(Level.SEVERE, "Error caught while linking logs: ", error));
     }
 
     public static GeneratedReport oldestFromMap(SortedMap<Double, LogEntity> map){
-        Comparator<LogEntity> comparator = Comparator.comparing(LogEntity::getDatetime);
-        var rootCause = map.values().stream().sorted(comparator).findFirst().orElseThrow();
+        var rootCause = map.values().stream()
+                .min(datetimeComparator)
+                .orElseThrow(EmptyReportError::new);
         return new GeneratedReport(rootCause, map);
     }
 }

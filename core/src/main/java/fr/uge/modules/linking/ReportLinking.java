@@ -12,12 +12,17 @@ import io.smallrye.mutiny.Uni;
 import java.sql.Timestamp;
 import java.time.Duration;
 import java.util.*;
+import java.util.logging.ConsoleHandler;
 import java.util.logging.Logger;
 
 public class ReportLinking {
 
     private final HashMap<Integer, TokenType> tokensType = new HashMap<>();
-    private final Logger logger = Logger.getLogger(this.getClass().getName());
+    private static final Logger LOGGER = Logger.getLogger(ReportLinking.class.getName());
+
+    static {
+        LOGGER.addHandler(new ConsoleHandler());
+    }
 
     public ReportLinking() {
         this.addInTokensType(TokenType.TokenTypeId.ID_IPV4.getId(), new TypeIPv4());
