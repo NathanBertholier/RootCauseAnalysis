@@ -8,9 +8,7 @@ import java.util.List;
 public interface TokenType {
 
     String getName();
-
     String getRegex();
-
     Integer getTokenTypeId();
 
     default int matcher(String word) {
@@ -31,6 +29,7 @@ public interface TokenType {
             case 4 -> new TypeDatetime();
             case 5 -> new TypeEdgeResponse();
             case 6 -> new TypeURL();
+            case 7 -> new TypeResource();
             default -> {throw new IllegalStateException("TokenType not recognized");}
         };
     }
@@ -41,14 +40,13 @@ public interface TokenType {
         ID_STATUS(3),
         ID_DATETIME(4),
         ID_EDGERESPONSE(5),
-        ID_URL(6);
+        ID_URL(6),
+        ID_RESOURCE(7);
 
         private final int id;
-
         TokenTypeId(int id) {
             this.id = id;
         }
-
         public int getId() {
             return id;
         }
