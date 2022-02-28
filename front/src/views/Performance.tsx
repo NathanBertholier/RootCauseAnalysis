@@ -1,6 +1,6 @@
 import {Sidebar} from "../components/Sidebar";
 import React from "react";
-import {Container, Row} from "react-bootstrap";
+import {Container, Row, Col} from "react-bootstrap";
 
 export const Performance = () => {
     return (
@@ -11,16 +11,22 @@ export const Performance = () => {
                     <h1 className="title">Performance</h1>
                     <Container fluid>
                         <Row className="graph-container" >
-                            <iframe src="https://localhost:3001/d-solo/nMC1qBank/rate?orgId=1&refresh=5s&panelId=6"
-                                width="450" height="400" frameBorder="0" title="panel1" />
-                        </Row>
-                        <Row className="graph-container" >
-                            <iframe src="https://localhost:3001/d-solo/nMC1qBank/rate?orgId=1&refresh=5s&panelId=4"
-                                width="450" height="400" frameBorder="0" title="panel2" />
+                            <Col><iframe src="https://localhost:3001/d-solo/nMC1qBank/rootcause?orgId=1&refresh=5s&panelId=6"
+                                         width="100%" height="400" frameBorder="0" title="panel1" /></Col>
+                            <Col lg md sm xl xs xxl={8}><iframe src="https://localhost:3001/d-solo/nMC1qBank/rootcause?orgId=1&refresh=5s&panelId=2"
+                                         width="100%" height="400" frameBorder="0" title="panel3" /></Col>
+                            <Col><iframe src="https://localhost:3001/d-solo/nMC1qBank/rootcause?orgId=1&refresh=5s&panelId=4"
+                                    width="100%" height="400" frameBorder="0" title="panel2" /></Col>
                         </Row>
                         <Row className="graph-container">
-                            <iframe src="https://localhost:3001/d-solo/nMC1qBank/rate?orgId=1&refresh=5s&panelId=2"
-                                width="450" height="400" frameBorder="0" title="panel3" />
+                            <Col lg md sm xl xs xxl={8}>
+                                <iframe
+                                    src="https://localhost:3001/d-solo/nMC1qBank/rootcause?orgId=1&refresh=5s&panelId=8"
+                                    width="100%" height="400" frameBorder="0"></iframe></Col>
+                            <Col>
+                                <iframe
+                                    src="https://localhost:3001/d-solo/nMC1qBank/rootcause?orgId=1&refresh=5s&panelId=12"
+                                    width="100%" height="400" frameBorder="0"></iframe></Col>
                         </Row>
                     </Container>
                 </div>
