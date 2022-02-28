@@ -23,6 +23,7 @@ public class Benchmark {
         //args = new String[]{"-l", "100000", "-F", "../logs/", "-b", "50", "-d", "85", "-t", "8", "-u", "http://localhost:8081/insertlog"};
         //args = new String[]{"-l", "1000", "-F", "../logs/", "-b", "50", "-d", "85", "-t", "4", "-u", "http://localhost:8081/insertlog","-s","stats.csv"};
 
+        //args = new String[]{"-l", "10000", "-F", "../logs/", "-b", "50", "-d", "1000", "-t", "10", "-u", "http://localhost:8081/insertlog","-s","stat.csv"};
         //use this to output to out.txt in exec folder
         //args = new String[]{"-l", "10000", "-f", "in.txt"};
 
@@ -227,7 +228,6 @@ class BenchHTTPClient{
     private final URI sendURI;
     private final Path statPath;
     private final Thread statThread;
-    private boolean sendDone = false;
 
     public BenchHTTPClient(int batchSize, Timestamp ts, String URITarget, Path statPath) {
         this.httpClient = HttpClient.newBuilder().version(HttpClient.Version.HTTP_2).followRedirects(HttpClient.Redirect.NORMAL).build();
@@ -254,9 +254,9 @@ class BenchHTTPClient{
                         synchronized (responseTimes) {
                             for(Map.Entry<Integer, List<Long>> entry : responseTimes.entrySet()) {
                                 builder.append(entry.getKey());
-                                builder.append(System.lineSeparator());
+                                builder.append("\n");
                                 builder.append(entry.getValue().stream().map(Object::toString).collect(Collectors.joining(";")));
-                                builder.append(System.lineSeparator());
+                                builder.append("\n");
                             }
                         }
                         Files.write(statPath, builder.toString().getBytes());
