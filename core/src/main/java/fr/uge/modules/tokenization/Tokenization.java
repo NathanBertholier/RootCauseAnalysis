@@ -24,8 +24,8 @@ public class Tokenization {
         tokenTypes.add(new TypeURL());
         tokenTypes.add(new TypeIPv4());
         tokenTypes.add(new TypeIPv6());
-        tokenTypes.add(new TypeEdgeResponse());
         tokenTypes.add(new TypeResource());
+        tokenTypes.add(new TypeEdgeResponse());
     }
 
     public LogEntity tokenizeLog(long id, String body) {

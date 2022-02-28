@@ -7,7 +7,7 @@ import java.util.ArrayList;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class TypeResourceTest {
+class TypeResourceTest {
 
     @Test
     void nullValue() {
@@ -19,7 +19,7 @@ public class TypeResourceTest {
     void regexMatch() {
         TypeResource typeResource = new TypeResource();
         assertAll(
-            () -> assertEquals(typeResource.getTokenTypeId(),typeResource.matcher("/wp-content/themes/Centreonv2/assets/fonts/radikal/radikal-webfont.ttf")),
+            () -> assertEquals(typeResource.getTokenTypeId(), typeResource.matcher("/wp-content/themes/Centreonv2/assets/fonts/radikal/radikal-webfont.ttf")),
             () -> assertEquals(typeResource.getTokenTypeId(),typeResource.matcher("/wp-includes/css/dist/block-library/style.min.css.gzip")),
             () -> assertEquals(typeResource.getTokenTypeId(),typeResource.matcher("/robots.txt")),
             () -> assertEquals(typeResource.getTokenTypeId(),typeResource.matcher("/favicon.ico")),

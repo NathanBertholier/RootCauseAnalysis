@@ -8,9 +8,7 @@ import java.util.List;
 public interface TokenType {
 
     String getName();
-
     String getRegex();
-
     Integer getTokenTypeId();
 
     default int matcher(String word) {
@@ -46,11 +44,9 @@ public interface TokenType {
         ID_RESOURCE(7);
 
         private final int id;
-
         TokenTypeId(int id) {
             this.id = id;
         }
-
         public int getId() {
             return id;
         }

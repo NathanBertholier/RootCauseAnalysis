@@ -30,8 +30,9 @@ public class TypeResource implements TokenType{
                             if ( tokenL.equals( tokenR ) ) {
                                 return 100;
                             }
-                            var arrayL = tokenL.split( "/" );
-                            var arrayR = tokenR.split( "/" );
+                            var startsWith = "/";
+                            var arrayL = tokenL.split(startsWith);
+                            var arrayR = tokenR.split(startsWith);
                             double count = 0;
                             for ( int i =0; i < arrayL.length-1; i++ ) {
                                 if(i<= arrayR.length-1){
