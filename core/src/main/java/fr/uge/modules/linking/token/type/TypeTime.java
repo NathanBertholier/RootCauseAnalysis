@@ -1,6 +1,7 @@
 package fr.uge.modules.linking.token.type;
 
 import fr.uge.modules.api.model.entities.TokenEntity;
+import fr.uge.modules.api.model.linking.Link;
 
 import java.util.List;
 
@@ -25,8 +26,8 @@ public class TypeTime implements TokenType{
     }
 
     @Override
-    public double computeProximity(List<TokenEntity> tokenLeft, List<TokenEntity> tokenRight) {
-        return 0;
+    public Link computeProximity(List<TokenEntity> tokenLeft, List<TokenEntity> tokenRight) {
+        return Link.emptyLink(0);
     }
 
 }

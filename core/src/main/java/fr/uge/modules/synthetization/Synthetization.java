@@ -1,10 +1,13 @@
 package fr.uge.modules.synthetization;
 
-import fr.uge.modules.api.model.ReportResponse;
+import fr.uge.modules.api.model.linking.LinkResponse;
+import fr.uge.modules.api.model.report.GenericReport;
+import fr.uge.modules.api.model.report.ReportResponse;
 import fr.uge.modules.api.model.TokensMostSeen;
 import fr.uge.modules.api.model.entities.LogEntity;
 import fr.uge.modules.api.model.entities.TokenEntity;
 import fr.uge.modules.api.model.report.ReportParameter;
+import fr.uge.modules.api.model.report.ReportResponseExpanded;
 import fr.uge.modules.linking.LogsLinking;
 import io.smallrye.mutiny.Multi;
 import io.smallrye.mutiny.Uni;
@@ -15,17 +18,23 @@ import java.util.logging.Logger;
 public class Synthetization {
 
     private static final Logger LOGGER = Logger.getLogger(Synthetization.class.getName());
-
-    public static Uni<ReportResponse> getReport(long idRootLog, ReportParameter reportParameter) {
+    public static Uni<GenericReport> getReport(long idRootLog, ReportParameter reportParameter) {
         return LogEntity.<LogEntity>findById(idRootLog)
                 .chain(log -> LogsLinking.linkedLogs(log, reportParameter)
-                        .chain(generatedReport -> getMostSeenTokens(generatedReport.entities().values())
-                                .map(tokens -> new ReportResponse(generatedReport.rootCause(), tokens, generatedReport.entities()))
+                        .chain(generatedReport -> getMostSeenTokens(generatedReport.computations().stream().map(LinkResponse::target).toList())
+                                .map(tokens -> {
+                                    var report = new ReportResponse(
+                                            generatedReport.rootCause(),
+                                            tokens,
+                                            generatedReport.computations().stream().map(LinkResponse::target).toList());
+                                    if(!reportParameter.expanded()) return report;
+                                    else return new ReportResponseExpanded(report, Set.of(generatedReport.computations().toArray(LinkResponse[]::new)));
+                                })
                         )
                 );
     }
 
-    private static Uni<Set<TokensMostSeen>> getMostSeenTokens(Collection<LogEntity> logs) {
+    private static Uni<Set<TokensMostSeen>> getMostSeenTokens(List<LogEntity> logs) {
         Comparator<TokensMostSeen> comparator = Comparator.comparingLong(TokensMostSeen::count);
         return Multi.createFrom().items(logs.stream().flatMap(log -> log.tokens.stream()))
                 .group().by(TokenEntity::getIdtokentype)

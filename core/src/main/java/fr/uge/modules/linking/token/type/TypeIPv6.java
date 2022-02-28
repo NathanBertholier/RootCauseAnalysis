@@ -1,7 +1,10 @@
 package fr.uge.modules.linking.token.type;
 
 import fr.uge.modules.api.model.entities.TokenEntity;
+import fr.uge.modules.api.model.linking.Computation;
+import fr.uge.modules.api.model.linking.Link;
 
+import java.util.Collection;
 import java.util.List;
 
 public class TypeIPv6 implements TokenType{
@@ -24,13 +27,17 @@ public class TypeIPv6 implements TokenType{
     }
 
     @Override
-    public double computeProximity(List<TokenEntity> tokenLeft, List<TokenEntity> tokenRight) {
-        if (tokenLeft.isEmpty() || tokenRight.isEmpty()) return 0;
+    public Link computeProximity(List<TokenEntity> tokenLeft, List<TokenEntity> tokenRight) {
+        if (tokenLeft.isEmpty() || tokenRight.isEmpty()) return Link.emptyLink(0);
+        var type = new TypeIPv6();
 
-        return tokenLeft.stream().mapToDouble(tokenL -> tokenRight.stream()
+        var computations = tokenLeft.stream().map(tokenL -> tokenRight.stream()
                 .filter(tokenL::equals)
-                .mapToDouble(tokenR -> 100)
-                .sum()).sum() / tokenLeft.size();
+                .map(tokenR -> new Computation(type, tokenL.value, tokenR.value, 100d))
+                .toList())
+                .flatMap(Collection::stream).toList();
+
+        return new Link(computations, computations.stream().mapToDouble(Computation::proximity).sum() / computations.size());
     }
 
 }

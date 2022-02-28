@@ -1,8 +1,12 @@
 package fr.uge.modules.linking.token.type;
 
 import fr.uge.modules.api.model.entities.TokenEntity;
+import fr.uge.modules.api.model.linking.Computation;
+import fr.uge.modules.api.model.linking.Link;
 
+import java.util.Collection;
 import java.util.List;
+import java.util.stream.Stream;
 
 public class TypeDate implements TokenType{
 
@@ -23,10 +27,4 @@ public class TypeDate implements TokenType{
     public Integer getTokenTypeId() {
         return 0;
     }
-
-    @Override
-    public double computeProximity(List<TokenEntity> tokenLeft, List<TokenEntity> tokenRight) {
-        return 0;
-    }
-
 }

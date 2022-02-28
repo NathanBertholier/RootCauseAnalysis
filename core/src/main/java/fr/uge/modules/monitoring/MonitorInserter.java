@@ -52,7 +52,7 @@ public class MonitorInserter {
                     .await().indefinitely();
 
         } catch (Exception e)  {
-            logger.warning("No log was inserted into the queue yet");
+            logger.warning("No root was inserted into the queue yet");
         }
     }
 

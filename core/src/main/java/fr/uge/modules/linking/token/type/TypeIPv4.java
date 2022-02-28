@@ -1,7 +1,10 @@
 package fr.uge.modules.linking.token.type;
 
 import fr.uge.modules.api.model.entities.TokenEntity;
+import fr.uge.modules.api.model.linking.Computation;
+import fr.uge.modules.api.model.linking.Link;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.stream.IntStream;
 
@@ -36,16 +39,18 @@ public class TypeIPv4 implements TokenType {
                 }).findFirst().orElse(100);
     }
 
-    public double computeProximity(List<TokenEntity> tokenLeft, List<TokenEntity> tokenRight) {
-        if(tokenLeft.isEmpty() || tokenRight.isEmpty()) {
-            return 50;
-        }
-        return tokenLeft.stream()
+    public Link computeProximity(List<TokenEntity> tokenLeft, List<TokenEntity> tokenRight) {
+        if(tokenLeft.isEmpty() || tokenRight.isEmpty()) return Link.emptyLink(50);
+        var type = new TypeIPv4();
+
+        var computations = tokenLeft.stream()
                     .map(TokenEntity::getValue)
-                    .mapToDouble(leftIP -> tokenRight.stream()
+                    .map(leftIP -> tokenRight.stream()
                             .map(TokenEntity::getValue)
-                            .mapToDouble(rightIP -> calculIp(leftIP, rightIP))
-                            .reduce(0, Double::max))
-                .reduce(0, Double::sum) / tokenLeft.size();
+                            .map(rightIP -> new Computation(type, leftIP, rightIP, calculIp(leftIP, rightIP)))
+                            .toList()
+                    ).flatMap(Collection::stream).toList();
+
+        return new Link(computations, computations.stream().mapToDouble(Computation::proximity).sum() / computations.size());
     }
 }

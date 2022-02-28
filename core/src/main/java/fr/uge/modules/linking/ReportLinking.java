@@ -1,18 +1,16 @@
 package fr.uge.modules.linking;
 
-import fr.uge.modules.api.model.CompleteLog;
-import fr.uge.modules.api.model.ReportResponse;
 import fr.uge.modules.api.model.entities.LogEntity;
 import fr.uge.modules.api.model.entities.TokenEntity;
+import fr.uge.modules.api.model.linking.Computation;
+import fr.uge.modules.api.model.linking.Link;
+import fr.uge.modules.api.model.linking.LinkResponse;
 import fr.uge.modules.api.model.report.ReportParameter;
 import fr.uge.modules.linking.token.type.*;
-import io.smallrye.common.annotation.Blocking;
-import io.smallrye.mutiny.Uni;
 
-import java.sql.Timestamp;
-import java.time.Duration;
 import java.util.*;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 public class ReportLinking {
 
@@ -38,8 +36,8 @@ public class ReportLinking {
         );
     }
 
-    public SortedMap<Double, LogEntity> computeProximityTree(LogEntity logTarget, List<LogEntity> logWithinDelta, ReportParameter rp){
-        TreeMap<Double, LogEntity> redBlack = new TreeMap<>(Collections.reverseOrder());
+    public SortedSet<LinkResponse> computeProximityTree(LogEntity logTarget, List<LogEntity> logWithinDelta, ReportParameter rp){
+        TreeSet<LinkResponse> redBlack = new TreeSet<>(Comparator.comparingDouble(linkResponse -> linkResponse.link().proximity()));
         var targetDatetime = logTarget.datetime;
 
         HashMap<Integer, List<TokenEntity>> tokenTarget = new HashMap<>();
@@ -51,31 +49,30 @@ public class ReportLinking {
         this.tokensType.forEach((id,v) -> tokenToLink.computeIfAbsent(id, k -> new ArrayList<>()));
 
         logWithinDelta.forEach(log -> {
-            double proximity = TypeDatetime.computeDateTimeProximity(log.datetime, targetDatetime, delta);
+            Computation dateTimeCommputation = TypeDatetime.computeDateTimeProximity(log.datetime, targetDatetime, delta);
             log.getTokens().forEach(token -> tokenToLink.get(token.getIdtokentype()).add(token));
 
-            proximity += tokenTarget.keySet().stream()
-                    .mapToDouble((k) -> tokensType.get(k)
-                            .computeProximity(tokenTarget.get(k),
-                                    tokenToLink.get(k))).sum();
-
-            proximity /= (tokenTarget.size() + 1); // NUMBER OF TOKENS CONSIDERATE + TIMESTAMP
-
-            if(proximity > rp.proximity_limit()) { // If computed proximity is above the defined limit
-                if (redBlack.size() > rp.network_size() - 1) { // If the map is already ful
-                    if (proximity > redBlack.lastKey()) { // If computed proximity is above the min calculated
-                        redBlack.pollLastEntry(); // Remove the farthest log
-                        redBlack.put(proximity, log);
-                    }
-                } else { // Otherwise (map is not full)
-                    redBlack.put(proximity, log);
-                }
-            }
-            tokenToLink.forEach((k,v) -> v.clear());
+            tokenTarget.keySet().stream()
+                    .map(tokentypeid -> {
+                        var tokenType = TokenType.fromId(tokentypeid);
+                        var target = tokenTarget.get(tokentypeid);
+                        var toLink = tokenToLink.get(tokentypeid);
+                        return tokenType.computeProximity(target, toLink);
+                    })
+                    .map(link -> new LinkResponse(logTarget, log, link))
+                    .forEach(linkResponse -> {
+                        var proximity = linkResponse.link().proximity();
+                        if(proximity > rp.proximity_limit()){
+                            if(redBlack.size() == rp.network_size()){
+                                redBlack.pollFirst();
+                                redBlack.add(linkResponse);
+                            } else redBlack.add(linkResponse);
+                        }
+                    });
         });
-        redBlack.forEach((k,v) -> System.out.println(k + " LOG " + v));
-        redBlack.forEach((k,v) -> System.out.println(k));
-        return redBlack;
+
+        System.out.println("RedBlack: " + redBlack);
+        return redBlack.descendingSet();
     }
 
 }

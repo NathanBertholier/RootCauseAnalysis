@@ -9,6 +9,7 @@ import io.smallrye.mutiny.Uni;
 import javax.inject.Inject;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Response;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
@@ -36,17 +37,8 @@ public class ReportEndpoint {
         if(network_size == null) network_size = envRetriever.reportDefaultSize();
 
         ReportParameter reportParameter = new ReportParameter(expanded, delta, cache, proximity_limit, network_size);
-        /*
-        LOGGER.log(Level.INFO, "Received request for id " +  idLogTarget + " with parameters: " + reportParameter);
-        System.out.println("ReportParameter: " + reportParameter);
 
-        return Synthetization.getReport(idLogTarget, reportParameter).onItemOrFailure()
-                .transform((report, error) -> {
-                    if(error != null){
-                        return Response.status(404).entity("Log not yet tokenized").build();
-                    } else return Response.ok(report).build();
-                });
-         */
+        LOGGER.log(Level.INFO, "Received request for id " +  idLogTarget + " with parameters: " + reportParameter);
 
         return Synthetization.getReport(idLogTarget, reportParameter)
                 .onItemOrFailure()

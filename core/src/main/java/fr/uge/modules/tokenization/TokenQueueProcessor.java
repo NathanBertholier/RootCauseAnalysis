@@ -38,7 +38,7 @@ public class TokenQueueProcessor {
         return Panache.withTransaction(() -> LogEntity.persist(logs))
                 .onFailure()
                 .invoke(error -> {
-                    LOGGER.log(Level.SEVERE, "Error while inserting log id in database");
+                    LOGGER.log(Level.SEVERE, "Error while inserting root id in database");
                 })
                 .replaceWithVoid();
     }
