@@ -24,13 +24,13 @@ public class TypeIPv6 implements TokenType{
     }
 
     @Override
-    public float computeProximity(List<TokenEntity> tokenLeft, List<TokenEntity> tokenRight) {
-        return 0;
-        /*
-        if(t1.token_value().equals(t2.token_value())){
-            return 100;
-        }
-        return 0;*/
+    public double computeProximity(List<TokenEntity> tokenLeft, List<TokenEntity> tokenRight) {
+        if (tokenLeft.isEmpty() || tokenRight.isEmpty()) return 0;
+
+        return tokenLeft.stream().mapToDouble(tokenL -> tokenRight.stream()
+                .filter(tokenL::equals)
+                .mapToDouble(tokenR -> 100)
+                .sum()).sum() / tokenLeft.size();
     }
 
 }

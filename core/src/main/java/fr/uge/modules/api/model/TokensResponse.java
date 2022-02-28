@@ -1,23 +1,8 @@
 package fr.uge.modules.api.model;
 
-import java.util.Arrays;
+import fr.uge.modules.api.model.entities.LogEntity;
 
-public record TokensResponse(CompleteLog[] logDemonstrators) {
-    @Override
-    public boolean equals(Object obj) {
-        if(!(obj instanceof TokensResponse tokensResponse)) return false;
-        else return Arrays.equals(tokensResponse.logDemonstrators, logDemonstrators);
-    }
+import java.util.List;
 
-    @Override
-    public int hashCode() {
-        return Arrays.hashCode(logDemonstrators);
-    }
-
-    @Override
-    public String toString() {
-        return "TokensResponse{" +
-                "dd=" + Arrays.toString(logDemonstrators) +
-                '}';
-    }
+public record TokensResponse(List<LogEntity> logDemonstrators) {
 }

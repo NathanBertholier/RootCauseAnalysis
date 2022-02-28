@@ -79,7 +79,13 @@ public class Benchmark {
         int batchSize = Integer.parseInt(line.getOptionValue("batchSize"));
         int delay = Integer.parseInt(line.getOptionValue("delay"));
         boolean loopOnData = line.hasOption("loopOnData");
-        Path statPath = Path.of(line.getOptionValue("statPath"));
+
+        Path statPath;
+        if (line.hasOption("statPath")) {
+            statPath = Path.of(line.getOptionValue("statPath"));
+        } else {
+            statPath = Path.of("stat.csv");
+        }
 
         sendToServer(stringList, threadCount, batchSize, delay, ts, URITarget, loopOnData, statPath);
     }
@@ -186,7 +192,7 @@ public class Benchmark {
 
         final Option loopOption = Option.builder("lo").longOpt("loopOnData").desc("Using this option will make the sender loop on the data loaded, instead of shutting down after sending all lines read").hasArg(false).required(false).build();
 
-        final Option statOption = Option.builder("s").longOpt("statPath").desc("Using this option will activate HTTP response time logging, a path for the stat file will be required as well. The application will update the file every 10 seconds and statistics are only collected on thread 0").hasArg(true).required(false).build();
+        final Option statOption = Option.builder("s").longOpt("statPath").desc("Using this option will activate HTTP response time logging, a path for the stat file will be required as well. The application will update the file every 10 seconds and statistics are only collected on thread 0").required(true).hasArg(true).required(false).build();
 
         final Options options = new Options();
 
@@ -221,6 +227,7 @@ class BenchHTTPClient{
     private final URI sendURI;
     private final Path statPath;
     private final Thread statThread;
+    private boolean sendDone = false;
 
     public BenchHTTPClient(int batchSize, Timestamp ts, String URITarget, Path statPath) {
         this.httpClient = HttpClient.newBuilder().version(HttpClient.Version.HTTP_2).followRedirects(HttpClient.Redirect.NORMAL).build();
@@ -289,7 +296,7 @@ class BenchHTTPClient{
                 .POST(HttpRequest.BodyPublishers.ofString(str))
                 .header("Accept", "application/json").header("Content-Type", "application/json").build();
         HttpResponse<String> send = httpClient.send(httpRequest, HttpResponse.BodyHandlers.ofString());
-        if(send.statusCode() != 201) {
+        if(send.statusCode() != 200) {
             System.out.println(send.statusCode());
         }
         if(statPath != null){

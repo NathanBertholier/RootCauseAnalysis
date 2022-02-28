@@ -29,7 +29,7 @@ public class TokenQueueProcessor {
                 .map(rawLogEntity -> tokenization.tokenizeLog(rawLogEntity.id, rawLogEntity.log))
                 .group()
                 .intoLists()
-                .every(Duration.ofMillis(3000));
+                .every(Duration.ofMillis(1000));
     }
 
     @Merge
@@ -37,7 +37,9 @@ public class TokenQueueProcessor {
     public Uni<Void> processBatch(List<LogEntity> logs) {
         return Panache.withTransaction(() -> LogEntity.persist(logs))
                 .onFailure()
-                .invoke(() -> LOGGER.log(Level.SEVERE, "Error while inserting log id in database"))
+                .invoke(error -> {
+                    LOGGER.log(Level.SEVERE, "Error while inserting log id in database");
+                })
                 .replaceWithVoid();
     }
 }

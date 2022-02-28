@@ -8,7 +8,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.concurrent.TimeoutException;
 
 public class SubscriberToken {
-    private final static String QUEUE_NAME = "logTokenization";
+    private final static String QUEUE_NAME = "token";
 
     public static void main(String[] argv) throws Exception {
         runSubscriber(QUEUE_NAME);
@@ -18,16 +18,15 @@ public class SubscriberToken {
         ConnectionFactory factory = new ConnectionFactory();
         factory.setHost("localhost");
 
-        try (var connection = factory.newConnection()) {
-            try (var channel = connection.createChannel()) {
+        var connection = factory.newConnection();
+        var channel = connection.createChannel();
 
-                channel.exchangeDeclare(queueName, "fanout", true, false, null);
+        channel.exchangeDeclare(queueName, "direct", true, false, null);
 
-                System.out.println(" [*] Waiting for messages. To exit press CTRL+C");
-                DeliverCallback deliverCallback = (consumerTag, delivery) -> System.out.println("ID : " + delivery.getProperties().getHeaders().get("id") + new String(delivery.getBody(), StandardCharsets.UTF_8));
-                channel.basicConsume(queueName, true, deliverCallback, consumerTag -> {
-                });
-            }
-        }
+        System.out.println(" [*] Waiting for messages. To exit press CTRL+C");
+        DeliverCallback deliverCallback = (consumerTag, delivery) -> {
+            System.out.println(new String(delivery.getBody(), StandardCharsets.UTF_8));
+        };
+        channel.basicConsume(queueName, true, deliverCallback, consumerTag -> {});
     }
 }

@@ -3,6 +3,7 @@ package fr.uge.modules.linking.token.type;
 import fr.uge.modules.api.model.entities.TokenEntity;
 
 import java.util.List;
+import java.util.stream.IntStream;
 
 public class TypeIPv4 implements TokenType {
 
@@ -22,22 +23,29 @@ public class TypeIPv4 implements TokenType {
         return TokenTypeId.ID_IPV4.getId();
     }
 
-    private static float cardBetween(String t1, String t2){
-        int res = 0;
-        for(int i = 0; i < Math.min(t1.length(),t2.length()); i++){
-            if(t1.charAt(i) == t2.charAt(i))
-                res++;
+    private static double calculIp(String t1, String t2) {
+        var sIP1 = t1.split("\\.");
+        var sIP2 = t2.split("\\.");
+
+        return IntStream.range(0, 4).filter(i -> !sIP1[i].equals(sIP2[i]))
+                .mapToDouble(i -> switch (i) {
+                    case 1 -> 20;
+                    case 2 -> 85;
+                    case 3 -> 95;
+                    default -> 0;
+                }).findFirst().orElse(100);
+    }
+
+    public double computeProximity(List<TokenEntity> tokenLeft, List<TokenEntity> tokenRight) {
+        if(tokenLeft.isEmpty() || tokenRight.isEmpty()) {
+            return 50;
         }
-        return res;
+        return tokenLeft.stream()
+                    .map(TokenEntity::getValue)
+                    .mapToDouble(leftIP -> tokenRight.stream()
+                            .map(TokenEntity::getValue)
+                            .mapToDouble(rightIP -> calculIp(leftIP, rightIP))
+                            .reduce(0, Double::max))
+                .reduce(0, Double::sum) / tokenLeft.size();
     }
-
-    private static float jaccard(String t1, String t2){
-        return (cardBetween(t1, t2) / t1.length()) * 100;
-    }
-
-    public float computeProximity(List<TokenEntity> tokenLeft, List<TokenEntity> tokenRight) {
-        return 0;
-        //return jaccard(tokenLeft.getValue(), tokenRight.getValue());
-    }
-
 }

@@ -23,7 +23,7 @@ import java.util.logging.Logger;
 
 @ApplicationScoped
 public class MonitorInserter {
-    private static final String QUEUE_NAME = "token-out";
+    private static final String QUEUE_NAME = "token";
     private final Logger logger = Logger.getGlobal();
 
     @ConfigProperty(name = "rabbitmq-host")
@@ -40,18 +40,19 @@ public class MonitorInserter {
             ObjectMapper objectMapper = new ObjectMapper();
             Map<String, Object> jsonMap = objectMapper.readValue(new InputStreamReader(getInputStream().orElseThrow()), Map.class);
 
-            var json = new JsonObject(jsonMap).getJsonArray("incoming").getJsonObject(0).getJsonObject("stats");
-
+            var json = new JsonObject(jsonMap);
+            System.out.println(monitoring);
             monitoring.setDatetime(Timestamp.from(Instant.now()));
-            monitoring.setDeliver(json.getLong("confirm"));
-            monitoring.setPublish(json.getLong("publish"));
-            monitoring.setAvgRate(json.getJsonObject("confirm_details").getFloat("rate"));
+            monitoring.setDeliver(json.getJsonObject("message_stats").getJsonObject("ack_details").getFloat("rate"));
+            monitoring.setPublish(json.getJsonArray("incoming").getJsonObject(0).getJsonObject("stats").getJsonObject("publish_details").getFloat("rate"));
+            monitoring.setMessages(json.getLong("messages"));
+            System.out.println(monitoring);
 
             Panache.<MonitoringEntity>withTransaction(monitoring::persist)
                     .onFailure().invoke(() -> this.logger.severe("ERROR while inserting in database monitoring"))
                     .await().indefinitely();
 
-        } catch (IndexOutOfBoundsException e)  {
+        } catch (Exception e)  {
             logger.warning("No log was inserted into the queue yet");
         }
     }
@@ -60,8 +61,8 @@ public class MonitorInserter {
         try {
             String sURL = "http://"
                     + this.rabbitmqurl
-                    + ":" + this.rabbitmqport + "/api/exchanges/%2f/"
-                    + QUEUE_NAME;
+                    + ":" + this.rabbitmqport + "/api/queues/%2f/"
+                    + QUEUE_NAME+"?lengths_age=60&lengths_incr=5&msg_rates_age=60&msg_rates_incr=5&data_rates_age=60&data_rates_incr=5";
 
             return Optional.of(new URL(sURL));
         } catch (MalformedURLException e) {
