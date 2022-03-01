@@ -14,7 +14,7 @@ type Log = {
     datetime: string
 }
 
-type Token = {
+export type MostUsedToken = {
     name: string
     value: number
     count: number
@@ -23,7 +23,7 @@ type Token = {
 export type ReportResponse = {
     root: Log
     target: Log
-    tokens: Token[]
+    tokens: MostUsedToken[]
     logs: Log[]
     proximity: Proximity[]
 }

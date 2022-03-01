@@ -1,8 +1,9 @@
 import React, {useEffect, useState} from "react";
 import CytoscapeComponent from "react-cytoscapejs";
 import cytoscape from "cytoscape";
-import {ReportResponse} from "../types/ReportResponse";
+import {MostUsedToken, ReportResponse} from "../types/ReportResponse";
 import dagre from "cytoscape-dagre";
+import GenericTable from "./GenericTable";
 
 cytoscape.use(dagre);
 
@@ -30,6 +31,7 @@ const layout = {
 
 export  const Graph = () => {
     const [data, setData] = useState<{nodes: cytoscape.ElementDefinition[], edges: cytoscape.ElementDefinition[]}>({ nodes: [], edges: [] });
+    const [mostUsedTokens, setMostUsedTokens] = useState( [] as MostUsedToken[] );
     const [cy, setCy] = useState<cytoscape.Core | null>(null);
 
     useEffect(() => {
@@ -50,6 +52,7 @@ export  const Graph = () => {
             } );
         });
 
+        setMostUsedTokens( x.tokens )
         setData({ nodes: nodes, edges: edges } );
     }, [] );
 
@@ -62,6 +65,26 @@ export  const Graph = () => {
     }, [cy] );
 
     return (
-        <CytoscapeComponent minZoom={0.1} wheelSensitivity={0.2} cy={x => setCy(x)} elements={CytoscapeComponent.normalizeElements(data)} stylesheet={stylesheet} style={{width: '100%', height: '700px'}} layout={layout} />
+        <div className="cytoscape-container">
+            <div className="most-use-tokens">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Etiquette</th>
+                            <th>Valeur</th>
+                            <th>Citation</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td className="tokens-labels">1</td>
+                            <td className="tokens-values">2</td>
+                            <td className="tokens-counts">2</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <CytoscapeComponent minZoom={0.1} wheelSensitivity={0.2} cy={x => setCy(x)} elements={CytoscapeComponent.normalizeElements(data)} stylesheet={stylesheet} style={{width: '100%', height: '700px'}} layout={layout} />
+        </div>
     )
 }
