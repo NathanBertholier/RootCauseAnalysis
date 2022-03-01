@@ -8,33 +8,37 @@ import fr.uge.modules.api.model.entities.LogEntity;
 import fr.uge.modules.api.model.entities.TokenEntity;
 import fr.uge.modules.api.model.report.ReportParameter;
 import fr.uge.modules.api.model.report.ReportResponseExpanded;
+import fr.uge.modules.error.EmptyReportError;
+import fr.uge.modules.error.NotYetTokenizedError;
 import fr.uge.modules.linking.LogsLinking;
 import io.smallrye.mutiny.Multi;
 import io.smallrye.mutiny.Uni;
 
 import java.util.*;
+import java.util.logging.ConsoleHandler;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class Synthetization {
 
     private static final Logger LOGGER = Logger.getLogger(Synthetization.class.getName());
-    public static Uni<GenericReport> getReport(long idRootLog, ReportParameter reportParameter) {
-        return LogEntity.<LogEntity>findById(idRootLog)
+
+    static {
+        LOGGER.addHandler(new ConsoleHandler());
+    }
+
+    public static Uni<GenericReport> getReport(long idLogTarget, ReportParameter reportParameter) {
+        LOGGER.log(Level.INFO, "Retrieving root cause for target: {0}", idLogTarget);
+        return LogEntity.<LogEntity>findById(idLogTarget)
+                .invoke(log -> LOGGER.log(Level.INFO, "Retrieved log target: {0}", log))
                 .chain(log -> LogsLinking.linkedLogs(log, reportParameter)
-                        .chain(generatedReport -> getMostSeenTokens(generatedReport.computations().stream().map(LinkResponse::target).toList())
-                                .map(tokens -> {
-                                    var report = new ReportResponse(
-                                            generatedReport.rootCause(),
-                                            tokens,
-                                            generatedReport.computations().stream().map(LinkResponse::target).toList());
-                                    if(!reportParameter.expanded()) return report;
-                                    else return new ReportResponseExpanded(report, Set.of(generatedReport.computations().toArray(LinkResponse[]::new)));
-                                })
+                        .chain(set -> getMostSeenTokens(set)
+                                    .map(tokens -> new ReportResponse(set.first(), tokens, set))
                         )
                 );
     }
 
-    private static Uni<Set<TokensMostSeen>> getMostSeenTokens(List<LogEntity> logs) {
+    private static Uni<TreeSet<TokensMostSeen>> getMostSeenTokens(Set<LogEntity> logs) {
         Comparator<TokensMostSeen> comparator = Comparator.comparingLong(TokensMostSeen::count);
         return Multi.createFrom().items(logs.stream().flatMap(log -> log.tokens.stream()))
                 .group().by(TokenEntity::getIdtokentype)
@@ -42,10 +46,9 @@ public class Synthetization {
                         .asList()
                         .map(Synthetization::fromTokenEntities)
                         .subscribeAsCompletionStage()
-                        .whenComplete(((tokensMostSeen, error) -> {
-                            if(error != null) LOGGER.severe("Error while isnerting " + tokensMostSeen + ": " + error);
-                            else set.add(tokensMostSeen);
-                        })));
+                        .thenAccept((set::add))
+                )
+                .invoke(set -> LOGGER.log(Level.INFO, "Most tokens seen: {0}", set));
     }
 
     private static TokensMostSeen fromTokenEntities(List<TokenEntity> entities){

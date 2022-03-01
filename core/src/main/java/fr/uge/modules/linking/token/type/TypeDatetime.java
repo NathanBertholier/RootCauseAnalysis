@@ -1,15 +1,8 @@
 package fr.uge.modules.linking.token.type;
 
-import fr.uge.modules.api.model.entities.TokenEntity;
 import fr.uge.modules.api.model.linking.Computation;
-import fr.uge.modules.api.model.linking.Link;
 
-import java.security.SecureRandom;
 import java.sql.Timestamp;
-import java.time.temporal.ChronoUnit;
-import java.util.Collection;
-import java.util.List;
-import java.util.Random;
 
 public class TypeDatetime implements TokenType{
 

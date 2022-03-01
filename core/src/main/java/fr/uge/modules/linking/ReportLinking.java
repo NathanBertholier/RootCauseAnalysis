@@ -3,14 +3,12 @@ package fr.uge.modules.linking;
 import fr.uge.modules.api.model.entities.LogEntity;
 import fr.uge.modules.api.model.entities.TokenEntity;
 import fr.uge.modules.api.model.linking.Computation;
-import fr.uge.modules.api.model.linking.Link;
 import fr.uge.modules.api.model.linking.LinkResponse;
 import fr.uge.modules.api.model.report.ReportParameter;
 import fr.uge.modules.linking.token.type.*;
 
 import java.util.*;
 import java.util.logging.Logger;
-import java.util.stream.Collectors;
 
 public class ReportLinking {
 
@@ -37,7 +35,7 @@ public class ReportLinking {
     }
 
     public SortedSet<LinkResponse> computeProximityTree(LogEntity logTarget, List<LogEntity> logWithinDelta, ReportParameter rp){
-        TreeSet<LinkResponse> redBlack = new TreeSet<>(Comparator.comparingDouble(linkResponse -> linkResponse.link().proximity()));
+        TreeSet<LinkResponse> redBlack = new TreeSet<>(Comparator.comparingDouble(linkResponse -> linkResponse.links().proximity()));
         var targetDatetime = logTarget.datetime;
 
         HashMap<Integer, List<TokenEntity>> tokenTarget = new HashMap<>();
@@ -61,7 +59,7 @@ public class ReportLinking {
                     })
                     .map(link -> new LinkResponse(logTarget, log, link))
                     .forEach(linkResponse -> {
-                        var proximity = linkResponse.link().proximity();
+                        var proximity = linkResponse.links().proximity();
                         if(proximity > rp.proximity_limit()){
                             if(redBlack.size() == rp.network_size()){
                                 redBlack.pollFirst();

@@ -8,5 +8,5 @@ import java.util.Set;
 import java.util.SortedMap;
 import java.util.SortedSet;
 
-public record GeneratedReport(LogEntity rootCause, Set<LinkResponse> computations) {
+public record GeneratedReport(LogEntity rootCause, SortedMap<Double, LogEntity> computations) {
 }

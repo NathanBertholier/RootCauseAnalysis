@@ -59,7 +59,7 @@ export class LogsTable extends Component<LogsTableProp, any> {
                     <tbody>
                     {
                         this.state.list.map( ( log, index ) => {
-                            return  <Row id={ log.id } datetime={log.datetime} content={log.content} tokens={ log.tokens } key={index} />
+                            return  <Row id={ log.id } datetime={log.datetime} rawLog={log.rawLog} tokens={ log.tokens } key={index} />
                         })
                     }
                     </tbody>

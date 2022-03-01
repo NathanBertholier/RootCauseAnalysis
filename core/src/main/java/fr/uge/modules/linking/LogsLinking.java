@@ -2,10 +2,10 @@ package fr.uge.modules.linking;
 
 import fr.uge.modules.api.model.entities.LogEntity;
 import fr.uge.modules.api.model.entities.TokenEntity;
-import fr.uge.modules.api.model.linking.Computation;
-import fr.uge.modules.api.model.linking.Link;
-import fr.uge.modules.api.model.linking.LinkResponse;
+import fr.uge.modules.api.model.linking.Links;
+import fr.uge.modules.api.model.report.GenericReport;
 import fr.uge.modules.api.model.report.ReportParameter;
+import fr.uge.modules.error.EmptyReportError;
 import fr.uge.modules.linking.token.type.TokenType;
 import fr.uge.modules.synthetization.GeneratedReport;
 import io.smallrye.mutiny.Uni;
@@ -13,20 +13,27 @@ import io.smallrye.mutiny.Uni;
 import java.sql.Timestamp;
 import java.time.Duration;
 import java.util.*;
+import java.util.logging.ConsoleHandler;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 // TODO
 public class LogsLinking {
     private static final Logger LOGGER = Logger.getLogger(LogsLinking.class.getName());
+    private static final Comparator<LogEntity> datetimeComparator = Comparator.comparing(LogEntity::getDatetime);
+
+    static {
+        LOGGER.addHandler(new ConsoleHandler());
+    }
+
     /**
-     * Computes link between root of id1 and root of id2 for all the tokens in tokenTypes
+     * Computes proximity between log of id1 and log of id2 for all the tokens in tokenTypes
      * @param log1
      * @param log2
      * @param delta
      * @return
      */
-    public static Uni<Link> computeLinks(LogEntity log1, LogEntity log2, long delta) {
+    public static Uni<Links> computeLinks(LogEntity log1, LogEntity log2, long delta) {
         var map1 = fromLog(log1);
         var map2 = fromLog(log2);
 
@@ -36,7 +43,7 @@ public class LogsLinking {
 
             var toCompare = map2.getOrDefault(key, new ArrayList<>());
             return TokenType.fromId(key).computeProximity(value, toCompare).proximity();
-        }).sum()).map(result -> new Link(Collections.emptyList(), result));
+        }).sum()).map(result -> new Links(Collections.emptyList(), result));
     }
 
     /***
@@ -60,7 +67,7 @@ public class LogsLinking {
      * @param reportParameter
      * @return
      */
-    public static Uni<GeneratedReport> linkedLogs(LogEntity root, ReportParameter reportParameter){
+    public static Uni<TreeSet<LogEntity>> linkedLogs(LogEntity root, ReportParameter reportParameter){
         var reportLinking = new ReportLinking();
         var datetime = root.datetime;
         Comparator<LogEntity> comparator = Comparator.comparing(LogEntity::getDatetime);
@@ -69,9 +76,9 @@ public class LogsLinking {
                     Timestamp.valueOf(datetime.toLocalDateTime().minus(Duration.ofSeconds(reportParameter.delta()))),
                     datetime).list()
                 .map(list -> {
-                    var rootCause = list.stream().min(comparator).orElseThrow();
-                    var set = reportLinking.computeProximityTree(root, list, reportParameter);
-                    return new GeneratedReport(rootCause, set);
+                    var treeset = new TreeSet<>(comparator);
+                    treeset.addAll(list);
+                    return treeset;
                 })
                 .onFailure().invoke(error -> LOGGER.severe("Error: " + error));
     }

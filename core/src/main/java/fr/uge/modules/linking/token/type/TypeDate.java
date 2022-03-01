@@ -1,13 +1,5 @@
 package fr.uge.modules.linking.token.type;
 
-import fr.uge.modules.api.model.entities.TokenEntity;
-import fr.uge.modules.api.model.linking.Computation;
-import fr.uge.modules.api.model.linking.Link;
-
-import java.util.Collection;
-import java.util.List;
-import java.util.stream.Stream;
-
 public class TypeDate implements TokenType{
 
     private static final String NAME = "date";

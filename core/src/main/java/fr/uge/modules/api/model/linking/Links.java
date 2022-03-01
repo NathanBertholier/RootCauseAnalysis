@@ -3,9 +3,9 @@ package fr.uge.modules.api.model.linking;
 import java.util.Collections;
 import java.util.List;
 
-public record Link(List<Computation> computations, double proximity) {
-    public static Link emptyLink(int value){
-        return new Link(Collections.emptyList(), value);
+public record Links(List<Computation> computations, double proximity) {
+    public static Links emptyLink(int value){
+        return new Links(Collections.emptyList(), value);
     }
 
     @Override
