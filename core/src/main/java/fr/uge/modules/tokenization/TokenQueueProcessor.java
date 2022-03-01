@@ -31,7 +31,7 @@ public class TokenQueueProcessor {
                 .map(rawLogEntity -> tokenization.tokenizeLog(rawLogEntity.id, rawLogEntity.log))
                 .group()
                 .intoLists()
-                .every(Duration.ofMillis(3000));
+                .every(Duration.ofMillis(1000));
     }
 
     @Merge

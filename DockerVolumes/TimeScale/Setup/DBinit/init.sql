@@ -10,4 +10,4 @@ CREATE TABLE report(id bigserial PRIMARY KEY, content text NOT NULL, proximity t
 CREATE TABLE token(id bigserial PRIMARY KEY, idlog bigint NOT NULL, idtokentype int NOT NULL, value text not null);
 CREATE TABLE tokentype(id serial PRIMARY KEY, name varchar(20) NOT NULL);
 
-INSERT INTO tokentype (name) values ('IPv4'),('IPv6'),('Statut'),('Datetime'),('EdgeResponse');
+INSERT INTO tokentype (name) values ('IPv4'),('IPv6'),('Statut'),('Datetime'),('EdgeResponse'),('URL'),('Resource');

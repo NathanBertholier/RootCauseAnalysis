@@ -15,7 +15,7 @@ services:
       - ./DockerVolumes/RabbitMQ/Setup/:/etc/rabbitmq/
 
   timescale:
-    image: timescale/timescaledb:latest-pg12
+    image: timescale/timescaledb:2.6.0-pg12
     container_name: "timescale"
     environment:
       POSTGRES_USER: "root"
@@ -29,7 +29,7 @@ services:
       - ./DockerVolumes/TimeScale/Setup/DBinit:/docker-entrypoint-initdb.d
 
   grafana:
-    image: grafana/grafana
+    image: grafana/grafana:8.4.2
     container_name: "grafana"
     ports:
       - "${GRAFANA_PORT}:3000"
@@ -60,7 +60,7 @@ services:
 
   nginx:
     container_name: nginx
-    image: nginx
+    image: nginx:1.21.6
     depends_on:
       - rootcause
     ports:
