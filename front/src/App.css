@@ -1,5 +1,5 @@
 .App {
-  text-align: center;
+  //font-family: "Josefin Sans";
 }
 
 .sidebar {
@@ -60,6 +60,10 @@
   padding: 0;
   min-height: 100vh;
   background-color: #d9dbe0;
+}
+
+.background-white {
+  background-color: white;
 }
 
 .black-icon {
@@ -210,4 +214,9 @@
   display: flex;
   justify-content: center;
   align-items: center;
+}
+
+.report-container {
+  border-radius: 10px;
+  margin-right: 10px;
 }

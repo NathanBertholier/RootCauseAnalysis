@@ -22,6 +22,12 @@ function App() {
                     <Route path="/logs">
                         <Logs />
                     </Route>
+                    <Route path="/proximity">
+                        <ProximityCalc />
+                    </Route>
+                    <Route path="/report">
+                        <Report />
+                    </Route>
                 </Switch>
             </div>
         </Router>
