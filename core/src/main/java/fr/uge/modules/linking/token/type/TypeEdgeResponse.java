@@ -33,7 +33,7 @@ public class TypeEdgeResponse implements TokenType {
     @Override
     public Link computeProximity(List<TokenEntity> listTokensLeft, List<TokenEntity> listTokensRight) {
         var type = new TypeEdgeResponse();
-        if (listTokensLeft.isEmpty() || listTokensRight.isEmpty()) return Link.emptyLink(0);
+        if (listTokensLeft.isEmpty() || listTokensRight.isEmpty()) return Link.emptyLink(50);
 
         var computations = listTokensLeft.stream()
                 .map(TokenEntity::getValue)

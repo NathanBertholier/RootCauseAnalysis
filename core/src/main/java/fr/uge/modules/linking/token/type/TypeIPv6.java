@@ -5,6 +5,7 @@ import fr.uge.modules.api.model.linking.Computation;
 import fr.uge.modules.api.model.linking.Link;
 
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.List;
 
 public class TypeIPv6 implements TokenType{
@@ -32,10 +33,16 @@ public class TypeIPv6 implements TokenType{
         var type = new TypeIPv6();
 
         var computations = tokenLeft.stream().map(tokenL -> tokenRight.stream()
-                .filter(tokenL::equals)
-                .map(tokenR -> new Computation(type, tokenL.value, tokenR.value, 100d))
+                .map(tokenR -> {
+                    if(tokenR.equals(tokenL))
+                        return new Computation(type, tokenL.value, tokenR.value, 100d);
+                    return new Computation(type, tokenL.value, tokenR.value, 0d);
+                })
                 .toList())
-                .flatMap(Collection::stream).toList();
+                .flatMap(Collection::stream)
+                .sorted(Comparator.comparingDouble(computation -> - computation.proximity()))
+                .limit(Integer.max(tokenLeft.size(), tokenRight.size()))
+                .toList();
 
         return new Link(computations, computations.stream().mapToDouble(Computation::proximity).sum() / computations.size());
     }

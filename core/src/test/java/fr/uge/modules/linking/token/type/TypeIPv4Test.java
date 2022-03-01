@@ -63,17 +63,18 @@ class TypeIPv4Test {
         t5.value = "10.11.12.13";
 
         assertAll(
-                () -> assertEquals(100, typeIPv4.computeProximity(new ArrayList<>(List.of(t0)), new ArrayList<>(List.of(t0)))),
-                () -> assertEquals(100, typeIPv4.computeProximity(new ArrayList<>(List.of(t1)), new ArrayList<>(List.of(t1)))),
-                () -> assertEquals(0, typeIPv4.computeProximity(new ArrayList<>(List.of(t0)), new ArrayList<>(List.of(t1)))),
-                () -> assertEquals(20, typeIPv4.computeProximity(new ArrayList<>(List.of(t0)), new ArrayList<>(List.of(t2)))),
-                () -> assertEquals(85, typeIPv4.computeProximity(new ArrayList<>(List.of(t0)), new ArrayList<>(List.of(t3)))),
-                () -> assertEquals(95, typeIPv4.computeProximity(new ArrayList<>(List.of(t0)), new ArrayList<>(List.of(t4)))),
-                () -> assertEquals(100, typeIPv4.computeProximity(new ArrayList<>(List.of(t0)), new ArrayList<>(List.of(t0, t1)))),
-                () -> assertEquals(50, typeIPv4.computeProximity(new ArrayList<>(List.of(t0, t1)), new ArrayList<>(List.of(t1)))),
-                () -> assertEquals(100, typeIPv4.computeProximity(new ArrayList<>(List.of(t0, t1)), new ArrayList<>(List.of(t0,t1)))),
-                () -> assertEquals(100, typeIPv4.computeProximity(new ArrayList<>(List.of(t1 ,t0)), new ArrayList<>(List.of(t1, t0)))),
-                () -> assertEquals(100, typeIPv4.computeProximity(new ArrayList<>(List.of(t1 ,t1)), new ArrayList<>(List.of(t0, t1))))
+                () -> assertEquals(100, typeIPv4.computeProximity(new ArrayList<>(List.of(t0)), new ArrayList<>(List.of(t0))).proximity()),
+                () -> assertEquals(100, typeIPv4.computeProximity(new ArrayList<>(List.of(t1)), new ArrayList<>(List.of(t1))).proximity()),
+                () -> assertEquals(0, typeIPv4.computeProximity(new ArrayList<>(List.of(t0)), new ArrayList<>(List.of(t1))).proximity()),
+                () -> assertEquals(20, typeIPv4.computeProximity(new ArrayList<>(List.of(t0)), new ArrayList<>(List.of(t2))).proximity()),
+                () -> assertEquals(85, typeIPv4.computeProximity(new ArrayList<>(List.of(t0)), new ArrayList<>(List.of(t3))).proximity()),
+                () -> assertEquals(95, typeIPv4.computeProximity(new ArrayList<>(List.of(t0)), new ArrayList<>(List.of(t4))).proximity()),
+                () -> assertEquals(50, typeIPv4.computeProximity(new ArrayList<>(List.of(t0)), new ArrayList<>(List.of(t0, t1))).proximity()),
+                () -> assertEquals(50, typeIPv4.computeProximity(new ArrayList<>(List.of(t0, t1)), new ArrayList<>(List.of(t1))).proximity()),
+                () -> assertEquals(50, typeIPv4.computeProximity(new ArrayList<>(List.of(t0, t1)), new ArrayList<>(List.of(t0, t1))).proximity()),
+                () -> assertEquals(50, typeIPv4.computeProximity(new ArrayList<>(List.of(t1 ,t0)), new ArrayList<>(List.of(t1, t0))).proximity()),
+                () -> assertEquals(50, typeIPv4.computeProximity(new ArrayList<>(List.of(t1 ,t1)), new ArrayList<>(List.of(t0, t1))).proximity()),
+                () -> assertEquals(91.25, typeIPv4.computeProximity(new ArrayList<>(List.of(t3 ,t4)), new ArrayList<>(List.of(t5, t3))).proximity())
         );
     }
 }

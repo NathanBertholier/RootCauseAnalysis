@@ -36,11 +36,9 @@ public class TypeHTTPStatus implements TokenType{
 
         for (TokenEntity tokenLeft : listTokensLeft) {
             var tokenLeftValue = tokenLeft.value;
-            var firstLeftChar = tokenLeftValue.substring(0,1);
             for (TokenEntity tokenRight : listTokensRight) {
                 var tokenRightValue = tokenRight.value;
-                var firstRightChar = tokenRightValue.substring(0,1);
-                var proximity = fromValues(firstLeftChar, firstRightChar);
+                var proximity = fromValues(tokenLeftValue, tokenRightValue);
                 computations.add(new Computation(type, tokenLeftValue, tokenRightValue, proximity));
             }
         }

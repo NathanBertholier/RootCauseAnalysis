@@ -61,18 +61,18 @@ public class TypeURLTest {
 
         assertAll(
                 // empty array
-                () -> assertEquals( 50, typeURL.computeProximity(new ArrayList<>(), new ArrayList<>(){ { add( urlPizzaTomate ); } } ) ),
-                () -> assertEquals( 50, typeURL.computeProximity(new ArrayList<>(){ { add( urlPizzaTomate ); } }, new ArrayList<>() ) ),
-                () -> assertEquals( 50, typeURL.computeProximity(new ArrayList<>(), new ArrayList<>() ) ),
+                () -> assertEquals( 50, typeURL.computeProximity(new ArrayList<>(), new ArrayList<>(){ { add( urlPizzaTomate ); } } ).proximity() ),
+                () -> assertEquals( 50, typeURL.computeProximity(new ArrayList<>(){ { add( urlPizzaTomate ); } }, new ArrayList<>() ).proximity() ),
+                () -> assertEquals( 50, typeURL.computeProximity(new ArrayList<>(), new ArrayList<>() ).proximity() ),
 
                 // case 1 element in array
-                () -> assertEquals( 100, typeURL.computeProximity(new ArrayList<>(){ { add( urlPizzaTomate ); } }, new ArrayList<>(){ { add( urlPizzaTomate ); } } ) ),
-                () -> assertEquals( 75, typeURL.computeProximity(new ArrayList<>(){ { add( urlPizzaTomate ); } }, new ArrayList<>(){ { add( urlPizzaBoeuf ); } } ) ),
+                () -> assertEquals( 100, typeURL.computeProximity(new ArrayList<>(){ { add( urlPizzaTomate ); } }, new ArrayList<>(){ { add( urlPizzaTomate ); } } ).proximity() ),
+                () -> assertEquals( 75, typeURL.computeProximity(new ArrayList<>(){ { add( urlPizzaTomate ); } }, new ArrayList<>(){ { add( urlPizzaBoeuf ); } } ).proximity() ),
 
-                () -> assertEquals( 33.33333333333333, typeURL.computeProximity(new ArrayList<>(){ { add( urlEssaiGratuit ); } }, new ArrayList<>(){ { add( urlPizzaBoeuf ); } } ) ),
+                () -> assertEquals( 33.33333333333333, typeURL.computeProximity(new ArrayList<>(){ { add( urlEssaiGratuit ); } }, new ArrayList<>(){ { add( urlPizzaBoeuf ); } } ).proximity() ),
 
 
-                () -> assertEquals( 25, typeURL.computeProximity(new ArrayList<>(){ { add( urlPizzaTomate );add( urlPizzaBoeuf ); } }, new ArrayList<>(){ { add( urlSVG ); } } ) )
+                () -> assertEquals( 25, typeURL.computeProximity(new ArrayList<>(){ { add( urlPizzaTomate );add( urlPizzaBoeuf ); } }, new ArrayList<>(){ { add( urlSVG ); } } ).proximity() )
 
 
         );

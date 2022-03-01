@@ -8,7 +8,7 @@ import static io.restassured.RestAssured.given;
 import static org.hamcrest.CoreMatchers.*;
 
 @QuarkusTest
-public class LinkRTest {
+public class LinkResponseTest {
     @Test
     public void linkShouldReturnCorrectJSON() {
         given()

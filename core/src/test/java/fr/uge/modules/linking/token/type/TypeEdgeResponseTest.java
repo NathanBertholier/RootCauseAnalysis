@@ -54,33 +54,33 @@ class TypeEdgeResponseTest {
 
         assertAll(
                 // empty array
-                () -> assertEquals( 50, typeEdgeResponse.computeProximity(new ArrayList<>(),                        new ArrayList<>(){{ add( hit ); }} ) ),
-                () -> assertEquals( 50, typeEdgeResponse.computeProximity(new ArrayList<>(){{ add( miss ); }},      new ArrayList<>() ) ),
-                () -> assertEquals( 50, typeEdgeResponse.computeProximity(new ArrayList<>(),                        new ArrayList<>() ) ),
+                () -> assertEquals( 50, typeEdgeResponse.computeProximity(new ArrayList<>(),                        new ArrayList<>(){{ add( hit ); }} ).proximity() ),
+                () -> assertEquals( 50, typeEdgeResponse.computeProximity(new ArrayList<>(){{ add( miss ); }},      new ArrayList<>() ).proximity() ),
+                () -> assertEquals( 50, typeEdgeResponse.computeProximity(new ArrayList<>(),                        new ArrayList<>() ).proximity() ),
 
                 // 100 % identical
-                () -> assertEquals( 100, typeEdgeResponse.computeProximity(new ArrayList<>(){{ add( hit ); }},      new ArrayList<>(){{ add( hit ); }} ) ),
-                () -> assertEquals( 100, typeEdgeResponse.computeProximity(new ArrayList<>(){{ add( error ); }},    new ArrayList<>(){{ add( error ); }} ) ),
+                () -> assertEquals( 100, typeEdgeResponse.computeProximity(new ArrayList<>(){{ add( hit ); }},      new ArrayList<>(){{ add( hit ); }} ).proximity() ),
+                () -> assertEquals( 100, typeEdgeResponse.computeProximity(new ArrayList<>(){{ add( error ); }},    new ArrayList<>(){{ add( error ); }} ).proximity() ),
 
                 // error case
-                () -> assertEquals( 0,  typeEdgeResponse.computeProximity(new ArrayList<>(){{ add( error ); }},     new ArrayList<>(){{ add( hit ); }} ) ),
-                () -> assertEquals( 95, typeEdgeResponse.computeProximity(new ArrayList<>(){{ add( error ); }},     new ArrayList<>(){{ add( miss ); }} ) ),
+                () -> assertEquals( 0,  typeEdgeResponse.computeProximity(new ArrayList<>(){{ add( error ); }},     new ArrayList<>(){{ add( hit ); }} ).proximity() ),
+                () -> assertEquals( 95, typeEdgeResponse.computeProximity(new ArrayList<>(){{ add( error ); }},     new ArrayList<>(){{ add( miss ); }} ).proximity() ),
 
                 // no error case
-                () -> assertEquals( 95, typeEdgeResponse.computeProximity(new ArrayList<>(){{ add( hit ); }},       new ArrayList<>(){{ add( refreshHit ); }} ) ),
-                () -> assertEquals( 25, typeEdgeResponse.computeProximity(new ArrayList<>(){{ add( refreshHit ); }},new ArrayList<>(){{ add( error ); }} ) ),
+                () -> assertEquals( 95, typeEdgeResponse.computeProximity(new ArrayList<>(){{ add( hit ); }},       new ArrayList<>(){{ add( refreshHit ); }} ).proximity() ),
+                () -> assertEquals( 25, typeEdgeResponse.computeProximity(new ArrayList<>(){{ add( refreshHit ); }},new ArrayList<>(){{ add( error ); }} ).proximity() ),
 
                 // case 2 elements in target array
-                () -> assertEquals( 50,         typeEdgeResponse.computeProximity(new ArrayList<>(){{ add( hit );add( error ); }},  new ArrayList<>(){{ add( hit ); }} ) ),
-                () -> assertEquals( 125.f/2,    typeEdgeResponse.computeProximity(new ArrayList<>(){{ add( hit );add( error ); }},  new ArrayList<>(){{ add( error ); }} ) ),
-                () -> assertEquals( 95.f/2,     typeEdgeResponse.computeProximity(new ArrayList<>(){{ add( hit );add( error ); }},  new ArrayList<>(){{ add( refreshHit ); }} ) ),
-                () -> assertEquals( 120.f/2,    typeEdgeResponse.computeProximity(new ArrayList<>(){{ add( hit );add( error ); }},  new ArrayList<>(){{ add( miss ); }} ) ),
+                () -> assertEquals( 50,         typeEdgeResponse.computeProximity(new ArrayList<>(){{ add( hit );add( error ); }},  new ArrayList<>(){{ add( hit ); }} ).proximity() ),
+                () -> assertEquals( 125.f/2,    typeEdgeResponse.computeProximity(new ArrayList<>(){{ add( hit );add( error ); }},  new ArrayList<>(){{ add( error ); }} ).proximity() ),
+                () -> assertEquals( 95.f/2,     typeEdgeResponse.computeProximity(new ArrayList<>(){{ add( hit );add( error ); }},  new ArrayList<>(){{ add( refreshHit ); }} ).proximity() ),
+                () -> assertEquals( 120.f/2,    typeEdgeResponse.computeProximity(new ArrayList<>(){{ add( hit );add( error ); }},  new ArrayList<>(){{ add( miss ); }} ).proximity() ),
 
                 // case 2 element in linking
-                () -> assertEquals( 100,        typeEdgeResponse.computeProximity(new ArrayList<>(){{ add( hit ); }},       new ArrayList<>(){{ add( hit );add( error ); }} ) ),
-                () -> assertEquals( 100,        typeEdgeResponse.computeProximity(new ArrayList<>(){{ add( error ); }},     new ArrayList<>(){{ add( hit );add( error ); }} ) ),
-                () -> assertEquals( 95,         typeEdgeResponse.computeProximity(new ArrayList<>(){{ add( refreshHit ); }},new ArrayList<>(){{ add( hit );add( error ); }} ) ),
-                () -> assertEquals( 95,         typeEdgeResponse.computeProximity(new ArrayList<>(){{ add( miss ); }},      new ArrayList<>(){{ add( hit );add( error ); }} ) )
+                () -> assertEquals( 62.5,        typeEdgeResponse.computeProximity(new ArrayList<>(){{ add( hit ); }},       new ArrayList<>(){{ add( hit );add( error ); }} ).proximity() ),
+                () -> assertEquals( 50,        typeEdgeResponse.computeProximity(new ArrayList<>(){{ add( error ); }},     new ArrayList<>(){{ add( hit );add( error ); }} ).proximity() ),
+                () -> assertEquals( 60,         typeEdgeResponse.computeProximity(new ArrayList<>(){{ add( refreshHit ); }},new ArrayList<>(){{ add( hit );add( error ); }} ).proximity() ),
+                () -> assertEquals( 47.5,         typeEdgeResponse.computeProximity(new ArrayList<>(){{ add( miss ); }},      new ArrayList<>(){{ add( hit );add( error ); }} ).proximity() )
         );
     }
 }
