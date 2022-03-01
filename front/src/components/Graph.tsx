@@ -11,7 +11,15 @@ const stylesheet : cytoscape.Stylesheet[] = [{
     style: {
         'label': 'data(label)',
         'curve-style': 'bezier',
+        'target-arrow-shape': 'triangle',
         'color': '#AAAEBA'
+    }
+},
+{
+    selector: "edge[label]",
+    style: {
+        "text-background-color": "white",
+        "text-background-opacity": 1
     }
 },
 {
