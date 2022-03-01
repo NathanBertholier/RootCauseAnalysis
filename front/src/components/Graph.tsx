@@ -62,6 +62,6 @@ export  const Graph = () => {
     }, [cy] );
 
     return (
-        <CytoscapeComponent cy={x => setCy(x)} elements={CytoscapeComponent.normalizeElements({...data})} stylesheet={stylesheet} style={{width: '100%', height: '750px'}} layout={layout} />
+        <CytoscapeComponent minZoom={0.1} wheelSensitivity={0.2} cy={x => setCy(x)} elements={CytoscapeComponent.normalizeElements(data)} stylesheet={stylesheet} style={{width: '100%', height: '700px'}} layout={layout} />
     )
 }

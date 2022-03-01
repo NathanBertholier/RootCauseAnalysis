@@ -6,15 +6,7 @@ import DataService from "../services/DataService";
 import {LinkResponse} from "../types/LinkResponse";
 import {LinkRequest} from "../types/LinkRequest";
 import {toast} from "../tools/ToastManager";
-
-type InputField = {
-    value: number
-    error: string
-}
-
-type FormData = {
-    [key: string]: InputField
-}
+import {FormData, onFocusOut} from "../types/FormData";
 
 const DEFAULT_ID_VALUE : number = 0;
 const DEFAULT_DELTA_VALUE : number = 2;
@@ -23,9 +15,9 @@ export const ProximityCalc = () => {
 
     const [ linkList, setLinkList ] = useState( { computations: [], proximity: 0} as LinkResponse );
     const [ formData, setFormData ] = useState({
-        "id1": {value:DEFAULT_ID_VALUE, error:""},
-        "id2": { value:DEFAULT_ID_VALUE, error: "" },
-        "delta": { value:DEFAULT_DELTA_VALUE, error: "" }
+        "id1":      {value:DEFAULT_ID_VALUE, error:"", isRequired: true},
+        "id2":      { value:DEFAULT_ID_VALUE, error: "", isRequired: true },
+        "delta":    { value:DEFAULT_DELTA_VALUE, error: "", isRequired: true }
     } as FormData );
 
     const sendForm = () => {
@@ -45,27 +37,6 @@ export const ProximityCalc = () => {
         }
     }
 
-    const onFocusOut = ( key: string, value: string, valid: boolean, field: string ) => {
-        if ( value === "" ) {
-            setError( key, "*Le champs "+ field +" est vide" );
-            return;
-        }
-        else if ( !valid ) {
-            setError( key, "*Le champs "+ field +" ne prend que des nombres positives" );
-            return;
-        }
-        let copy = {...formData}
-        copy[ key ].value = parseInt(value)
-        copy[ key ].error = ""
-        setFormData( copy );
-    }
-
-    const setError = ( key: string, message: string ) => {
-        let copy = {...formData}
-        copy[ key ].error = message
-        setFormData( copy );
-    }
-
     return (
         <Container fluid>
             <Row>
@@ -76,15 +47,15 @@ export const ProximityCalc = () => {
                         <Row className="proximity-filters-container">
                             <div className="proximity-filter">
                                 <Form.Text className="text-muted">ID n°1 :</Form.Text>
-                                <Form.Control onBlur={ e => onFocusOut(e.target.name, e.target.value, e.target.validity.valid, "ID n°1") } name="id1" type="text" className="custom-input" pattern="^[1-9]+[0-9]*$" />
+                                <Form.Control onBlur={ e => onFocusOut(formData, setFormData, e.target.name, e.target.value, e.target.validity.valid, "ID n°1") } name="id1" type="text" className="custom-input" pattern="^[1-9]+[0-9]*$" />
                             </div>
                             <div className="proximity-filter">
                                 <Form.Text className="text-muted">ID n°2 :</Form.Text>
-                                <FormControl onBlur={ e => onFocusOut(e.target.name, e.target.value, e.target.validity.valid,"ID n°2" ) } name="id2" type="text" className="custom-input" pattern="^[1-9]+[0-9]*$" />
+                                <FormControl onBlur={ e => onFocusOut(formData, setFormData, e.target.name, e.target.value, e.target.validity.valid,"ID n°2" ) } name="id2" type="text" className="custom-input" pattern="^[1-9]+[0-9]*$" />
                             </div>
                             <div className="proximity-filter">
                                 <Form.Text className="text-muted">delta :</Form.Text>
-                                <FormControl onBlur={ e => onFocusOut(e.target.name, e.target.value, e.target.validity.valid, "delta" ) } name="delta" type="text" className="custom-input" pattern="^[1-9]+[0-9]*$" defaultValue={ DEFAULT_DELTA_VALUE } />
+                                <FormControl onBlur={ e => onFocusOut(formData, setFormData, e.target.name, e.target.value, e.target.validity.valid, "delta" ) } name="delta" type="text" className="custom-input" pattern="^[1-9]+[0-9]*$" defaultValue={ DEFAULT_DELTA_VALUE } />
                             </div>
                             <div className="proximity-filter">
                                 <Button className={`custom-filter-btn`} variant="outline-primary" onClick={ sendForm } >Valider</Button>
@@ -93,7 +64,6 @@ export const ProximityCalc = () => {
                                 <div className={`error form-error ${ formData["id1"].error === "" ? "d-none" : ""}`}>{formData["id1"].error}</div>
                                 <div className={`error form-error ${ formData["id2"].error === "" ? "d-none" : ""}`}>{formData["id2"].error}</div>
                                 <div className={`error form-error ${ formData["delta"].error === "" ? "d-none" : ""}`}>{formData["delta"].error}</div>
-
                             </div>
                         </Row>
                         <Row className="proximity-table-container">
