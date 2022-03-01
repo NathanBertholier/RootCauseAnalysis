@@ -1,16 +1,9 @@
 package fr.uge.modules.linking;
 
-import fr.uge.modules.api.model.CompleteLog;
-import fr.uge.modules.api.model.ReportResponse;
 import fr.uge.modules.api.model.entities.LogEntity;
 import fr.uge.modules.api.model.entities.TokenEntity;
 import fr.uge.modules.api.model.report.ReportParameter;
 import fr.uge.modules.linking.token.type.*;
-import io.smallrye.common.annotation.Blocking;
-import io.smallrye.mutiny.Uni;
-
-import java.sql.Timestamp;
-import java.time.Duration;
 import java.util.*;
 import java.util.logging.ConsoleHandler;
 import java.util.logging.Logger;
@@ -30,6 +23,8 @@ public class ReportLinking {
         this.addInTokensType(TokenType.TokenTypeId.ID_DATETIME.getId(), new TypeDatetime());
         this.addInTokensType(TokenType.TokenTypeId.ID_EDGERESPONSE.getId(), new TypeEdgeResponse());
         this.addInTokensType(TokenType.TokenTypeId.ID_STATUS.getId(), new TypeHTTPStatus());
+        this.addInTokensType(TokenType.TokenTypeId.ID_RESOURCE.getId(), new TypeResource());
+        this.addInTokensType(TokenType.TokenTypeId.ID_URL.getId(), new TypeURL());
     }
 
     private void addInTokensType(Integer id, TokenType tokenType) {

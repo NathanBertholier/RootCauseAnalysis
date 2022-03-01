@@ -21,8 +21,9 @@ public class Benchmark {
         //use this to try out spamming rabbitmq with different parameters
         //args = new String[]{"-l", "100000", "-F", "../logs/", "-b", "50", "-d", "85", "-t", "8", "-u", "http://localhost:8081/insertlog", "-nT", "2022-02-18 11:57:00"};
         //args = new String[]{"-l", "100000", "-F", "../logs/", "-b", "50", "-d", "85", "-t", "8", "-u", "http://localhost:8081/insertlog"};
-        //args = new String[]{"-l", "100000", "-F", "../logs/", "-b", "50", "-d", "85", "-t", "8", "-u", "http://localhost:8081/insertlog","-lo","-s","stats.csv"};
+        //args = new String[]{"-l", "1000", "-F", "../logs/", "-b", "50", "-d", "85", "-t", "4", "-u", "http://localhost:8081/insertlog","-s","stats.csv"};
 
+        //args = new String[]{"-l", "10000", "-F", "../logs/", "-b", "50", "-d", "1000", "-t", "10", "-u", "http://localhost:8081/insertlog","-s","stat.csv"};
         //use this to output to out.txt in exec folder
         //args = new String[]{"-l", "10000", "-f", "in.txt"};
 
@@ -79,7 +80,13 @@ public class Benchmark {
         int batchSize = Integer.parseInt(line.getOptionValue("batchSize"));
         int delay = Integer.parseInt(line.getOptionValue("delay"));
         boolean loopOnData = line.hasOption("loopOnData");
-        Path statPath = Path.of(line.getOptionValue("statPath"));
+
+        Path statPath;
+        if (line.hasOption("statPath")) {
+            statPath = Path.of(line.getOptionValue("statPath"));
+        } else {
+            statPath = Path.of("stat.csv");
+        }
 
         sendToServer(stringList, threadCount, batchSize, delay, ts, URITarget, loopOnData, statPath);
     }
@@ -170,23 +177,23 @@ public class Benchmark {
 
         final Option folderPathOption = Option.builder("F").longOpt("folder").desc("Folder to read, in this mode only logs starting with \"EOX\" will be read").hasArg(true).argName("folderPath").required(false).build();
 
-        final Option linesOption = Option.builder("l").longOpt("linesCount").desc("max number of lines to keep").hasArg(true).argName("lines").required(false).build();
+        final Option linesOption = Option.builder("l").longOpt("linesCount").desc("Max number of lines to keep").hasArg(true).argName("lines").required(false).build();
 
-        final Option outputOption = Option.builder("o").longOpt("output").desc("path of Output File if output needed (automatically overwrites, be careful !), will be out.txt if left blank").hasArg(true).argName("outputPath").required(false).build();
+        final Option outputOption = Option.builder("o").longOpt("output").desc("Path of Output File if output needed (automatically overwrites, be careful !), will be out.txt if left blank").hasArg(true).argName("outputPath").required(false).build();
 
-        final Option batchSizeOption = Option.builder("b").longOpt("batchSize").desc("number of lines to send in each HTTP request to server").hasArg(true).argName("batchSize").required(true).build();
+        final Option batchSizeOption = Option.builder("b").longOpt("batchSize").desc("Number of lines to send in each HTTP request to server").hasArg(true).argName("batchSize").required(true).build();
 
-        final Option delayOption = Option.builder("d").longOpt("delay").desc("delay between each HTTP request (each thread uses this delay, so for example with 8 threads and a 100ms delay there will be 80 requests per second").hasArg(true).argName("delay").required(true).build();
+        final Option delayOption = Option.builder("d").longOpt("delay").desc("Delay between each HTTP request (each thread uses this delay, so for example with 8 threads and a 100ms delay there will be 80 requests per second").hasArg(true).argName("delay").required(true).build();
 
-        final Option threadCountOption = Option.builder("t").longOpt("threadCount").desc("number of threads to use as HTTP senders, this doesn't change the behavior or performance of the rest of the program").hasArg(true).argName("delay").required(true).build();
+        final Option threadCountOption = Option.builder("t").longOpt("threadCount").desc("Number of threads to use as HTTP senders, this doesn't change the behavior or performance of the rest of the program").hasArg(true).argName("delay").required(true).build();
 
         final Option newTimeStampOption = Option.builder("nT").longOpt("newTimeStamp").desc("Replace read time stamps with current time stamp").hasArg(true).argName("newTimeStamp").required(false).build();
 
-        final Option URITargetOption = Option.builder("u").longOpt("uriTarget").desc("Replace read time stamps with current time stamp").hasArg(true).argName("uriTarget").required(true).build();
+        final Option URITargetOption = Option.builder("u").longOpt("uriTarget").desc("Indicate target URI to send the HTTP requests to").hasArg(true).argName("uriTarget").required(true).build();
 
         final Option loopOption = Option.builder("lo").longOpt("loopOnData").desc("Using this option will make the sender loop on the data loaded, instead of shutting down after sending all lines read").hasArg(false).required(false).build();
 
-        final Option statOption = Option.builder("s").longOpt("statPath").desc("Using this option will activate HTTP response time logging, a path for the stat file will be required as well. The application will update the file every 10 seconds and statistics are only collected on thread 0").hasArg(true).required(false).build();
+        final Option statOption = Option.builder("s").longOpt("statPath").desc("Using this option will activate HTTP response time logging, a path for the stat file will be required as well. The application will update the file every 10 seconds and statistics are only collected on thread 0").required(true).hasArg(true).required(false).build();
 
         final Options options = new Options();
 
@@ -241,24 +248,25 @@ class BenchHTTPClient{
             responseTimes = Collections.synchronizedMap(new HashMap<>());
             this.statThread = new Thread( () -> {
                 try {
-                    while (true) {
-                        Thread.sleep(15000);
+                    while (!Thread.currentThread().isInterrupted()) {
+                        Thread.sleep(5000);
                         StringBuilder builder = new StringBuilder();
                         synchronized (responseTimes) {
                             for(Map.Entry<Integer, List<Long>> entry : responseTimes.entrySet()) {
                                 builder.append(entry.getKey());
-                                builder.append(System.lineSeparator());
-                                builder.append(entry.getValue().stream().map(l -> l.toString()).collect(Collectors.joining(";")));
-                                builder.append(System.lineSeparator());
+                                builder.append("\n");
+                                builder.append(entry.getValue().stream().map(Object::toString).collect(Collectors.joining(";")));
+                                builder.append("\n");
                             }
                         }
                         Files.write(statPath, builder.toString().getBytes());
                     }
                 } catch (InterruptedException e) {
-                    e.printStackTrace();
+                    return;
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
+                System.out.println("Stat logger shutting down.");
             });
 
         }
@@ -288,7 +296,7 @@ class BenchHTTPClient{
                 .POST(HttpRequest.BodyPublishers.ofString(str))
                 .header("Accept", "application/json").header("Content-Type", "application/json").build();
         HttpResponse<String> send = httpClient.send(httpRequest, HttpResponse.BodyHandlers.ofString());
-        if(send.statusCode() != 201) {
+        if(send.statusCode() != 200) {
             System.out.println(send.statusCode());
         }
         if(statPath != null){
@@ -347,6 +355,9 @@ class BenchHTTPClient{
                 e.printStackTrace();
             }
         } while(loop);
+        if(statThread != null) {
+            statThread.interrupt();
+        }
     }
     private List<List<String>> cutList(List<String> originalList, int partitionSize) {
         List<List<String>> partitions = new ArrayList<>();

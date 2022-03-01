@@ -42,12 +42,14 @@ public class TypeURL implements TokenType{
             var arrayL = tokenL.split( "/" );
             var arrayR = tokenR.split( "/" );
             double count = 0;
-            for ( int i =0; i < arrayL.length; i++ ) {
-                if ( arrayL[i].equals( arrayR[i] ) ) {
-                    count++;
-                }
-                else {
-                    break;
+            for ( int i =0; i < arrayL.length-1; i++ ) {
+                if(i<= arrayR.length-1){
+                    if ( arrayL[i].equals( arrayR[i] ) ) {
+                        count++;
+                    }
+                    else {
+                        break;
+                    }
                 }
             }
             return (count / arrayL.length) * 100;
