@@ -250,3 +250,88 @@
 .cytoscape-container {
   position: relative;
 }
+
+/*******************************
+ * Tooltip
+ *******************************/
+
+.toolTip {
+  position: absolute;
+  top: 20px;
+  left: 0;
+  padding: 10px 20px;
+  background-color: #f5f6fA;
+  border-radius: 10px;
+}
+
+.toolTip-title {
+  font-weight: bold;
+}
+
+.toolTip-entity {
+  font-size: 18px;
+  font-weight: bold;
+}
+
+.toolTip-value {
+  font-size: 14px;
+  color: #5567ff;
+}
+
+/*******************************
+ * Legend
+ *******************************/
+
+.legend {
+  position: absolute;
+  bottom: 20px;
+  right: 10px;
+  background-color: #F5F6FA;
+  border-radius: 10px;
+  padding: 10px 20px;
+  font-weight: 400;
+}
+
+.legend-title {
+  margin-bottom: 10px;
+  font-weight: bold;
+}
+
+.hint-container {
+  display: flex;
+  margin-bottom: 7px;
+}
+
+.hint {
+  display: inline-block;
+  border-radius: 15px;
+}
+
+.hint-edge {
+  margin-left: 3px;
+  margin-right: 14px;
+  color: #AAAEBA;
+}
+
+.hint-node {
+  width: 24px;
+  margin-right: 10px;
+}
+
+.hint-label {
+  display: inline-block;
+  font-size: 16px;
+}
+
+.hint-orange {
+  background-color: #F24E1E;
+}
+
+.hint-green {
+  background-color: #4ECB71;
+}
+
+.hint-gray {
+  padding-left: 7px;
+  background-color: #C4C4C4;
+}

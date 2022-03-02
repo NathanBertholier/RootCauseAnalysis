@@ -8,7 +8,7 @@ type Proximity = {
     links: Link[]
 }
 
-type Log = {
+export type Log = {
     id: number
     content: string
     datetime: string
