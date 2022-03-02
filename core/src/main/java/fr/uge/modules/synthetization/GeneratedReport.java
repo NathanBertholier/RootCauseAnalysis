@@ -1,12 +1,10 @@
 package fr.uge.modules.synthetization;
 
 import fr.uge.modules.api.model.entities.LogEntity;
-import fr.uge.modules.api.model.linking.LinkResponse;
+import fr.uge.modules.api.model.linking.Relation;
 
 import java.util.List;
-import java.util.Set;
-import java.util.SortedMap;
-import java.util.SortedSet;
+import java.util.TreeSet;
 
-public record GeneratedReport(LogEntity rootCause, SortedMap<Double, LogEntity> computations) {
+public record GeneratedReport(LogEntity rootCause, List<LogEntity> relevantLogs, TreeSet<Relation> computations) {
 }

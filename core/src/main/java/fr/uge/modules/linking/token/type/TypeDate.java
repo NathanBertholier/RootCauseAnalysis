@@ -1,5 +1,10 @@
 package fr.uge.modules.linking.token.type;
 
+import fr.uge.modules.api.model.entities.TokenEntity;
+import fr.uge.modules.api.model.linking.TokensLink;
+
+import java.util.List;
+
 public class TypeDate implements TokenType{
 
     private static final String NAME = "date";
@@ -18,5 +23,10 @@ public class TypeDate implements TokenType{
     @Override
     public Integer getTokenTypeId() {
         return 0;
+    }
+
+    @Override
+    public TokensLink computeProximity(List<TokenEntity> tokenLeft, List<TokenEntity> tokenRight) {
+        return TokensLink.withoutStrategy(0);
     }
 }

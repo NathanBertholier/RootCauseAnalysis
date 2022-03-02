@@ -2,7 +2,8 @@ package fr.uge.modules.linking.token.type;
 
 import fr.uge.modules.api.model.entities.TokenEntity;
 import fr.uge.modules.api.model.linking.Computation;
-import fr.uge.modules.api.model.linking.Links;
+import fr.uge.modules.api.model.linking.TokensLink;
+import fr.uge.modules.linking.strategy.AverageStrategy;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,8 +29,8 @@ public class TypeHTTPStatus implements TokenType{
     }
 
     @Override
-    public Links computeProximity(List<TokenEntity> listTokensLeft, List<TokenEntity> listTokensRight) {
-        if (listTokensLeft.isEmpty() || listTokensRight.isEmpty()) return Links.emptyLink(0);
+    public TokensLink computeProximity(List<TokenEntity> listTokensLeft, List<TokenEntity> listTokensRight) {
+        if (listTokensLeft.isEmpty() || listTokensRight.isEmpty()) return TokensLink.withoutStrategy(0);
         var type = new TypeHTTPStatus();
 
         List<Computation> computations = new ArrayList<>();
@@ -43,7 +44,7 @@ public class TypeHTTPStatus implements TokenType{
             }
         }
 
-        return new Links(computations, computations.stream().mapToDouble(Computation::proximity).sum() / computations.size());
+        return new TokensLink(computations, new AverageStrategy());
     }
 
     private static double fromValues(String left, String right){

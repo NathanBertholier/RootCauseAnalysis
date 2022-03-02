@@ -2,7 +2,8 @@ package fr.uge.modules.linking.token.type;
 
 import fr.uge.modules.api.model.entities.TokenEntity;
 import fr.uge.modules.api.model.linking.Computation;
-import fr.uge.modules.api.model.linking.Links;
+import fr.uge.modules.api.model.linking.TokensLink;
+import fr.uge.modules.linking.strategy.AverageStrategy;
 
 import java.util.Collection;
 import java.util.List;
@@ -22,9 +23,9 @@ public class TypeResource implements TokenType{
     public Integer getTokenTypeId() { return TokenTypeId.ID_RESOURCE.getId(); }
 
     @Override
-    public Links computeProximity(List<TokenEntity> tokenLeft, List<TokenEntity> tokenRight) {
+    public TokensLink computeProximity(List<TokenEntity> tokenLeft, List<TokenEntity> tokenRight) {
         if(tokenLeft.isEmpty() || tokenRight.isEmpty()) {
-            return Links.emptyLink(50);
+            return TokensLink.withoutStrategy(50);
         }
         var computations = tokenLeft.stream().map(TokenEntity::getValue)
                 .map(tokenL -> tokenRight.stream()
@@ -52,7 +53,7 @@ public class TypeResource implements TokenType{
                         .toList())
                 .flatMap(Collection::stream)
                 .toList();
-        return new Links(computations, computations.stream().mapToDouble(Computation::proximity).sum() / computations.size());
+        return new TokensLink(computations, new AverageStrategy());
     }
 
 }

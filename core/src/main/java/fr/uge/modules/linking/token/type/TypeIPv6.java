@@ -2,7 +2,8 @@ package fr.uge.modules.linking.token.type;
 
 import fr.uge.modules.api.model.entities.TokenEntity;
 import fr.uge.modules.api.model.linking.Computation;
-import fr.uge.modules.api.model.linking.Links;
+import fr.uge.modules.api.model.linking.TokensLink;
+import fr.uge.modules.linking.strategy.AverageStrategy;
 
 import java.util.Collection;
 import java.util.Comparator;
@@ -28,8 +29,8 @@ public class TypeIPv6 implements TokenType{
     }
 
     @Override
-    public Links computeProximity(List<TokenEntity> tokenLeft, List<TokenEntity> tokenRight) {
-        if (tokenLeft.isEmpty() || tokenRight.isEmpty()) return Links.emptyLink(0);
+    public TokensLink computeProximity(List<TokenEntity> tokenLeft, List<TokenEntity> tokenRight) {
+        if (tokenLeft.isEmpty() || tokenRight.isEmpty()) return TokensLink.withoutStrategy(0);
         var type = new TypeIPv6();
 
         var computations = tokenLeft.stream().map(tokenL -> tokenRight.stream()
@@ -44,7 +45,7 @@ public class TypeIPv6 implements TokenType{
                 .limit(Integer.max(tokenLeft.size(), tokenRight.size()))
                 .toList();
 
-        return new Links(computations, computations.stream().mapToDouble(Computation::proximity).sum() / computations.size());
+        return new TokensLink(computations, new AverageStrategy());
     }
 
 }

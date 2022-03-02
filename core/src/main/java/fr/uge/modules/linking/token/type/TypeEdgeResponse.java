@@ -2,7 +2,8 @@ package fr.uge.modules.linking.token.type;
 
 import fr.uge.modules.api.model.entities.TokenEntity;
 import fr.uge.modules.api.model.linking.Computation;
-import fr.uge.modules.api.model.linking.Links;
+import fr.uge.modules.api.model.linking.TokensLink;
+import fr.uge.modules.linking.strategy.AverageStrategy;
 
 import java.util.Collection;
 import java.util.List;
@@ -28,9 +29,9 @@ public class TypeEdgeResponse implements TokenType {
     }
 
     @Override
-    public Links computeProximity(List<TokenEntity> listTokensLeft, List<TokenEntity> listTokensRight) {
+    public TokensLink computeProximity(List<TokenEntity> listTokensLeft, List<TokenEntity> listTokensRight) {
         var type = new TypeEdgeResponse();
-        if (listTokensLeft.isEmpty() || listTokensRight.isEmpty()) return Links.emptyLink(50);
+        if (listTokensLeft.isEmpty() || listTokensRight.isEmpty()) return TokensLink.withoutStrategy(50);
 
         var computations = listTokensLeft.stream()
                 .map(TokenEntity::getValue)
@@ -51,6 +52,6 @@ public class TypeEdgeResponse implements TokenType {
                             else return new Computation(type, leftValue, rightValue, 0d);
                         }).toList()
                 ).flatMap(Collection::stream).toList();
-        return new Links(computations, computations.stream().mapToDouble(Computation::proximity).sum() / computations.size());
+        return new TokensLink(computations, new AverageStrategy());
     }
 }

@@ -9,5 +9,5 @@ import java.util.Set;
 public interface GenericReport {
     LogEntity getRoot();
     Set<TokensMostSeen> getSeenTokens();
-    Set<LogEntity> getRelevantLogs();
+    List<LogEntity> getRelevantLogs();
 }

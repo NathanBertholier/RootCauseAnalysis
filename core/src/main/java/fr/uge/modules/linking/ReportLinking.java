@@ -3,74 +3,110 @@ package fr.uge.modules.linking;
 import fr.uge.modules.api.model.entities.LogEntity;
 import fr.uge.modules.api.model.entities.TokenEntity;
 import fr.uge.modules.api.model.linking.Computation;
-import fr.uge.modules.api.model.linking.LinkResponse;
+import fr.uge.modules.api.model.linking.Relation;
+import fr.uge.modules.api.model.linking.TokensLink;
 import fr.uge.modules.api.model.report.ReportParameter;
-import fr.uge.modules.linking.token.type.*;
+import fr.uge.modules.linking.strategy.AverageStrategy;
+import fr.uge.modules.linking.token.type.TokenType;
+import fr.uge.modules.linking.token.type.TypeDatetime;
+import org.jboss.logmanager.Level;
 
 import java.util.*;
+import java.util.function.Function;
+import java.util.logging.ConsoleHandler;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
+
+import static java.util.stream.Collectors.mapping;
 
 public class ReportLinking {
 
-    private final HashMap<Integer, TokenType> tokensType = new HashMap<>();
-    private final Logger logger = Logger.getLogger(this.getClass().getName());
+    private static class TokenGrouperManager {
+        private final Map<Long, Map<Integer, List<TokenEntity>>> fromId = new HashMap<>();
 
-    public ReportLinking() {
-        this.addInTokensType(TokenType.TokenTypeId.ID_IPV4.getId(), new TypeIPv4());
-        this.addInTokensType(TokenType.TokenTypeId.ID_IPV6.getId(), new TypeIPv6());
-        this.addInTokensType(TokenType.TokenTypeId.ID_DATETIME.getId(), new TypeDatetime());
-        this.addInTokensType(TokenType.TokenTypeId.ID_EDGERESPONSE.getId(), new TypeEdgeResponse());
-        this.addInTokensType(TokenType.TokenTypeId.ID_STATUS.getId(), new TypeHTTPStatus());
+        public Map<Integer, List<TokenEntity>> groupTokens(LogEntity log){
+            return fromId.computeIfAbsent(log.id, id -> groupMethod(log.tokens));
+        }
+
+        private Map<Integer, List<TokenEntity>> groupMethod(List<TokenEntity> tokenEntities){
+            return tokenEntities.stream().collect(Collectors.groupingBy(
+                    TokenEntity::getIdtokentype, mapping(Function.identity(), Collectors.toList())
+            ));
+        }
     }
 
-    private void addInTokensType(Integer id, TokenType tokenType) {
-        tokensType.compute(id, (k,v) -> tokenType);
+    private static class RelationManager {
+        private static final TokenGrouperManager grouperManager = new TokenGrouperManager();
+
+        private Relation computeRelation(LogEntity firstLog, LogEntity secondLog){
+            var firstMap = grouperManager.groupTokens(firstLog);
+            var secondMap = grouperManager.groupTokens(secondLog);
+
+            var computations = firstMap.entrySet().stream()
+                    .map(entry -> {
+                        var tokenTypeId = entry.getKey();
+                        var tokenType = TokenType.fromId(tokenTypeId);
+                        var entryList = entry.getValue();
+                        var toCompareList = secondMap.getOrDefault(tokenTypeId, new ArrayList<>());
+                        var link = tokenType.computeProximity(entryList, toCompareList);
+                        return link;
+                    })
+                    .map(TokensLink::getComputations)
+                    .flatMap(Collection::stream)
+                    .toList();
+
+            var finalRelation = new TokensLink(computations, new AverageStrategy());
+            System.out.println("FinalRelation: " + finalRelation);
+
+            return new Relation(firstLog, secondLog, finalRelation);
+        }
+
+        public Relation addToRelation(Relation relation, Computation computation){
+            return new Relation(relation.source(), relation.target(), relation.tokensLinks().addComputation(computation));
+        }
     }
 
-    private void fillHashmap(List<TokenEntity> tokens, HashMap<Integer, List<TokenEntity>> tokensToFill) {
-        tokens.forEach(token -> tokensToFill
-                .computeIfAbsent(token.getIdtokentype(), ArrayList::new)
-                .add(token)
-        );
+    private static final RelationManager relationManager = new RelationManager();
+    private static final Logger LOGGER = Logger.getLogger(ReportLinking.class.getName());
+
+    static {
+        LOGGER.addHandler(new ConsoleHandler());
     }
 
-    public SortedSet<LinkResponse> computeProximityTree(LogEntity logTarget, List<LogEntity> logWithinDelta, ReportParameter rp){
-        TreeSet<LinkResponse> redBlack = new TreeSet<>(Comparator.comparingDouble(linkResponse -> linkResponse.links().proximity()));
+    public TreeSet<Relation> computeProximityTree(LogEntity logTarget, List<LogEntity> logWithinDelta, ReportParameter rp){
+        TreeSet<Relation> redBlack = new TreeSet<>(Comparator.comparingDouble(relation -> - relation.tokensLinks().getProximity()));
         var targetDatetime = logTarget.datetime;
 
-        HashMap<Integer, List<TokenEntity>> tokenTarget = new HashMap<>();
-        fillHashmap(logTarget.tokens, tokenTarget);
-
         var delta = rp.delta();
+        var proximityLimit = rp.proximity_limit();
+        var networkSize = rp.network_size();
 
-        HashMap<Integer, List<TokenEntity>> tokenToLink = new HashMap<>();
-        this.tokensType.forEach((id,v) -> tokenToLink.computeIfAbsent(id, k -> new ArrayList<>()));
+        logWithinDelta.stream()
+                .map(log -> {
+                    var relation = relationManager.computeRelation(logTarget, log);
+                    Computation datetimeComputation = TypeDatetime.computeDateTimeProximity(log.datetime, targetDatetime, delta);
+                    relationManager.addToRelation(relation, datetimeComputation);
 
-        logWithinDelta.forEach(log -> {
-            Computation dateTimeCommputation = TypeDatetime.computeDateTimeProximity(log.datetime, targetDatetime, delta);
-            log.getTokens().forEach(token -> tokenToLink.get(token.getIdtokentype()).add(token));
-
-            tokenTarget.keySet().stream()
-                    .map(tokentypeid -> {
-                        var tokenType = TokenType.fromId(tokentypeid);
-                        var target = tokenTarget.get(tokentypeid);
-                        var toLink = tokenToLink.get(tokentypeid);
-                        return tokenType.computeProximity(target, toLink);
-                    })
-                    .map(link -> new LinkResponse(logTarget, log, link))
-                    .forEach(linkResponse -> {
-                        var proximity = linkResponse.links().proximity();
-                        if(proximity > rp.proximity_limit()){
-                            if(redBlack.size() == rp.network_size()){
-                                redBlack.pollFirst();
-                                redBlack.add(linkResponse);
-                            } else redBlack.add(linkResponse);
+                    LOGGER.log(Level.DEBUG, "Relation created between " + logTarget + " and " + log + ": " + relation);
+                    System.out.println("Relation: " + relation);
+                    return relation;
+                })
+                .forEach(relation -> {;
+                    var relationProximity = relation.tokensLinks().getProximity();
+                    if(!redBlack.isEmpty()) {
+                        var firstProximity = redBlack.first().tokensLinks().getProximity();
+                        if(relationProximity > proximityLimit){
+                            if(redBlack.size() == networkSize){
+                                if(relationProximity > firstProximity){
+                                    redBlack.pollFirst();
+                                    redBlack.add(relation);
+                                }
+                            } else redBlack.add(relation);
                         }
-                    });
-        });
+                    } else redBlack.add(relation);
+                });
 
         System.out.println("RedBlack: " + redBlack);
-        return redBlack.descendingSet();
+        return redBlack;
     }
-
 }

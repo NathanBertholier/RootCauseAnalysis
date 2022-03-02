@@ -1,6 +1,5 @@
 package fr.uge.modules.synthetization;
 
-import fr.uge.modules.api.model.linking.LinkResponse;
 import fr.uge.modules.api.model.report.GenericReport;
 import fr.uge.modules.api.model.report.ReportResponse;
 import fr.uge.modules.api.model.TokensMostSeen;
@@ -9,7 +8,6 @@ import fr.uge.modules.api.model.entities.TokenEntity;
 import fr.uge.modules.api.model.report.ReportParameter;
 import fr.uge.modules.api.model.report.ReportResponseExpanded;
 import fr.uge.modules.error.EmptyReportError;
-import fr.uge.modules.error.NotYetTokenizedError;
 import fr.uge.modules.linking.LogsLinking;
 import io.smallrye.mutiny.Multi;
 import io.smallrye.mutiny.Uni;
@@ -32,15 +30,23 @@ public class Synthetization {
         return LogEntity.<LogEntity>findById(idLogTarget)
                 .invoke(log -> LOGGER.log(Level.INFO, "Retrieved log target: {0}", log))
                 .chain(log -> LogsLinking.linkedLogs(log, reportParameter)
-                        .chain(set -> getMostSeenTokens(set)
-                                    .map(tokens -> new ReportResponse(set.first(), tokens, set))
+                        .chain(generatedReport -> getMostSeenTokens(generatedReport.relevantLogs())
+                                    .map(tokens -> {
+                                        var relevantLogs = generatedReport.relevantLogs();
+                                        var rootCause = generatedReport.rootCause();
+                                        var report = new ReportResponse(rootCause, tokens, relevantLogs);
+                                        if(!reportParameter.expanded()) return report;
+                                        else {
+                                            return new ReportResponseExpanded(report, generatedReport.computations());
+                                        }
+                                    })
                         )
                 );
     }
 
-    private static Uni<TreeSet<TokensMostSeen>> getMostSeenTokens(Set<LogEntity> logs) {
+    private static Uni<TreeSet<TokensMostSeen>> getMostSeenTokens(List<LogEntity> logs) {
         Comparator<TokensMostSeen> comparator = Comparator.comparingLong(TokensMostSeen::count);
-        return Multi.createFrom().items(logs.stream().flatMap(log -> log.tokens.stream()))
+        return Multi.createFrom().items(logs.stream().flatMap(logEntity -> logEntity.tokens.stream()))
                 .group().by(TokenEntity::getIdtokentype)
                 .collect().in(() -> new TreeSet<>(comparator), (set, group) -> group.collect()
                         .asList()

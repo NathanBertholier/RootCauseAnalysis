@@ -5,7 +5,7 @@ import fr.uge.modules.api.model.entities.LogEntity;
 
 import java.util.*;
 
-public record ReportResponse(LogEntity root, Set<TokensMostSeen> tokens, Set<LogEntity> logs) implements GenericReport {
+public record ReportResponse(LogEntity root, Set<TokensMostSeen> tokens, List<LogEntity> logs) implements GenericReport {
     @Override
     public LogEntity getRoot() {
         return root;
@@ -17,7 +17,7 @@ public record ReportResponse(LogEntity root, Set<TokensMostSeen> tokens, Set<Log
     }
 
     @Override
-    public Set<LogEntity> getRelevantLogs() {
+    public List<LogEntity> getRelevantLogs() {
         return logs;
     }
 

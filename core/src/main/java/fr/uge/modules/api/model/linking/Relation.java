@@ -2,13 +2,16 @@ package fr.uge.modules.api.model.linking;
 
 import fr.uge.modules.api.model.entities.LogEntity;
 
-public record LinkResponse(LogEntity source, LogEntity target, Links links) {
+import java.util.List;
+import java.util.Map;
+
+public record Relation(LogEntity source, LogEntity target, TokensLink tokensLinks) {
     @Override
     public String toString() {
-        return "LinkResponse{" +
+        return "Relation{" +
                 "source=" + source +
                 ", target=" + target +
-                ", link=" + links +
+                ", tokensLinks=" + tokensLinks +
                 '}';
     }
 }

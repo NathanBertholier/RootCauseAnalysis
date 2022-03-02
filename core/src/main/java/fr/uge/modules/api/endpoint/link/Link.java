@@ -2,7 +2,7 @@ package fr.uge.modules.api.endpoint.link;
 
 import fr.uge.modules.api.EnvRetriever;
 import fr.uge.modules.api.model.entities.LogEntity;
-import fr.uge.modules.api.model.linking.Links;
+import fr.uge.modules.api.model.linking.TokensLink;
 import fr.uge.modules.linking.LogsLinking;
 import io.smallrye.common.constraint.NotNull;
 import io.smallrye.mutiny.Uni;
@@ -19,7 +19,7 @@ public class Link {
     @GET
     @Consumes(APPLICATION_JSON)
     @Produces(APPLICATION_JSON)
-    public Uni<Links> getProximity(
+    public Uni<TokensLink> getProximity(
             @QueryParam("id1") @NotNull long id_log_first,
             @QueryParam("id2") @NotNull long id_log_second,
             @QueryParam("delta") Long delta){
