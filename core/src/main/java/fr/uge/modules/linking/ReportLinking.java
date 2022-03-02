@@ -26,19 +26,20 @@ public class ReportLinking {
         tokensType.compute(id, (k,v) -> tokenType);
     }
 
-    private void fillHashmap(List<TokenEntity> tokens, HashMap<Integer, List<TokenEntity>> tokensToFill) {
+    private HashMap<Integer, List<TokenEntity>> fillHashmap(List<TokenEntity> tokens) {
+        HashMap<Integer, List<TokenEntity>> tokensToFill = new HashMap<>();
         tokens.forEach(token -> tokensToFill
                 .computeIfAbsent(token.getIdtokentype(), ArrayList::new)
                 .add(token)
         );
+        return tokensToFill;
     }
 
     public SortedMap<Double, LogEntity> computeProximityTree(LogEntity logTarget, List<LogEntity> logWithinDelta, ReportParameter rp){
         TreeMap<Double, LogEntity> redBlack = new TreeMap<>(Collections.reverseOrder());
         var targetDatetime = logTarget.datetime;
 
-        HashMap<Integer, List<TokenEntity>> tokenTarget = new HashMap<>();
-        fillHashmap(logTarget.tokens, tokenTarget);
+        HashMap<Integer, List<TokenEntity>> tokenTarget = fillHashmap(logTarget.tokens);
 
         var delta = rp.delta();
 
