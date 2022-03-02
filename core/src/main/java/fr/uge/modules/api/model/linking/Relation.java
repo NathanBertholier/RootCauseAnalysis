@@ -1,17 +1,17 @@
 package fr.uge.modules.api.model.linking;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import fr.uge.modules.api.model.entities.LogEntity;
+import fr.uge.modules.api.serializer.RelationSerializer;
 
-import java.util.List;
-import java.util.Map;
-
-public record Relation(LogEntity source, LogEntity target, TokensLink tokensLinks) {
+@JsonSerialize(using = RelationSerializer.class)
+public record Relation(LogEntity source, LogEntity target, TokensLink tokensLink) {
     @Override
     public String toString() {
         return "Relation{" +
                 "source=" + source +
                 ", target=" + target +
-                ", tokensLinks=" + tokensLinks +
+                ", tokensLink=" + tokensLink +
                 '}';
     }
 }

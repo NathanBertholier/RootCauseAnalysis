@@ -20,8 +20,8 @@ public class ExpendedReportSerializer extends StdSerializer<ReportResponseExpand
     @Override
     public void serialize(ReportResponseExpanded reportResponseExpanded, JsonGenerator jsonGenerator, SerializerProvider serializerProvider) throws IOException {
         jsonGenerator.writeStartObject();
-        jsonGenerator.writeNumberField("root", reportResponseExpanded.getRoot().id);
-        jsonGenerator.writeNumberField("computations", reportResponseExpanded.proximity().size());
+        serializerProvider.defaultSerializeField("report", reportResponseExpanded.reportResponseBase(), jsonGenerator);
+        serializerProvider.defaultSerializeField("proximities", reportResponseExpanded.getProximity().stream().toList(), jsonGenerator);
         jsonGenerator.writeEndObject();
     }
 }

@@ -3,6 +3,7 @@ package fr.uge.modules.api.serializer;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.ser.std.StdSerializer;
+import fr.uge.modules.api.model.TokensMostSeen;
 import fr.uge.modules.api.model.report.GenericReport;
 
 import java.io.IOException;
@@ -20,6 +21,10 @@ public class SimpleReportSerializer extends StdSerializer<GenericReport> {
     public void serialize(GenericReport genericReport, JsonGenerator jsonGenerator, SerializerProvider serializerProvider) throws IOException {
         jsonGenerator.writeStartObject();
         serializerProvider.defaultSerializeField("root", genericReport.getRoot(), jsonGenerator);
+        for(TokensMostSeen tms : genericReport.getSeenTokens()){
+            serializerProvider.defaultSerializeField("token_values", tms.token_values(), jsonGenerator);
+        }
+        serializerProvider.defaultSerializeField("logs", genericReport.getRelevantLogs(), jsonGenerator);
         jsonGenerator.writeEndObject();
     }
 }

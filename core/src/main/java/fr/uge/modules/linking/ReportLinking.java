@@ -60,7 +60,7 @@ public class ReportLinking {
         }
 
         public Relation addToRelation(Relation relation, Computation computation){
-            return new Relation(relation.source(), relation.target(), relation.tokensLinks().addComputation(computation));
+            return new Relation(relation.source(), relation.target(), relation.tokensLink().addComputation(computation));
         }
     }
 
@@ -72,7 +72,7 @@ public class ReportLinking {
     }
 
     public TreeSet<Relation> computeProximityTree(LogEntity logTarget, List<LogEntity> logWithinDelta, ReportParameter rp){
-        TreeSet<Relation> redBlack = new TreeSet<>(Comparator.comparingDouble(relation -> - relation.tokensLinks().getProximity()));
+        TreeSet<Relation> redBlack = new TreeSet<>(Comparator.comparingDouble(relation -> - relation.tokensLink().getProximity()));
         var targetDatetime = logTarget.datetime;
 
         var delta = rp.delta();
@@ -89,9 +89,9 @@ public class ReportLinking {
                     return relation;
                 })
                 .forEach(relation -> {;
-                    var relationProximity = relation.tokensLinks().getProximity();
+                    var relationProximity = relation.tokensLink().getProximity();
                     if(!redBlack.isEmpty()) {
-                        var firstProximity = redBlack.first().tokensLinks().getProximity();
+                        var firstProximity = redBlack.first().tokensLink().getProximity();
                         if(relationProximity > proximityLimit){
                             if(redBlack.size() == networkSize){
                                 if(relationProximity > firstProximity){
