@@ -5,11 +5,9 @@ import fr.uge.modules.tokenization.configuration.timestamp.DateTimeFormatter;
 import fr.uge.modules.tokenization.configuration.timestamp.DefaultDateTime;
 
 import javax.enterprise.context.ApplicationScoped;
-import javax.inject.Named;
 import java.sql.Timestamp;
 import java.util.*;
 
-@Named("standard")
 @ApplicationScoped
 public class StandardProfile implements Profile {
     private final HashMap<TokenType, Integer> tokenTypeIndex = new HashMap<>();
@@ -18,11 +16,12 @@ public class StandardProfile implements Profile {
 
 
     public StandardProfile() {
-        tokenTypeIndex.put(new TypeIPv4(), -1);
-        tokenTypeIndex.put(new TypeHTTPStatus(), -1);
-        tokenTypeIndex.put(new TypeEdgeResponse(), -1);
-        tokenTypeIndex.put(new TypeIPv6(), -1);
-        tokenTypeIndex.put(new TypeURL(), -1);
+        tokenTypes.add(new TypeIPv4());
+        tokenTypes.add(new TypeResource());
+        tokenTypes.add(new TypeHTTPStatus());
+        tokenTypes.add(new TypeURL());
+        tokenTypes.add(new TypeEdgeResponse());
+        tokenTypes.add(new TypeIPv6());
     }
 
     @Override

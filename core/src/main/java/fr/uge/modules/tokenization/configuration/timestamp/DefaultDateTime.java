@@ -1,5 +1,6 @@
 package fr.uge.modules.tokenization.configuration.timestamp;
 
+import javax.enterprise.context.ApplicationScoped;
 import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;

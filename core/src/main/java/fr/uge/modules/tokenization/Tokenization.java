@@ -3,10 +3,13 @@ package fr.uge.modules.tokenization;
 import fr.uge.modules.api.model.entities.LogEntity;
 import fr.uge.modules.api.model.entities.TokenEntity;
 import fr.uge.modules.linking.token.type.TokenType;
+import fr.uge.modules.tokenization.configuration.AWSProfile;
 import fr.uge.modules.tokenization.configuration.Profile;
+import fr.uge.modules.tokenization.configuration.StandardProfile;
+import io.quarkus.runtime.StartupEvent;
+import org.eclipse.microprofile.config.ConfigProvider;
 import javax.enterprise.context.ApplicationScoped;
-import javax.inject.Inject;
-import javax.inject.Named;
+import javax.enterprise.event.Observes;
 import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.*;
@@ -16,9 +19,16 @@ import java.util.logging.Logger;
 public class Tokenization {
     private static final Logger LOGGER = Logger.getGlobal();
 
-    @Named("AWS")
-    @Inject
-    Profile profile;
+    private Profile profile;
+
+    public void chooseProfile(@Observes StartupEvent ev) {
+        this.profile = switch (ConfigProvider.getConfig()
+                .getOptionalValue("profile.name", String.class)
+                .orElse("standard")) {
+            case "AWS" -> new AWSProfile();
+            default -> new StandardProfile();
+        };
+    }
 
     public LogEntity tokenizeLog(long id, String body) {
         Objects.requireNonNull(body);
@@ -42,16 +52,12 @@ public class Tokenization {
 
     private Optional<TokenEntity> getTokenWithIndex(Integer index, TokenType tokenType, List<String> words) {
         var token = new TokenEntity();
-        if(index > words.size()) {
-            return Optional.empty();
+        if(index < words.size() - 1 && tokenType.matcher(words.get(index)) != -1) {
+            token.setIdtokentype(tokenType.getTokenTypeId());
+            token.setValue(words.get(index));
+            return Optional.of(token);
         }
-        if(tokenType.matcher(words.get(index)) == -1) {
-            return Optional.empty();
-        }
-
-        token.setIdtokentype(tokenType.getTokenTypeId());
-        token.setValue(words.get(index));
-        return Optional.of(token);
+        return Optional.empty();
     }
 
     public List<TokenEntity> getTokens(List<String> words) {
@@ -63,7 +69,9 @@ public class Tokenization {
                 tokenTypesNoFound.add(k.getKey());
             }
             return token;
-        }).filter(Optional::isPresent).map(Optional::get).toList()));
+        }).filter(Optional::isPresent)
+                .map(Optional::get)
+                .toList()));
 
         tokenTypesNoFound.addAll(profile.getTokenType());
 
