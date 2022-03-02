@@ -2,12 +2,9 @@ package fr.uge.modules.api.endpoint.report;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.module.SimpleModule;
 import fr.uge.modules.api.EnvRetriever;
 import fr.uge.modules.api.model.report.GenericReport;
 import fr.uge.modules.api.model.report.ReportParameter;
-import fr.uge.modules.api.model.report.ReportResponse;
-import fr.uge.modules.api.serializer.SimpleReportSerializer;
 import fr.uge.modules.error.EmptyReportError;
 import fr.uge.modules.error.NotYetTokenizedError;
 import fr.uge.modules.error.RootCauseError;
@@ -29,7 +26,7 @@ public class ReportEndpoint {
     @Inject
     EnvRetriever envRetriever;
     private static final Logger LOGGER = Logger.getLogger(ReportEndpoint.class.getName());
-    private static final Function<RootCauseError, Response> withStatusAndError = rootCauseError ->
+    private static final Function<RootCauseError, Response> withRootCauseError = rootCauseError ->
             Response
                     .status(rootCauseError.getStatus())
                     .entity(rootCauseError.getMessage())
@@ -41,13 +38,14 @@ public class ReportEndpoint {
 
     @GET
     @Produces(APPLICATION_JSON)
-    public Uni<String> getReport(
+    public Uni<Response> getReport(
             @PathParam("id") long idLogTarget,
             @QueryParam("expanded") Boolean expanded,
             @QueryParam("delta") Long delta,
             @QueryParam("cache") Boolean cache,
             @QueryParam("proximity_limit") Integer proximity_limit,
-            @QueryParam("network_size") Integer network_size
+            @QueryParam("network_size") Integer network_size,
+            @QueryParam("debug") Boolean debug
     ) {
         if(expanded == null) expanded = envRetriever.reportDefaultExpanded();
         if(delta == null) delta = envRetriever.reportDefaultDelta();
@@ -59,18 +57,12 @@ public class ReportEndpoint {
 
         LOGGER.log(Level.INFO, "Received request for id " +  idLogTarget + " with parameters: " + reportParameter);
 
-
         return Synthetization.getReport(idLogTarget, reportParameter)
                 .map(report -> {
-                    try {
-                        return asString(report);
-                    } catch (JsonProcessingException e) {
-                        return "Problem: " + e;
-                    }
-                });
-    }
-
-    private static String asString(GenericReport report) throws JsonProcessingException {
-        return new ObjectMapper().writeValueAsString(report);
+                    LOGGER.log(Level.INFO, "Generated report: {0}", report);
+                    return Response.ok(report).build();
+                })
+                .onFailure(NotYetTokenizedError.class).recoverWithItem(withRootCauseError.apply(new NotYetTokenizedError()))
+                .onFailure(EmptyReportError.class).recoverWithItem(withRootCauseError.apply(new EmptyReportError()));
     }
 }
