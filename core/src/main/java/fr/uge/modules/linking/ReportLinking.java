@@ -56,8 +56,6 @@ public class ReportLinking {
                     .toList();
 
             var finalRelation = new TokensLink(computations, new AverageStrategy());
-            System.out.println("FinalRelation: " + finalRelation);
-
             return new Relation(firstLog, secondLog, finalRelation);
         }
 
@@ -88,7 +86,6 @@ public class ReportLinking {
                     relationManager.addToRelation(relation, datetimeComputation);
 
                     LOGGER.log(Level.DEBUG, "Relation created between " + logTarget + " and " + log + ": " + relation);
-                    System.out.println("Relation: " + relation);
                     return relation;
                 })
                 .forEach(relation -> {;
@@ -106,7 +103,7 @@ public class ReportLinking {
                     } else redBlack.add(relation);
                 });
 
-        System.out.println("RedBlack: " + redBlack);
+        LOGGER.log(Level.DEBUG, "Generated tree for id " + logTarget.id + ": " + redBlack);
         return redBlack;
     }
 }

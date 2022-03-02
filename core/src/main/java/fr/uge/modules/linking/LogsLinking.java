@@ -4,12 +4,14 @@ import fr.uge.modules.api.model.entities.LogEntity;
 import fr.uge.modules.api.model.entities.TokenEntity;
 import fr.uge.modules.api.model.linking.Relation;
 import fr.uge.modules.api.model.linking.TokensLink;
+import fr.uge.modules.api.model.report.GenericReport;
 import fr.uge.modules.api.model.report.ReportParameter;
 import fr.uge.modules.error.EmptyReportError;
 import fr.uge.modules.error.NotYetTokenizedError;
 import fr.uge.modules.linking.token.type.TokenType;
 import fr.uge.modules.synthetization.GeneratedReport;
 import io.smallrye.mutiny.Uni;
+import io.smallrye.mutiny.unchecked.Unchecked;
 
 import java.sql.Timestamp;
 import java.time.Duration;
@@ -17,12 +19,14 @@ import java.util.*;
 import java.util.logging.ConsoleHandler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
+
+import static java.util.Objects.isNull;
 
 // TODO
 public class LogsLinking {
     private static final Logger LOGGER = Logger.getLogger(LogsLinking.class.getName());
-    private static final Comparator<Relation> timeComparator = Comparator.comparing(relation -> relation.target().datetime);
-    private static final Comparator<Relation> proximityComparator = Comparator.comparingDouble(relation -> relation.tokensLinks().getProximity());
+    private static final Comparator<Relation> datetimeComparator = Comparator.comparing(relation -> relation.target().datetime);
 
     static {
         LOGGER.addHandler(new ConsoleHandler());
@@ -71,7 +75,7 @@ public class LogsLinking {
      */
     public static Uni<GeneratedReport> linkedLogs(LogEntity root, ReportParameter reportParameter){
         LOGGER.log(Level.INFO, "Linking logs to {0}", root);
-        if(Objects.isNull(root)) throw new NotYetTokenizedError();
+        if(isNull(root)) throw new NotYetTokenizedError();
 
         var reportGenerator = new ReportLinking();
         var datetime = root.datetime;
@@ -80,14 +84,19 @@ public class LogsLinking {
                     Timestamp.valueOf(datetime.toLocalDateTime().minus(Duration.ofSeconds(reportParameter.delta()))),
                     datetime).list()
                 .map(list -> reportGenerator.computeProximityTree(root, list, reportParameter))
-                .map(treeset -> {
-                    var rootCause = treeset.stream()
-                            .findFirst()
-                            .orElseThrow(EmptyReportError::new)
-                            .target();
-                    var relevantLogs = treeset.stream().map(Relation::target).toList();
-                    return new GeneratedReport(rootCause, relevantLogs, treeset);
-                })
+                .map(LogsLinking::fromRelationsTree)
+                .invoke(generatedReport -> LOGGER.log(Level.INFO, "Generated report for id " + root.id + ": " + generatedReport))
                 .onFailure().invoke(error -> LOGGER.severe("Error: " + error));
+    }
+
+    private static GeneratedReport fromRelationsTree(TreeSet<Relation> treeset){
+        var rootcause = treeset.stream()
+                .max(datetimeComparator)
+                .orElseThrow(EmptyReportError::new)
+                .target();
+        var relevantLogs = treeset.stream()
+                .map(Relation::target)
+                .toList();
+        return new GeneratedReport(rootcause, relevantLogs, treeset);
     }
 }
