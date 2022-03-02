@@ -1,7 +1,13 @@
 package fr.uge.modules.api.endpoint.report;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.module.SimpleModule;
 import fr.uge.modules.api.EnvRetriever;
+import fr.uge.modules.api.model.report.GenericReport;
 import fr.uge.modules.api.model.report.ReportParameter;
+import fr.uge.modules.api.model.report.ReportResponse;
+import fr.uge.modules.api.serializer.SimpleReportSerializer;
 import fr.uge.modules.error.EmptyReportError;
 import fr.uge.modules.error.NotYetTokenizedError;
 import fr.uge.modules.error.RootCauseError;
@@ -35,7 +41,7 @@ public class ReportEndpoint {
 
     @GET
     @Produces(APPLICATION_JSON)
-    public Uni<Response> getReport(
+    public Uni<String> getReport(
             @PathParam("id") long idLogTarget,
             @QueryParam("expanded") Boolean expanded,
             @QueryParam("delta") Long delta,
@@ -53,11 +59,18 @@ public class ReportEndpoint {
 
         LOGGER.log(Level.INFO, "Received request for id " +  idLogTarget + " with parameters: " + reportParameter);
 
+
         return Synthetization.getReport(idLogTarget, reportParameter)
-                .map(reportResponse -> Response.ok(reportResponse).build())
-                .onFailure(NotYetTokenizedError.class)
-                    .recoverWithItem(withStatusAndError.apply(new NotYetTokenizedError()))
-                .onFailure(EmptyReportError.class)
-                    .recoverWithItem(withStatusAndError.apply(new EmptyReportError()));
+                .map(report -> {
+                    try {
+                        return asString(report);
+                    } catch (JsonProcessingException e) {
+                        return "Problem: " + e;
+                    }
+                });
+    }
+
+    private static String asString(GenericReport report) throws JsonProcessingException {
+        return new ObjectMapper().writeValueAsString(report);
     }
 }
