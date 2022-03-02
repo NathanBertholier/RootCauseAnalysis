@@ -105,12 +105,12 @@ export  const Graph = () => {
                     </tbody>
                 </table>
             </div>
-            <div className={`toolTip ${Object.keys(logToolTip).length == 0  ? "d-none" : ""}`} >
+            <div className={`toolTip ${Object.keys(logToolTip).length === 0  ? "d-none" : ""}`} >
                 <div><span className="toolTip-title">Nœud : </span><span className="toolTip-value">{logToolTip.id}</span></div>
                 <div><span className="toolTip-entity">Log : </span><span className="toolTip-value">{logToolTip.content}</span></div>
                 <div><span className="toolTip-entity">DateTime : </span><span className="toolTip-value">{logToolTip.datetime}</span></div>
             </div>
-            <div className="legend" >
+            <div className="legend">
                 <div className="legend-title">Légende</div>
                 <div className="hint-container">
                     <div className="hint hint-node hint-orange"/>

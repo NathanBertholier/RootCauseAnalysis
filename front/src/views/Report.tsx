@@ -34,6 +34,7 @@ export const Report = () => {
         else {
             setError( formData,setFormData, "target", "*Le champs 'ID cible' est requis" );
             toast.show({
+                title: "Error",
                 content: "Le champs 'ID cible' est vide",
                 duration: 3000,
             });

@@ -12,21 +12,20 @@ export const Performance = () => {
                     <Container fluid>
                         <Row className="graph-container" >
                             <Col><iframe src="https://localhost:3001/d-solo/nMC1qBank/rootcause?orgId=1&refresh=5s&panelId=6"
-                                         width="100%" height="400" frameBorder="0" title="panel1" /></Col>
-                            <Col lg md sm xl xs xxl={8}><iframe src="https://localhost:3001/d-solo/nMC1qBank/rootcause?orgId=1&refresh=5s&panelId=2"
-                                         width="100%" height="400" frameBorder="0" title="panel3" /></Col>
+                                    width="100%" height="400" frameBorder="0" title="panel1" /></Col>
+                            <Col lg md sm xl xs xxl={8}><iframe src="https://localhost:3001/d-solo/nMC1qBank/rootcause?orgId=1&refresh=5s&panelId=2" width="100%" height="400" frameBorder="0" title="panel2" /></Col>
                             <Col><iframe src="https://localhost:3001/d-solo/nMC1qBank/rootcause?orgId=1&refresh=5s&panelId=4"
-                                    width="100%" height="400" frameBorder="0" title="panel2" /></Col>
+                                    width="100%" height="400" frameBorder="0" title="panel3" /></Col>
                         </Row>
                         <Row className="graph-container">
                             <Col lg md sm xl xs xxl={8}>
-                                <iframe
-                                    src="https://localhost:3001/d-solo/nMC1qBank/rootcause?orgId=1&refresh=5s&panelId=8"
-                                    width="100%" height="400" frameBorder="0"></iframe></Col>
+                                <iframe src="https://localhost:3001/d-solo/nMC1qBank/rootcause?orgId=1&refresh=5s&panelId=8"
+                                    width="100%" height="400" frameBorder="0" title="panel4"/>
+                            </Col>
                             <Col>
-                                <iframe
-                                    src="https://localhost:3001/d-solo/nMC1qBank/rootcause?orgId=1&refresh=5s&panelId=12"
-                                    width="100%" height="400" frameBorder="0"></iframe></Col>
+                                <iframe src="https://localhost:3001/d-solo/nMC1qBank/rootcause?orgId=1&refresh=5s&panelId=12"
+                                    width="100%" height="400" frameBorder="0" title="panel5"/>
+                            </Col>
                         </Row>
                     </Container>
                 </div>

@@ -31,6 +31,7 @@ export const ProximityCalc = () => {
         }
         else {
             toast.show({
+                title: "Error",
                 content: "Un des champs est vide",
                 duration: 3000,
             });

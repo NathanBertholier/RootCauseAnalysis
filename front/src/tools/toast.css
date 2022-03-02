@@ -8,28 +8,21 @@
     max-width: 500px;
 }
 
-#toast-container-main > div {
-    background-color: #aaaeba;
+.toast {
+    margin-top: 10px;
+}
+
+.toast-header {
+    color: black;
+}
+
+.toast-header-error {
+    background-color: #f95846;
     color: white;
-    width: 100%;
-    margin-bottom: 10px;
-    min-height: 50px;
-    padding: 12px;
-    animation: slide-in 0.2s;
-    transition: all 0.3s ease;
 }
 
-.toast-content-wrapper {
-    margin: 0;
-}
-
-.toast-content {
-    width: auto;
-    margin-top: 3px;
-}
-
-.toast-close {
-    text-align: right;
+.toast-header-error .btn-close {
+    filter: brightness(0) invert(1);
 }
 
 @keyframes slide-in {
@@ -41,20 +34,4 @@
         transform: translateX(0px);
         opacity: 1;
     }
-}
-
-button {
-    background: none;
-    border: none;
-    color: #d9dbe0;
-    font-weight: 900;
-    outline: none;
-    cursor: pointer;
-    border-radius: 8px;
-    padding: 4px 8px;
-
-}
-
-button:hover {
-    background-color: rgba(255, 255, 255, 0.1);
 }
