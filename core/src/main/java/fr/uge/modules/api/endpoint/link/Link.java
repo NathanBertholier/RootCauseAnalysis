@@ -1,19 +1,14 @@
 package fr.uge.modules.api.endpoint.link;
 
 import fr.uge.modules.api.EnvRetriever;
-import fr.uge.modules.api.model.CompleteLog;
 import fr.uge.modules.api.model.entities.LogEntity;
 import fr.uge.modules.api.model.linking.LinksResponse;
 import fr.uge.modules.linking.LogsLinking;
-import fr.uge.modules.linking.strategy.LinkingStrategy;
-import fr.uge.modules.linking.strategy.StandardStrategy;
 import io.smallrye.common.constraint.NotNull;
 import io.smallrye.mutiny.Uni;
 
 import javax.inject.Inject;
 import javax.ws.rs.*;
-
-import java.math.BigDecimal;
 
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 

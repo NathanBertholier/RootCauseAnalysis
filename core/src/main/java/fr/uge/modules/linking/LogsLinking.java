@@ -13,7 +13,6 @@ import java.time.Duration;
 import java.util.*;
 import java.util.logging.Logger;
 
-// TODO
 public class LogsLinking {
     private static final Logger LOGGER = Logger.getLogger(LogsLinking.class.getName());
     /**
@@ -60,10 +59,10 @@ public class LogsLinking {
     public static Uni<GeneratedReport> linkedLogs(LogEntity root, ReportParameter reportParameter){
         var reportLinking = new ReportLinking();
         var datetime = root.datetime;
-        return LogEntity.<LogEntity>find("id != ?1 and datetime between ?2 and ?3",
+        return LogEntity.findAllWithJoin(
                     root.id,
                     Timestamp.valueOf(datetime.toLocalDateTime().minus(Duration.ofSeconds(reportParameter.delta()))),
-                    datetime).list()
+                    datetime)
                 .map(list -> reportLinking.computeProximityTree(root, list, reportParameter))
                 .map(LogsLinking::oldestFromMap)
                 .onFailure().invoke(error -> LOGGER.severe("Error: " + error));
