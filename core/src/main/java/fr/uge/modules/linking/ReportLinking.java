@@ -88,7 +88,7 @@ public class ReportLinking {
                     LOGGER.log(Level.DEBUG, "Relation created between " + logTarget + " and " + log + ": " + relation);
                     return relation;
                 })
-                .forEach(relation -> {;
+                .forEach(relation -> {
                     var relationProximity = relation.tokensLink().getProximity();
                     if(!redBlack.isEmpty()) {
                         var firstProximity = redBlack.first().tokensLink().getProximity();

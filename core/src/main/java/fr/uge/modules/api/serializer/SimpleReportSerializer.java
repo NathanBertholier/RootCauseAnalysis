@@ -21,9 +21,7 @@ public class SimpleReportSerializer extends StdSerializer<GenericReport> {
     public void serialize(GenericReport genericReport, JsonGenerator jsonGenerator, SerializerProvider serializerProvider) throws IOException {
         jsonGenerator.writeStartObject();
         serializerProvider.defaultSerializeField("root", genericReport.getRoot(), jsonGenerator);
-        for(TokensMostSeen tms : genericReport.getSeenTokens()){
-            serializerProvider.defaultSerializeField("token_values", tms.token_values(), jsonGenerator);
-        }
+        serializerProvider.defaultSerializeField("tokens", genericReport.getSeenTokens(), jsonGenerator);
         serializerProvider.defaultSerializeField("logs", genericReport.getRelevantLogs(), jsonGenerator);
         jsonGenerator.writeEndObject();
     }

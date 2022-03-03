@@ -18,8 +18,11 @@ public class TokenMostSeenSerializer extends StdSerializer<TokensMostSeen> {
 
     @Override
     public void serialize(TokensMostSeen tokensMostSeen, JsonGenerator jsonGenerator, SerializerProvider serializerProvider) throws IOException {
-        jsonGenerator.writeStartArray();
+        jsonGenerator.writeStartObject();
         jsonGenerator.writeArrayFieldStart("token_values");
-        jsonGenerator.writeEndArray();
+        jsonGenerator.writeStringField("name", tokensMostSeen.token_type());
+        serializerProvider.defaultSerializeField("value", tokensMostSeen.token_values(), jsonGenerator);
+        jsonGenerator.writeNumberField("count", tokensMostSeen.count());
+        jsonGenerator.writeEndObject();
     }
 }
