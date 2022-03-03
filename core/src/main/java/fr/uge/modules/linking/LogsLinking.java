@@ -63,7 +63,7 @@ public class LogsLinking {
                     root.id,
                     Timestamp.valueOf(datetime.toLocalDateTime().minus(Duration.ofSeconds(reportParameter.delta()))),
                     datetime)
-                .map(list -> reportLinking.computeProximityTree(root, list, reportParameter))
+                .map(list -> reportLinking.computeProximityTree(root, list.stream().distinct().toList(), reportParameter))
                 .map(LogsLinking::oldestFromMap)
                 .onFailure().invoke(error -> LOGGER.severe("Error: " + error));
     }
