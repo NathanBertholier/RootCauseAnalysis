@@ -166,6 +166,7 @@ export const Logs = () => {
 
         if ( !handleValidation() ) {
             toast.show({
+                title: "Error",
                 content: "Le formulaire contient une ou plusieurs erreurs",
                 duration: 3000,
             });
@@ -368,9 +369,12 @@ export const Logs = () => {
             array.push( { id: Filter.LOG_ID,                    option: "log_id",       text: "ID du log",      alone: true } )
             array.sort( (x, y) => x.id > y.id ? 1 : -1 )
             setDEFAULT_FILTERS( array )
-        }).catch((e: Error) => {
-            //TODO TOAST
-            console.log(e)
+        }).catch(() => {
+            toast.show({
+                title: "Error",
+                content: "Un problème est survenue",
+                duration: 3000,
+            });
         });
     }, []);
 

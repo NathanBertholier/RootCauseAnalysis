@@ -82,8 +82,20 @@
 }
 
 .custom-filter-btn {
+  color: #5567FF;
+  border-color: #5567FF;
   margin-left: 10px;
   vertical-align: baseline;
+}
+
+.custom-filter-btn:hover {
+  background-color: #5567FF;
+  border-color: #5567FF;
+}
+
+.custom-filter-btn:active {
+  background-color: #5567FF;
+  border-color: #5567FF;
 }
 
 .add-filter-btn, .filter-container, .number-row-filter-container {
