@@ -33,7 +33,7 @@ public class LogsLinking {
     }
 
     /**
-     * Computes proximity between log of id1 and log of id2 for all the tokens in tokenTypes
+     * Computes relations between log of id1 and log of id2 for all the tokens in tokenTypes
      * @param log1
      * @param log2
      * @param delta

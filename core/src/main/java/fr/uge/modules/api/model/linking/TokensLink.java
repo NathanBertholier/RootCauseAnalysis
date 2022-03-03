@@ -1,6 +1,7 @@
 package fr.uge.modules.api.model.linking;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import fr.uge.modules.api.serializer.TokensLinkSerializer;
 import fr.uge.modules.linking.strategy.AverageStrategy;
 import fr.uge.modules.linking.strategy.ProximityStrategy;
 
@@ -8,6 +9,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+@JsonSerialize(using = TokensLinkSerializer.class)
 public class TokensLink {
     private final List<Computation> computations;
     private final double proximity;
