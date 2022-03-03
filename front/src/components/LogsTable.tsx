@@ -48,7 +48,7 @@ export class LogsTable extends Component<LogsTableProp, any> {
     render() {
         return (
             <div>
-                <Table striped bordered hover className="logTable">
+                <Table responsive striped bordered hover className="logTable">
                     <thead>
                     <tr>
                         <th>id</th>
