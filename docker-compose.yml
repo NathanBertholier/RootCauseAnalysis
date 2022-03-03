@@ -57,6 +57,7 @@ services:
       REPORT_DELTA: ${REPORT_DELTA}
       REPORT_PROXIMITY_LIMIT: ${REPORT_PROXIMITY_LIMIT}
       REPORT_NETWORK_SIZE: ${REPORT_NETWORK_SIZE}
+      PROFILE: ${PROFILE}
 
   nginx:
     container_name: nginx

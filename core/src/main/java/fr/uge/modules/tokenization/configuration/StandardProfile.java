@@ -1,8 +1,8 @@
 package fr.uge.modules.tokenization.configuration;
 
 import fr.uge.modules.linking.token.type.*;
+import fr.uge.modules.tokenization.configuration.timestamp.CommonDateTime;
 import fr.uge.modules.tokenization.configuration.timestamp.DateTimeFormatter;
-import fr.uge.modules.tokenization.configuration.timestamp.DefaultDateTime;
 
 import javax.enterprise.context.ApplicationScoped;
 import java.sql.Timestamp;
@@ -12,8 +12,7 @@ import java.util.*;
 public class StandardProfile implements Profile {
     private final HashMap<TokenType, Integer> tokenTypeIndex = new HashMap<>();
     private final ArrayList<TokenType> tokenTypes = new ArrayList<>();
-    private final DateTimeFormatter dateTimeFormatter = new DefaultDateTime();
-
+    private final DateTimeFormatter dateTimeFormatter = new CommonDateTime();
 
     public StandardProfile() {
         tokenTypes.add(new TypeIPv4());
