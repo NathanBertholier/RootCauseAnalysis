@@ -106,6 +106,10 @@
   margin-bottom: 20px;
 }
 
+.number-row-filter-container {
+  text-align: right;
+}
+
 .input-labels {
   text-align: right;
   margin-top: 7px;
@@ -132,6 +136,7 @@
 
 .react-datetime-picker {
   padding: 0;
+  text-align: center;
 }
 
 .react-datetime-picker .react-datetime-picker__wrapper {
