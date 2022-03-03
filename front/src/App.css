@@ -181,11 +181,11 @@
 .proximity-filters-container, .report-filters-container {
   padding-top: 20px;
   padding-left: 5px;
+  padding-bottom: 15px;
 }
 
 .proximity-filter, .report-filter {
   width: auto;
-  margin-bottom: 15px;
 }
 
 .proximity-score-container {
