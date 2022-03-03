@@ -7,11 +7,11 @@ import io.smallrye.mutiny.Multi;
 import io.smallrye.mutiny.Uni;
 import io.smallrye.reactive.messaging.annotations.Merge;
 import io.vertx.core.json.JsonObject;
-import org.eclipse.microprofile.reactive.messaging.Message;
 import org.jboss.logmanager.Level;
 import org.eclipse.microprofile.reactive.messaging.Outgoing;
 import org.eclipse.microprofile.reactive.messaging.Incoming;
 import javax.enterprise.context.ApplicationScoped;
+import javax.inject.Inject;
 
 import java.time.Duration;
 import java.util.List;
@@ -20,7 +20,9 @@ import java.util.logging.Logger;
 @ApplicationScoped
 public class TokenQueueProcessor {
     private final Logger LOGGER = Logger.getGlobal();
-    private final Tokenization tokenization = new Tokenization();
+
+    @Inject
+    Tokenization tokenization;
 
     @Incoming(value = "token-in")
     @Outgoing(value = "batch-processor")
@@ -37,9 +39,7 @@ public class TokenQueueProcessor {
     public Uni<Void> processBatch(List<LogEntity> logs) {
         return Panache.withTransaction(() -> LogEntity.persist(logs))
                 .onFailure()
-                .invoke(error -> {
-                    LOGGER.log(Level.SEVERE, "Error while inserting log id in database");
-                })
+                .invoke(error -> LOGGER.log(Level.SEVERE, "Error while inserting log id in database"))
                 .replaceWithVoid();
     }
 }

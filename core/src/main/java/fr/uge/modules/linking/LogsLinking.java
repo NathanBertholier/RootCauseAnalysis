@@ -6,14 +6,12 @@ import fr.uge.modules.api.model.linking.LinksResponse;
 import fr.uge.modules.api.model.report.ReportParameter;
 import fr.uge.modules.linking.token.type.TokenType;
 import fr.uge.modules.synthetization.GeneratedReport;
-import fr.uge.modules.synthetization.Synthetization;
 import io.smallrye.mutiny.Uni;
 
 import java.sql.Timestamp;
 import java.time.Duration;
 import java.util.*;
 import java.util.logging.Logger;
-import java.util.stream.Collectors;
 
 // TODO
 public class LogsLinking {

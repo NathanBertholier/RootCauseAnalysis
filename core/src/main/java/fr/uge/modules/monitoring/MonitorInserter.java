@@ -41,12 +41,10 @@ public class MonitorInserter {
             Map<String, Object> jsonMap = objectMapper.readValue(new InputStreamReader(getInputStream().orElseThrow()), Map.class);
 
             var json = new JsonObject(jsonMap);
-            System.out.println(monitoring);
             monitoring.setDatetime(Timestamp.from(Instant.now()));
             monitoring.setDeliver(json.getJsonObject("message_stats").getJsonObject("ack_details").getFloat("rate"));
             monitoring.setPublish(json.getJsonArray("incoming").getJsonObject(0).getJsonObject("stats").getJsonObject("publish_details").getFloat("rate"));
             monitoring.setMessages(json.getLong("messages"));
-            System.out.println(monitoring);
 
             Panache.<MonitoringEntity>withTransaction(monitoring::persist)
                     .onFailure().invoke(() -> this.logger.severe("ERROR while inserting in database monitoring"))
