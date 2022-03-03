@@ -22,6 +22,9 @@ public class ExpendedReportSerializer extends StdSerializer<ReportResponseExpand
         jsonGenerator.writeStartObject();
         serializerProvider.defaultSerializeField("report", reportResponseExpanded.reportResponseBase(), jsonGenerator);
         jsonGenerator.writeArrayFieldStart("proximity");
+        jsonGenerator.writeStartObject();
+        jsonGenerator.writeNumberField("id", reportResponseExpanded.getRoot().id);
+        serializerProvider.defaultSerializeField("links", reportResponseExpanded.relations().stream().toList(), jsonGenerator);
         jsonGenerator.writeEndObject();
     }
 }

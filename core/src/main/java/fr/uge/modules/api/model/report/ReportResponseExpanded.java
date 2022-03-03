@@ -27,10 +27,6 @@ public record ReportResponseExpanded(ReportResponse reportResponseBase, SortedSe
         return reportResponseBase.getRelevantLogs();
     }
 
-    public SortedSet<Relation> getRelations(){
-        return relations;
-    }
-
     @Override
     public String toString() {
         return "ReportResponseExpanded{" +

@@ -20,8 +20,6 @@ public class RelationSerializer extends StdSerializer<Relation> {
     @Override
     public void serialize(Relation relation, JsonGenerator jsonGenerator, SerializerProvider serializerProvider) throws IOException {
         jsonGenerator.writeStartObject();
-        // in coming feature - prox between source and target for each log
-        jsonGenerator.writeNumberField("id", relation.source().id);
         jsonGenerator.writeNumberField("id", relation.target().id);
         jsonGenerator.writeNumberField("proximity", relation.tokensLink().getProximity());
         jsonGenerator.writeEndObject();
