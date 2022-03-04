@@ -8,11 +8,15 @@ import fr.uge.modules.api.serializer.SimpleReportSerializer;
 import java.util.*;
 
 @JsonSerialize(using = SimpleReportSerializer.class)
-public record ReportResponse(LogEntity root, Set<TokensMostSeen> tokens, List<LogEntity> logs) implements GenericReport {
+public record ReportResponse(LogEntity rootCause, LogEntity target, Set<TokensMostSeen> tokens, List<LogEntity> logs) implements GenericReport {
+
     @Override
     public LogEntity getRoot() {
-        return root;
+        return rootCause;
     }
+
+    @Override
+    public LogEntity getTarget() { return target; }
 
     @Override
     public Set<TokensMostSeen> getSeenTokens() {
@@ -27,7 +31,7 @@ public record ReportResponse(LogEntity root, Set<TokensMostSeen> tokens, List<Lo
     @Override
     public String toString() {
         return "ReportResponse{" +
-                "root=" + root +
+                "rootCause=" + rootCause +
                 ", tokens=" + tokens +
                 ", logs=" + logs +
                 '}';

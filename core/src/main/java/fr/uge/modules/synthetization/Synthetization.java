@@ -29,15 +29,15 @@ public class Synthetization {
     }
 
     public static Uni<GenericReport> getReport(long idLogTarget, ReportParameter reportParameter) {
-        LOGGER.log(Level.INFO, "Retrieving root cause for target: {0}", idLogTarget);
+        LOGGER.log(Level.INFO, "Retrieving rootCause cause for target: {0}", idLogTarget);
         return LogEntity.<LogEntity>findById(idLogTarget)
-                .invoke(log -> LOGGER.log(Level.INFO, "Retrieved log target: {0}", log))
-                .chain(log -> LogsLinking.linkedLogs(log, reportParameter)
+                .invoke(target -> LOGGER.log(Level.INFO, "Retrieved log target: {0}", target))
+                .chain(target -> LogsLinking.linkedLogs(target, reportParameter)
                         .chain(generatedReport -> getMostSeenTokens(generatedReport.relevantLogs())
                                     .map(tokens -> {
                                         var relevantLogs = generatedReport.relevantLogs();
                                         var rootCause = generatedReport.rootCause();
-                                        var report = new ReportResponse(rootCause, tokens, relevantLogs);
+                                        var report = new ReportResponse(rootCause, target, tokens, relevantLogs);
                                         if(!reportParameter.expanded()) return report;
                                         else {
                                             return new ReportResponseExpanded(report, generatedReport.computations());

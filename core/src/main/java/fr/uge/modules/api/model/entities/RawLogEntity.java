@@ -18,7 +18,7 @@ public class RawLogEntity extends PanacheEntity {
     @Override
     public String toString() {
         return "RawLogEntity{" +
-                "root='" + log + '\'' +
+                "rootCause='" + log + '\'' +
                 '}';
     }
 }
