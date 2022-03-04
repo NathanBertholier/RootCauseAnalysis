@@ -91,7 +91,7 @@ public class LogsLinking {
 
     private static GeneratedReport fromRelationsTree(PriorityQueue<Relation> proximityQ){
         var rootcause = proximityQ.stream()
-                .max(datetimeComparator)
+                .min(datetimeComparator)
                 .orElseThrow(EmptyReportError::new)
                 .target();
         var relevantLogs = proximityQ.stream()
