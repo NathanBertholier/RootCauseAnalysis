@@ -98,8 +98,16 @@
   border-color: #5567FF;
 }
 
-.add-filter-btn, .filter-container, .number-row-filter-container {
+.filter-container {
   margin-bottom: 20px;
+}
+
+.add-filter-btn, .number-row-filter-container {
+  margin-bottom: 20px;
+}
+
+.number-row-filter-container {
+  text-align: right;
 }
 
 .input-labels {
@@ -115,7 +123,7 @@
 .error {
   color: red;
   font-size: 12px;
-  margin-bottom: 10px;
+  margin-top: 10px;
 }
 
 .form-error {
@@ -128,6 +136,7 @@
 
 .react-datetime-picker {
   padding: 0;
+  text-align: center;
 }
 
 .react-datetime-picker .react-datetime-picker__wrapper {
@@ -177,11 +186,11 @@
 .proximity-filters-container, .report-filters-container {
   padding-top: 20px;
   padding-left: 5px;
+  padding-bottom: 15px;
 }
 
 .proximity-filter, .report-filter {
   width: auto;
-  margin-bottom: 15px;
 }
 
 .proximity-score-container {
