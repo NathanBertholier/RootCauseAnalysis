@@ -73,9 +73,6 @@ services:
     networks:
       - root-cause-net
 
-  #certbot:
-
 networks:
   root-cause-net:
     driver: bridge
-
