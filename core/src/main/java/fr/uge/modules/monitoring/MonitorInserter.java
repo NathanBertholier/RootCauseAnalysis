@@ -51,7 +51,7 @@ public class MonitorInserter {
                     .await().indefinitely();
 
         } catch (Exception e)  {
-            logger.warning("No root was inserted into the queue yet");
+            logger.warning("No rootCause was inserted into the queue yet");
         }
     }
 

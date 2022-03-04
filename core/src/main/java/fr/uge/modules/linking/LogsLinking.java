@@ -4,14 +4,12 @@ import fr.uge.modules.api.model.entities.LogEntity;
 import fr.uge.modules.api.model.entities.TokenEntity;
 import fr.uge.modules.api.model.linking.Relation;
 import fr.uge.modules.api.model.linking.TokensLink;
-import fr.uge.modules.api.model.report.GenericReport;
 import fr.uge.modules.api.model.report.ReportParameter;
 import fr.uge.modules.error.EmptyReportError;
 import fr.uge.modules.error.NotYetTokenizedError;
 import fr.uge.modules.linking.token.type.TokenType;
 import fr.uge.modules.synthetization.GeneratedReport;
 import io.smallrye.mutiny.Uni;
-import io.smallrye.mutiny.unchecked.Unchecked;
 
 import java.sql.Timestamp;
 import java.time.Duration;
@@ -19,7 +17,6 @@ import java.util.*;
 import java.util.logging.ConsoleHandler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.stream.Collectors;
 
 import static java.util.Objects.isNull;
 
@@ -53,7 +50,7 @@ public class LogsLinking {
     }
 
     /***
-     * Returns a Map of <TokenTypeId, List<TokenEntity>> that groups every type of token of a root with its entities
+     * Returns a Map of <TokenTypeId, List<TokenEntity>> that groups every type of token of a rootCause with its entities
      * @param log
      * @return a map of token entities associated with its type id
      */
@@ -68,7 +65,7 @@ public class LogsLinking {
     }
 
     /**
-     * Retrieves all linked logs of a root one within given delta
+     * Retrieves all linked logs of a rootCause one within given delta
      * @param root
      * @param reportParameter
      * @return

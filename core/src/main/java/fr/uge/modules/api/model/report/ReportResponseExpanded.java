@@ -13,10 +13,14 @@ import java.util.SortedSet;
 
 @JsonSerialize(using = ExpendedReportSerializer.class)
 public record ReportResponseExpanded(ReportResponse reportResponseBase, PriorityQueue<Relation> relations) implements GenericReport {
+
     @Override
     public LogEntity getRoot() {
         return reportResponseBase.getRoot();
     }
+
+    @Override
+    public LogEntity getTarget() { return reportResponseBase.getTarget(); }
 
     @Override
     public Set<TokensMostSeen> getSeenTokens() {
