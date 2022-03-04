@@ -23,7 +23,6 @@ import java.util.stream.Collectors;
 
 import static java.util.Objects.isNull;
 
-// TODO
 public class LogsLinking {
     private static final Logger LOGGER = Logger.getLogger(LogsLinking.class.getName());
     private static final Comparator<Relation> datetimeComparator = Comparator.comparing(relation -> relation.target().datetime);
@@ -83,7 +82,7 @@ public class LogsLinking {
                     root.id,
                     Timestamp.valueOf(datetime.toLocalDateTime().minus(Duration.ofSeconds(reportParameter.delta()))),
                     datetime)
-                .map(list -> reportGenerator.computeProximityTree(root, list, reportParameter))
+                .map(list -> reportGenerator.computeProximityTree(root, list.stream().distinct().toList(), reportParameter))
                 .map(LogsLinking::fromRelationsTree)
                 .invoke(generatedReport -> LOGGER.log(Level.INFO, "Generated report for id " + root.id + ": " + generatedReport))
                 .onFailure().invoke(error -> LOGGER.severe("Error: " + error));

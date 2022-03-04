@@ -1,5 +1,7 @@
 package fr.uge.modules.api.model.entities;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import fr.uge.modules.api.serializer.LogSerializer;
 import io.quarkus.hibernate.reactive.panache.PanacheEntityBase;
 import io.smallrye.mutiny.Uni;
 
