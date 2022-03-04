@@ -89,14 +89,14 @@ public class LogsLinking {
                 .onFailure().invoke(error -> LOGGER.severe("Error: " + error));
     }
 
-    private static GeneratedReport fromRelationsTree(TreeSet<Relation> treeset){
-        var rootcause = treeset.stream()
+    private static GeneratedReport fromRelationsTree(PriorityQueue<Relation> proximityQ){
+        var rootcause = proximityQ.stream()
                 .max(datetimeComparator)
                 .orElseThrow(EmptyReportError::new)
                 .target();
-        var relevantLogs = treeset.stream()
+        var relevantLogs = proximityQ.stream()
                 .map(Relation::target)
                 .toList();
-        return new GeneratedReport(rootcause, relevantLogs, treeset);
+        return new GeneratedReport(rootcause, relevantLogs, proximityQ);
     }
 }

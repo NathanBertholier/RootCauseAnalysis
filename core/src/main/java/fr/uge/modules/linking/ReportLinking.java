@@ -71,13 +71,15 @@ public class ReportLinking {
         LOGGER.addHandler(new ConsoleHandler());
     }
 
-    public TreeSet<Relation> computeProximityTree(LogEntity logTarget, List<LogEntity> logWithinDelta, ReportParameter rp){
-        TreeSet<Relation> redBlack = new TreeSet<>(Comparator.comparingDouble(relation -> - relation.tokensLink().getProximity()));
+    public PriorityQueue<Relation> computeProximityTree(LogEntity logTarget, List<LogEntity> logWithinDelta, ReportParameter rp){
+        //TreeSet<Relation> redBlack = new TreeSet<>(Comparator.comparingDouble(relation -> - relation.tokensLink().getProximity()));
         var targetDatetime = logTarget.datetime;
 
         var delta = rp.delta();
         var proximityLimit = rp.proximity_limit();
         var networkSize = rp.network_size();
+        PriorityQueue<Relation> proximityQ = new PriorityQueue<>(networkSize,
+                Comparator.comparingDouble(r -> r.tokensLink().getProximity()));
 
         logWithinDelta.stream()
                 .map(log -> {
@@ -89,21 +91,23 @@ public class ReportLinking {
                     return relation;
                 })
                 .forEach(relation -> {
+
                     var relationProximity = relation.tokensLink().getProximity();
-                    if(!redBlack.isEmpty()) {
-                        var firstProximity = redBlack.first().tokensLink().getProximity();
+                    if(!proximityQ.isEmpty()) {
+                        var firstProximity = proximityQ.peek().tokensLink().getProximity();
+                        System.out.println();
                         if(relationProximity > proximityLimit){
-                            if(redBlack.size() == networkSize){
+                            if(proximityQ.size() == networkSize){
                                 if(relationProximity > firstProximity){
-                                    redBlack.pollFirst();
-                                    redBlack.add(relation);
+                                    proximityQ.remove();
+                                    proximityQ.add(relation);
                                 }
-                            } else redBlack.add(relation);
+                            } else proximityQ.add(relation);
                         }
-                    } else redBlack.add(relation);
+                    } else proximityQ.add(relation);
                 });
 
-        LOGGER.log(Level.DEBUG, "Generated tree for id " + logTarget.id + ": " + redBlack);
-        return redBlack;
+        LOGGER.log(Level.DEBUG, "Generated tree for id " + logTarget.id + ": " + proximityQ);
+        return proximityQ;
     }
 }

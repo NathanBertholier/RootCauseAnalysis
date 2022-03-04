@@ -8,6 +8,7 @@ import fr.uge.modules.linking.strategy.ProximityStrategy;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 @JsonSerialize(using = TokensLinkSerializer.class)
 public class TokensLink {
@@ -44,6 +45,19 @@ public class TokensLink {
 
     public static TokensLink withoutStrategy(double value){
         return new TokensLink(Collections.emptyList(), averageStrategy);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        TokensLink that = (TokensLink) o;
+        return Double.compare(that.proximity, proximity) == 0 && computations.equals(that.computations) && proximityFunction.equals(that.proximityFunction);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(computations, proximity, proximityFunction);
     }
 
     @Override

@@ -11,7 +11,7 @@ import java.util.List;
 public class TypeURL implements TokenType{
 
     private static final String NAME = "url";
-    private static final String REGEX = "https?://www.[-a-zA-Z0-9@:%._\\+~#=]{1,256}\\.[a-zA-Z0-9()]{1,6}\\b([-a-zA-Z0-9()@:%_\\+.~#?&\\/\\/=]*)";
+    private static final String REGEX = "https?://[-a-zA-Z0-9@:%._\\+~#=]{1,256}\\.[a-zA-Z0-9()]{1,6}\\b([-a-zA-Z0-9()@:%_\\+.~#?&\\/\\/=]*)";
 
     @Override
     public String getName() {

@@ -13,9 +13,12 @@ import io.smallrye.mutiny.Multi;
 import io.smallrye.mutiny.Uni;
 
 import java.util.*;
+import java.util.function.Function;
 import java.util.logging.ConsoleHandler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class Synthetization {
 
@@ -59,8 +62,12 @@ public class Synthetization {
 
     private static TokensMostSeen fromTokenEntities(List<TokenEntity> entities){
         var tokenTypeName = entities.stream().findAny().orElseThrow().token_type.name;
-        var values = entities.stream().map(t -> t.value).toList();
-        var size = entities.size();
-        return new TokensMostSeen(tokenTypeName, values, size);
+        var values = entities.stream()
+                .collect(Collectors.groupingBy(TokenEntity::getValue, Collectors.counting()))
+                .entrySet();
+        var max = values.stream().max(Map.Entry.comparingByValue()).orElseThrow();
+        var mostSeen = values.stream().filter(entry -> entry.getValue().equals(max.getValue())).map(Map.Entry::getKey).toList();
+
+        return new TokensMostSeen(tokenTypeName, mostSeen, max.getValue());
     }
 }
