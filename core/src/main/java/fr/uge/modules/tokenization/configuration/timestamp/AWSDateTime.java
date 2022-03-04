@@ -7,7 +7,7 @@ import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.Optional;
 
-public class DefaultDateTime implements DateTimeFormatter {
+public class AWSDateTime implements DateTimeFormatter {
     private final SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
     @Override

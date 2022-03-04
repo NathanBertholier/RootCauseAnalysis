@@ -1,11 +1,11 @@
 .App {
-  text-align: center;
+  //font-family: "Josefin Sans";
 }
 
 .sidebar {
   height: 100%;
   width: 20%;
-  background-color: #d9dbe0;
+  background-color: #f5f6fA;
   position: fixed;
   z-index: 1;
   top: 0;
@@ -59,7 +59,7 @@
   margin-left: 20%;
   padding: 0;
   min-height: 100vh;
-  background-color: #d9dbe0;
+  background-color: #f5f6fA;
 }
 
 .black-icon {
@@ -82,12 +82,32 @@
 }
 
 .custom-filter-btn {
+  color: #5567FF;
+  border-color: #5567FF;
   margin-left: 10px;
   vertical-align: baseline;
 }
 
-.add-filter-btn, .filter-container, .number-row-filter-container {
+.custom-filter-btn:hover {
+  background-color: #5567FF;
+  border-color: #5567FF;
+}
+
+.custom-filter-btn:active {
+  background-color: #5567FF;
+  border-color: #5567FF;
+}
+
+.filter-container {
   margin-bottom: 20px;
+}
+
+.add-filter-btn, .number-row-filter-container {
+  margin-bottom: 20px;
+}
+
+.number-row-filter-container {
+  text-align: right;
 }
 
 .input-labels {
@@ -103,18 +123,20 @@
 .error {
   color: red;
   font-size: 12px;
+  margin-top: 10px;
 }
 
 .form-error {
   text-align: left;
 }
 
-.row-number-error, .form-error {
+.row-number-error {
   padding-top: 10px;
 }
 
 .react-datetime-picker {
   padding: 0;
+  text-align: center;
 }
 
 .react-datetime-picker .react-datetime-picker__wrapper {
@@ -139,7 +161,7 @@
  * Log Css
  *******************************/
 
-.logs-container, .proximity-container {
+.logs-container, .proximity-container, .report-container {
   background-color: white;
   width: auto;
   min-height: 70vh;
@@ -158,16 +180,16 @@
 }
 
 /*******************************
- * Proximity Css
+ * Proximity / Report Css
  *******************************/
 
-.proximity-filters-container {
+.proximity-filters-container, .report-filters-container {
   padding-top: 20px;
-  margin-bottom: 20px;
   padding-left: 5px;
+  padding-bottom: 15px;
 }
 
-.proximity-filter {
+.proximity-filter, .report-filter {
   width: auto;
 }
 
@@ -175,6 +197,36 @@
   text-align: right;
   font-weight: bold;
   font-size: 18px;
+}
+
+/*******************************
+ * Report Css
+ *******************************/
+
+.report-filters-container {
+  border-bottom: 1px solid #aaaeba;
+}
+
+.most-use-tokens {
+  position: absolute;
+  right: 0;
+  top: 20px;
+  padding: 10px;
+  background-color: #f5f6fA;
+  border-radius: 10px;
+}
+
+.most-use-tokens th, .most-use-tokens td {
+  padding: 0 10px;
+}
+
+.tokens-labels, .tokens-values {
+  color: #aaaeba;
+}
+
+.tokens-counts {
+  color: #5567ff;
+  font-weight: 600;
 }
 
 /*******************************
@@ -210,4 +262,97 @@
   display: flex;
   justify-content: center;
   align-items: center;
+}
+
+/*******************************
+ * Cytoscape
+ *******************************/
+
+.cytoscape-container {
+  position: relative;
+}
+
+/*******************************
+ * Tooltip
+ *******************************/
+
+.toolTip {
+  position: absolute;
+  top: 20px;
+  left: 0;
+  padding: 10px 20px;
+  background-color: #f5f6fA;
+  border-radius: 10px;
+}
+
+.toolTip-title {
+  font-weight: bold;
+}
+
+.toolTip-entity {
+  font-size: 18px;
+  font-weight: bold;
+}
+
+.toolTip-value {
+  font-size: 14px;
+  color: #5567ff;
+}
+
+/*******************************
+ * Legend
+ *******************************/
+
+.legend {
+  position: absolute;
+  bottom: 20px;
+  right: 10px;
+  background-color: #F5F6FA;
+  border-radius: 10px;
+  padding: 10px 20px;
+  font-weight: 400;
+}
+
+.legend-title {
+  margin-bottom: 10px;
+  font-weight: bold;
+}
+
+.hint-container {
+  display: flex;
+  margin-bottom: 7px;
+}
+
+.hint {
+  display: inline-block;
+  border-radius: 15px;
+}
+
+.hint-edge {
+  margin-left: 3px;
+  margin-right: 14px;
+  color: #AAAEBA;
+}
+
+.hint-node {
+  width: 24px;
+  margin-right: 10px;
+}
+
+.hint-label {
+  display: inline-block;
+  font-size: 16px;
+}
+
+.hint-orange {
+  background-color: #F24E1E;
+}
+
+.hint-green {
+  background-color: #4ECB71;
+}
+
+.hint-gray {
+  padding-left: 7px;
+  background-color: #C4C4C4;
 }
