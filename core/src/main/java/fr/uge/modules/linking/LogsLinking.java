@@ -2,8 +2,11 @@ package fr.uge.modules.linking;
 
 import fr.uge.modules.api.model.entities.LogEntity;
 import fr.uge.modules.api.model.entities.TokenEntity;
-import fr.uge.modules.api.model.linking.LinksResponse;
+import fr.uge.modules.api.model.linking.Relation;
+import fr.uge.modules.api.model.linking.TokensLink;
 import fr.uge.modules.api.model.report.ReportParameter;
+import fr.uge.modules.error.EmptyReportError;
+import fr.uge.modules.error.NotYetTokenizedError;
 import fr.uge.modules.linking.token.type.TokenType;
 import fr.uge.modules.synthetization.GeneratedReport;
 import io.smallrye.mutiny.Uni;
@@ -11,18 +14,29 @@ import io.smallrye.mutiny.Uni;
 import java.sql.Timestamp;
 import java.time.Duration;
 import java.util.*;
+import java.util.logging.ConsoleHandler;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import static java.util.Objects.isNull;
+
+// TODO
 public class LogsLinking {
     private static final Logger LOGGER = Logger.getLogger(LogsLinking.class.getName());
+    private static final Comparator<Relation> datetimeComparator = Comparator.comparing(relation -> relation.target().datetime);
+
+    static {
+        LOGGER.addHandler(new ConsoleHandler());
+    }
+
     /**
-     * Computes proximity between log of id1 and log of id2 for all the tokens in tokenTypes
+     * Computes relations between log of id1 and log of id2 for all the tokens in tokenTypes
      * @param log1
      * @param log2
      * @param delta
      * @return
      */
-    public static Uni<LinksResponse> computeLinks(LogEntity log1, LogEntity log2, long delta) {
+    public static Uni<TokensLink> computeLinks(LogEntity log1, LogEntity log2, long delta) {
         var map1 = fromLog(log1);
         var map2 = fromLog(log2);
 
@@ -31,12 +45,12 @@ public class LogsLinking {
             var value = entry.getValue();
 
             var toCompare = map2.getOrDefault(key, new ArrayList<>());
-            return TokenType.fromId(key).computeProximity(value, toCompare);
-        }).sum()).map(result -> new LinksResponse(Collections.emptyList(), result));
+            return TokenType.fromId(key).computeProximity(value, toCompare).getProximity();
+        }).sum()).map(TokensLink::withoutStrategy);
     }
 
     /***
-     * Returns a Map of <TokenTypeId, List<TokenEntity>> that groups every type of token of a log with its entities
+     * Returns a Map of <TokenTypeId, List<TokenEntity>> that groups every type of token of a rootCause with its entities
      * @param log
      * @return a map of token entities associated with its type id
      */
@@ -51,26 +65,35 @@ public class LogsLinking {
     }
 
     /**
-     * Retrieves all linked logs of a root one within given delta
+     * Retrieves all linked logs of a rootCause one within given delta
      * @param root
      * @param reportParameter
      * @return
      */
     public static Uni<GeneratedReport> linkedLogs(LogEntity root, ReportParameter reportParameter){
-        var reportLinking = new ReportLinking();
+        LOGGER.log(Level.INFO, "Linking logs to {0}", root);
+        if(isNull(root)) throw new NotYetTokenizedError();
+
+        var reportGenerator = new ReportLinking();
         var datetime = root.datetime;
-        return LogEntity.findAllWithJoin(
+        return LogEntity.<LogEntity>find("id != ?1 and datetime between ?2 and ?3",
                     root.id,
                     Timestamp.valueOf(datetime.toLocalDateTime().minus(Duration.ofSeconds(reportParameter.delta()))),
-                    datetime)
-                .map(list -> reportLinking.computeProximityTree(root, list.stream().distinct().toList(), reportParameter))
-                .map(LogsLinking::oldestFromMap)
+                    datetime).list()
+                .map(list -> reportGenerator.computeProximityTree(root, list, reportParameter))
+                .map(LogsLinking::fromRelationsTree)
+                .invoke(generatedReport -> LOGGER.log(Level.INFO, "Generated report for id " + root.id + ": " + generatedReport))
                 .onFailure().invoke(error -> LOGGER.severe("Error: " + error));
     }
 
-    public static GeneratedReport oldestFromMap(SortedMap<Double, LogEntity> map){
-        Comparator<LogEntity> comparator = Comparator.comparing(LogEntity::getDatetime);
-        var rootCause = map.values().stream().sorted(comparator).findFirst().orElseThrow();
-        return new GeneratedReport(rootCause, map);
+    private static GeneratedReport fromRelationsTree(PriorityQueue<Relation> proximityQ){
+        var rootcause = proximityQ.stream()
+                .min(datetimeComparator)
+                .orElseThrow(EmptyReportError::new)
+                .target();
+        var relevantLogs = proximityQ.stream()
+                .map(Relation::target)
+                .toList();
+        return new GeneratedReport(rootcause, relevantLogs, proximityQ);
     }
 }

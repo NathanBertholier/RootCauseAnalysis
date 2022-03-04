@@ -23,11 +23,11 @@ public class Benchmark {
         //args = new String[]{"-l", "100000", "-F", "../logs/", "-b", "50", "-d", "85", "-t", "8", "-u", "http://localhost:8081/insertlog"};
         //args = new String[]{"-l", "1000", "-F", "../logs/", "-b", "50", "-d", "85", "-t", "4", "-u", "http://localhost:8081/insertlog","-s","stats.csv"};
 
-        args = new String[]{"-b", "1000", "-d", "1000", "-t", "4", "-u", "http://localhost:8081/insertlog", "-l", "1000", "-F", "C:\\Users\\05tra\\Documents\\Logs", "-lo"};
-//        args = new String[]{"-l", "10000", "-F", "C:\\Users\\natha\\OneDrive\\Documents\\logs\\logs", "-b", "100", "-d", "1000", "-t", "10", "-u", "http://localhost:8081/insertlog","-lo"};
+        args = new String[]{"-l", "10000", "-F", "../logs/", "-b", "500", "-d", "1000", "-t", "50", "-u", "http://localhost:8081/insertlog","-s","stat.csv"};
         //use this to output to out.txt in exec folder
         //args = new String[]{"-l", "10000", "-f", "in.txt"};
 
+        /*generate command line argument reader*/
         final Options firstOptions = configFirstParameters();
         final Options options = configParameters(firstOptions);
 
@@ -45,6 +45,8 @@ public class Benchmark {
             System.err.println(e.getMessage());
             printHelp(options);
         }
+
+        /*Try to read log files with the path passed as argument*/
         Stream<String> stream;
         assert line != null;
         if (!line.hasOption("file")) {
@@ -92,8 +94,8 @@ public class Benchmark {
         sendToServer(stringList, threadCount, batchSize, delay, ts, URITarget, loopOnData, statPath);
     }
 
+    /*Main functioning function : launches the different threads and sets them up with the arguments provided at program launch*/
     private static void sendToServer(List<String> stringSource, int threadCount, int batchSize, int millisDelay, Timestamp ts, String URITarget, boolean loop, Path statPath) throws InterruptedException {
-
         Thread[] threads = new Thread[threadCount];
         ArrayList<List<String>> subLists = new ArrayList<>();
 
@@ -108,10 +110,11 @@ public class Benchmark {
                 } else {
                     client = new BenchHTTPClient(batchSize, ts, URITarget, null);
                 }
-                client.sendToServer(subLists.get(finalI),millisDelay, loop);
+                client.sendToServer(subLists.get(finalI), millisDelay, loop);
             });
         }
 
+        /*Separates the threads starting over time to have a more uniform load on the server*/
         for(Thread t : threads) {
             t.start();
             Thread.sleep(millisDelay/threadCount);
@@ -123,10 +126,18 @@ public class Benchmark {
         }
     }
 
+    /**
+     * Helper function that returns the limit of lines to be read from the path passed as argument
+     * @return a Long integer containing the max number of lines to read
+     */
     private static Long lineLimit(CommandLine line) {
         return line.hasOption("linesCount") ? Long.parseLong(line.getOptionValue("linesCount")) : Long.MAX_VALUE;
     }
 
+    /**
+     * Reads the path passed as argument, separates the different logs, reformats them according to specification and returns them in a stream of String
+     * @return a stream of formatted strings, not bigger than the limit provided, each containing a log read from the path passed as argument.
+     */
     private static Stream<String> getFilesFromFolder(Path folderPath, long limit) throws IOException {
         ArrayList<String> list = new ArrayList<>();
         DirectoryStream<Path> dir = Files.newDirectoryStream(folderPath);
@@ -150,10 +161,16 @@ public class Benchmark {
         return list.stream();
     }
 
+    /**
+     * Helper function that reads the raw log and returns a stream of String, skipping the two first lines (headers)
+     */
     private static Stream<String> getStreamFromFile(Path filePath) throws IOException {
         return Files.lines(filePath).skip(2);
     }
 
+    /**
+     * Prints help summary to standard output
+     */
     private static void printHelp(Options options) {
         final HelpFormatter formatter = new HelpFormatter();
         formatter.printHelp("Benchmark", options, true);
@@ -171,6 +188,9 @@ public class Benchmark {
         return firstOptions;
     }
 
+    /**
+     * Creates and returns the Options representing allowed arguments for the program
+     */
     private static Options configParameters(final Options firstOptions) {
 
         final Option filePathOption = Option.builder("f").longOpt("file") //
@@ -218,6 +238,9 @@ public class Benchmark {
     }
 }
 
+/**
+ * HTTP Client designed to upload logs provided to it to the server, according to its set parameters.
+ */
 class BenchHTTPClient{
 
     private final Map<Integer,List<Long>> responseTimes;
@@ -296,22 +319,25 @@ class BenchHTTPClient{
         HttpRequest httpRequest = HttpRequest.newBuilder().uri(uri)
                 .POST(HttpRequest.BodyPublishers.ofString(str))
                 .header("Accept", "application/json").header("Content-Type", "application/json").build();
-        HttpResponse<String> send = httpClient.send(httpRequest, HttpResponse.BodyHandlers.ofString());
-        if(send.statusCode() != 200) {
-            System.out.println(send.statusCode());
+        try{
+            HttpResponse<String> send = httpClient.send(httpRequest, HttpResponse.BodyHandlers.ofString());
+            if(send.statusCode() != 200) {
+                System.out.println(send.statusCode());
+            }
+            if(statPath != null){
+                long resTime = System.currentTimeMillis() - start;
+                responseTimes.compute(send.statusCode(),(k,v) ->
+                {
+                    if(v == null) {
+                        v = new ArrayList<>();
+                    }
+                    v.add(resTime);
+                    return v;
+                });
+            }
+        } catch (IOException e){
+            System.err.println(e.getMessage());
         }
-        if(statPath != null){
-            long resTime = System.currentTimeMillis() - start;
-            responseTimes.compute(send.statusCode(),(k,v) ->
-            {
-                if(v == null) {
-                    v = new ArrayList<>();
-                }
-                v.add(resTime);
-                return v;
-            });
-        }
-
     }
 
     private String prepareRequest(List<String> stringList) {
