@@ -1,7 +1,11 @@
 package fr.uge.modules.linking.token.type;
 
 import fr.uge.modules.api.model.entities.TokenEntity;
+import fr.uge.modules.api.model.linking.Computation;
+import fr.uge.modules.api.model.linking.TokensLink;
+import fr.uge.modules.linking.strategy.AverageStrategy;
 
+import java.util.Collection;
 import java.util.List;
 
 public class TypeResource implements TokenType{
@@ -19,16 +23,16 @@ public class TypeResource implements TokenType{
     public Integer getTokenTypeId() { return TokenTypeId.ID_RESOURCE.getId(); }
 
     @Override
-    public double computeProximity(List<TokenEntity> tokenLeft, List<TokenEntity> tokenRight) {
+    public TokensLink computeProximity(List<TokenEntity> tokenLeft, List<TokenEntity> tokenRight) {
         if(tokenLeft.isEmpty() || tokenRight.isEmpty()) {
-            return 50;
+            return TokensLink.withoutStrategy(50);
         }
-        return tokenLeft.stream().map(TokenEntity::getValue)
-                .mapToDouble(tokenL -> tokenRight.stream()
+        var computations = tokenLeft.stream().map(TokenEntity::getValue)
+                .map(tokenL -> tokenRight.stream()
                         .map(TokenEntity::getValue)
-                        .mapToDouble(tokenR -> {
+                        .map(tokenR -> {
                             if ( tokenL.equals( tokenR ) ) {
-                                return 100;
+                                return new Computation(this, tokenL, tokenR, 100d);
                             }
                             var startsWith = "/";
                             var arrayL = tokenL.split(startsWith);
@@ -44,9 +48,12 @@ public class TypeResource implements TokenType{
                                     }
                                 }
                             }
-                            return (count / arrayL.length) * 100;
-                        } ).reduce( 0,Double::max)).reduce(0, Double::sum) / tokenLeft.size();
-
+                            return new Computation(this, tokenL, tokenR, (count / arrayL.length) * 100);
+                        } )
+                        .toList())
+                .flatMap(Collection::stream)
+                .toList();
+        return new TokensLink(computations, new AverageStrategy());
     }
 
 }

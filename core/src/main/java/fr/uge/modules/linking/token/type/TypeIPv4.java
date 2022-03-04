@@ -1,7 +1,11 @@
 package fr.uge.modules.linking.token.type;
 
 import fr.uge.modules.api.model.entities.TokenEntity;
+import fr.uge.modules.api.model.linking.Computation;
+import fr.uge.modules.api.model.linking.TokensLink;
+import fr.uge.modules.linking.strategy.AverageStrategy;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.stream.IntStream;
 
@@ -36,16 +40,18 @@ public class TypeIPv4 implements TokenType {
                 }).findFirst().orElse(100);
     }
 
-    public double computeProximity(List<TokenEntity> tokenLeft, List<TokenEntity> tokenRight) {
-        if(tokenLeft.isEmpty() || tokenRight.isEmpty()) {
-            return 50;
-        }
-        return tokenLeft.stream()
+    public TokensLink computeProximity(List<TokenEntity> tokenLeft, List<TokenEntity> tokenRight) {
+        if(tokenLeft.isEmpty() || tokenRight.isEmpty()) return TokensLink.withoutStrategy(50);
+        var type = new TypeIPv4();
+
+        var computations = tokenLeft.stream()
                     .map(TokenEntity::getValue)
-                    .mapToDouble(leftIP -> tokenRight.stream()
+                    .map(leftIP -> tokenRight.stream()
                             .map(TokenEntity::getValue)
-                            .mapToDouble(rightIP -> calculIp(leftIP, rightIP))
-                            .reduce(0, Double::max))
-                .reduce(0, Double::sum) / tokenLeft.size();
+                            .map(rightIP -> new Computation(type, leftIP, rightIP, calculIp(leftIP, rightIP)))
+                            .toList()
+                    ).flatMap(Collection::stream).toList();
+
+        return new TokensLink(computations, new AverageStrategy());
     }
 }

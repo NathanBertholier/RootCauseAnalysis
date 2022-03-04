@@ -1,7 +1,11 @@
 package fr.uge.modules.linking.token.type;
 
 import fr.uge.modules.api.model.entities.TokenEntity;
+import fr.uge.modules.api.model.linking.Computation;
+import fr.uge.modules.api.model.linking.TokensLink;
+import fr.uge.modules.linking.strategy.AverageStrategy;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class TypeHTTPStatus implements TokenType{
@@ -25,59 +29,42 @@ public class TypeHTTPStatus implements TokenType{
     }
 
     @Override
-    public double computeProximity(List<TokenEntity> tokenLeft, List<TokenEntity> tokenRight) {
-        if (tokenLeft.isEmpty() || tokenRight.isEmpty()) return 0;
+    public TokensLink computeProximity(List<TokenEntity> listTokensLeft, List<TokenEntity> listTokensRight) {
+        if (listTokensLeft.isEmpty() || listTokensRight.isEmpty()) return TokensLink.withoutStrategy(0);
+        var type = new TypeHTTPStatus();
 
-        float proximity = 0;
+        List<Computation> computations = new ArrayList<>();
 
-        /*
-        return tokenLeft.stream().mapToDouble(tokenL -> {
-            var firstLeftChar =  tokenL.getValue().substring(0,1);
-           return tokenRight.stream().mapToDouble(tokenR -> {
-               var firstRightChar =  tokenL.getValue().substring(0,1);
-               if (tokenL.getValue().equals(tokenR.getValue())) {
-                   return 100;
-               }
-               else if (firstLeftChar.equals(firstRightChar)) {
-                   return 95;
-               }
-               else if ((firstLeftChar.equals("4") || firstLeftChar.equals("5"))
-                       && (firstRightChar.equals("4") || firstRightChar.equals("5"))) {
-                   return 90;
-               }
-               else if ((firstLeftChar.equals("2") || firstLeftChar.equals("3"))
-                       && (firstRightChar.equals("4") || firstRightChar.equals("5"))) {
-                   return 25;
-               } else if ((firstLeftChar.equals("4") || firstLeftChar.equals("5"))
-                       && (firstRightChar.equals("2") || firstRightChar.equals("3"))) {
-                    return 0;
-               }
-               return 0;
-           }).reduce(0, Double::max);
-        }).reduce(0, Double::max);*/
-
-        for (TokenEntity tokenL : tokenLeft) {
-            var firstLeftChar = tokenL.getValue().substring(0,1);
-            for (TokenEntity tokenR : tokenRight) {
-                var firstRightChar = tokenR.getValue().substring(0,1);
-                if (tokenL.getValue().equals( tokenR.getValue() ) ) {
-                    return 100;
-                }
-                else if (firstLeftChar.equals(firstRightChar)) {
-                    proximity = 95;
-                }
-                else if (proximity < 90
-                        && (firstLeftChar.equals("4") || firstLeftChar.equals("5"))
-                        && ( firstRightChar.equals("4") || firstRightChar.equals("5"))) {
-                    proximity = 90;
-                }
-                else if (proximity < 25
-                        && (firstLeftChar.equals("2") || firstLeftChar.equals("3"))
-                        && ( firstRightChar.equals("4") || firstRightChar.equals("5"))) {
-                    proximity = 25;
-                }
+        for (TokenEntity tokenLeft : listTokensLeft) {
+            var tokenLeftValue = tokenLeft.value;
+            for (TokenEntity tokenRight : listTokensRight) {
+                var tokenRightValue = tokenRight.value;
+                var proximity = fromValues(tokenLeftValue, tokenRightValue);
+                computations.add(new Computation(type, tokenLeftValue, tokenRightValue, proximity));
             }
         }
-        return proximity;
+
+        return new TokensLink(computations, new AverageStrategy());
+    }
+
+    private static double fromValues(String left, String right){
+        if (left.equals(right)) {
+            return 100;
+        }
+        var firstLeftChar = left.substring(0,1);
+        var firstRightChar = right.substring(0,1);
+
+        if (firstLeftChar.equals(firstRightChar)) {
+            return 95;
+        }
+
+        else if ((firstLeftChar.equals("4") || firstLeftChar.equals("5"))
+                && ( firstRightChar.equals("4") || firstRightChar.equals("5"))) {
+            return 90;
+        }
+        else if ((firstLeftChar.equals("2") || firstLeftChar.equals("3"))
+                && ( firstRightChar.equals("4") || firstRightChar.equals("5"))) {
+            return 25;
+        } else return 0;
     }
 }
