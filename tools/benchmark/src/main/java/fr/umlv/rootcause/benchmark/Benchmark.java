@@ -23,7 +23,7 @@ public class Benchmark {
         //args = new String[]{"-l", "100000", "-F", "../logs/", "-b", "50", "-d", "85", "-t", "8", "-u", "http://localhost:8081/insertlog"};
         //args = new String[]{"-l", "1000", "-F", "../logs/", "-b", "50", "-d", "85", "-t", "4", "-u", "http://localhost:8081/insertlog","-s","stats.csv"};
 
-        args = new String[]{"-l", "1000000", "-F", "../logs/", "-b", "500", "-d", "1000", "-t", "50", "-u", "http://localhost:8081/insertlog","-s","stat.csv"};
+        args = new String[]{"-l", "10000", "-F", "../logs/", "-b", "500", "-d", "1000", "-t", "50", "-u", "http://localhost:8081/insertlog","-s","stat.csv"};
         //use this to output to out.txt in exec folder
         //args = new String[]{"-l", "10000", "-f", "in.txt"};
 
@@ -110,7 +110,7 @@ public class Benchmark {
                 } else {
                     client = new BenchHTTPClient(batchSize, ts, URITarget, null);
                 }
-                client.sendToServer(subLists.get(finalI),millisDelay, loop);
+                client.sendToServer(subLists.get(finalI), millisDelay, loop);
             });
         }
 
@@ -319,22 +319,25 @@ class BenchHTTPClient{
         HttpRequest httpRequest = HttpRequest.newBuilder().uri(uri)
                 .POST(HttpRequest.BodyPublishers.ofString(str))
                 .header("Accept", "application/json").header("Content-Type", "application/json").build();
-        HttpResponse<String> send = httpClient.send(httpRequest, HttpResponse.BodyHandlers.ofString());
-        if(send.statusCode() != 200) {
-            System.out.println(send.statusCode());
+        try{
+            HttpResponse<String> send = httpClient.send(httpRequest, HttpResponse.BodyHandlers.ofString());
+            if(send.statusCode() != 200) {
+                System.out.println(send.statusCode());
+            }
+            if(statPath != null){
+                long resTime = System.currentTimeMillis() - start;
+                responseTimes.compute(send.statusCode(),(k,v) ->
+                {
+                    if(v == null) {
+                        v = new ArrayList<>();
+                    }
+                    v.add(resTime);
+                    return v;
+                });
+            }
+        } catch (IOException e){
+            System.err.println(e.getMessage());
         }
-        if(statPath != null){
-            long resTime = System.currentTimeMillis() - start;
-            responseTimes.compute(send.statusCode(),(k,v) ->
-            {
-                if(v == null) {
-                    v = new ArrayList<>();
-                }
-                v.add(resTime);
-                return v;
-            });
-        }
-
     }
 
     private String prepareRequest(List<String> stringList) {

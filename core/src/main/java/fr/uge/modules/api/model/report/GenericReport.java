@@ -8,6 +8,7 @@ import java.util.Set;
 
 public interface GenericReport {
     LogEntity getRoot();
+    LogEntity getTarget();
     Set<TokensMostSeen> getSeenTokens();
     List<LogEntity> getRelevantLogs();
 }
