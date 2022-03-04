@@ -1,6 +1,7 @@
 package fr.uge.modules.linking.token.type;
 
 import fr.uge.modules.api.model.entities.TokenEntity;
+import fr.uge.modules.api.model.linking.TokensLink;
 
 import java.util.Objects;
 import java.util.List;
@@ -19,7 +20,7 @@ public interface TokenType {
         return -1;
     }
 
-    double computeProximity(List<TokenEntity> tokenLeft, List<TokenEntity> tokenRight);
+    TokensLink computeProximity(List<TokenEntity> tokenLeft, List<TokenEntity> tokenRight);
 
     static TokenType fromId(int id){
         return switch (id){

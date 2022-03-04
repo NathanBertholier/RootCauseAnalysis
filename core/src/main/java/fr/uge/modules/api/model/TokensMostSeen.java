@@ -1,9 +1,13 @@
 package fr.uge.modules.api.model;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import fr.uge.modules.api.serializer.TokenMostSeenSerializer;
+
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
+@JsonSerialize(using = TokenMostSeenSerializer.class)
 public record TokensMostSeen(String token_type, List<String> token_values, long count) {
     @Override
     public boolean equals(Object o) {

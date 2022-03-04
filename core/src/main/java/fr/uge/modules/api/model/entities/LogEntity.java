@@ -1,5 +1,7 @@
 package fr.uge.modules.api.model.entities;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import fr.uge.modules.api.serializer.LogSerializer;
 import io.quarkus.hibernate.reactive.panache.PanacheEntityBase;
 
 import javax.persistence.*;
@@ -9,6 +11,7 @@ import java.util.Objects;
 
 @Entity
 @Table(name = "log", schema = "public", catalog = "rootcause")
+@JsonSerialize(using = LogSerializer.class)
 public class LogEntity extends PanacheEntityBase {
     @Id
     @Column(name = "id")

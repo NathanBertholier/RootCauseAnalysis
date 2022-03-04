@@ -1,7 +1,12 @@
 package fr.uge.modules.linking.token.type;
 
 import fr.uge.modules.api.model.entities.TokenEntity;
+import fr.uge.modules.api.model.linking.Computation;
+import fr.uge.modules.api.model.linking.TokensLink;
+import fr.uge.modules.linking.strategy.AverageStrategy;
 
+import java.util.Collection;
+import java.util.Comparator;
 import java.util.List;
 
 public class TypeIPv6 implements TokenType{
@@ -24,13 +29,23 @@ public class TypeIPv6 implements TokenType{
     }
 
     @Override
-    public double computeProximity(List<TokenEntity> tokenLeft, List<TokenEntity> tokenRight) {
-        if (tokenLeft.isEmpty() || tokenRight.isEmpty()) return 0;
+    public TokensLink computeProximity(List<TokenEntity> tokenLeft, List<TokenEntity> tokenRight) {
+        if (tokenLeft.isEmpty() || tokenRight.isEmpty()) return TokensLink.withoutStrategy(0);
+        var type = new TypeIPv6();
 
-        return tokenLeft.stream().mapToDouble(tokenL -> tokenRight.stream()
-                .filter(tokenL::equals)
-                .mapToDouble(tokenR -> 100)
-                .sum()).sum() / tokenLeft.size();
+        var computations = tokenLeft.stream().map(tokenL -> tokenRight.stream()
+                .map(tokenR -> {
+                    if(tokenR.equals(tokenL))
+                        return new Computation(type, tokenL.value, tokenR.value, 100d);
+                    return new Computation(type, tokenL.value, tokenR.value, 0d);
+                })
+                .toList())
+                .flatMap(Collection::stream)
+                .sorted(Comparator.comparingDouble(computation -> - computation.proximity()))
+                .limit(Integer.max(tokenLeft.size(), tokenRight.size()))
+                .toList();
+
+        return new TokensLink(computations, new AverageStrategy());
     }
 
 }
