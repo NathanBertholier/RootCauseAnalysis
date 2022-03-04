@@ -48,8 +48,7 @@ public class ReportLinking {
                         var tokenType = TokenType.fromId(tokenTypeId);
                         var entryList = entry.getValue();
                         var toCompareList = secondMap.getOrDefault(tokenTypeId, new ArrayList<>());
-                        var link = tokenType.computeProximity(entryList, toCompareList);
-                        return link;
+                        return tokenType.computeProximity(entryList, toCompareList);
                     })
                     .map(TokensLink::getComputations)
                     .flatMap(Collection::stream)
@@ -72,39 +71,33 @@ public class ReportLinking {
     }
 
     public PriorityQueue<Relation> computeProximityTree(LogEntity logTarget, List<LogEntity> logWithinDelta, ReportParameter rp){
-        //TreeSet<Relation> redBlack = new TreeSet<>(Comparator.comparingDouble(relation -> - relation.tokensLink().getProximity()));
         var targetDatetime = logTarget.datetime;
 
         var delta = rp.delta();
         var proximityLimit = rp.proximity_limit();
         var networkSize = rp.network_size();
-        PriorityQueue<Relation> proximityQ = new PriorityQueue<>(networkSize,
-                Comparator.comparingDouble(r -> r.tokensLink().getProximity()));
+        PriorityQueue<Relation> proximityQ = new PriorityQueue<>(Comparator.comparingDouble(r -> r.tokensLink().getProximity()));
 
         logWithinDelta.stream()
                 .map(log -> {
                     var relation = relationManager.computeRelation(logTarget, log);
                     Computation datetimeComputation = TypeDatetime.computeDateTimeProximity(log.datetime, targetDatetime, delta);
-                    relationManager.addToRelation(relation, datetimeComputation);
+                    var finalRelation = relationManager.addToRelation(relation, datetimeComputation);
 
                     LOGGER.log(Level.DEBUG, "Relation created between " + logTarget + " and " + log + ": " + relation);
-                    return relation;
+                    return finalRelation;
                 })
                 .forEach(relation -> {
-
                     var relationProximity = relation.tokensLink().getProximity();
-                    if(!proximityQ.isEmpty()) {
-                        var firstProximity = proximityQ.peek().tokensLink().getProximity();
-                        System.out.println();
-                        if(relationProximity > proximityLimit){
-                            if(proximityQ.size() == networkSize){
-                                if(relationProximity > firstProximity){
-                                    proximityQ.remove();
-                                    proximityQ.add(relation);
-                                }
-                            } else proximityQ.add(relation);
-                        }
-                    } else proximityQ.add(relation);
+                    if(relationProximity >= proximityLimit){
+                        if(proximityQ.size() == networkSize && !proximityQ.isEmpty()){
+                            var firstProximity = proximityQ.peek().tokensLink().getProximity();
+                            if(relationProximity > firstProximity){
+                                proximityQ.remove();
+                                proximityQ.add(relation);
+                            }
+                        } else proximityQ.add(relation);
+                    }
                 });
 
         LOGGER.log(Level.DEBUG, "Generated tree for id " + logTarget.id + ": " + proximityQ);
