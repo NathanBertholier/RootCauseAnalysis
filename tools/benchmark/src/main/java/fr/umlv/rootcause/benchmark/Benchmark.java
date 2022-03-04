@@ -23,7 +23,8 @@ public class Benchmark {
         //args = new String[]{"-l", "100000", "-F", "../logs/", "-b", "50", "-d", "85", "-t", "8", "-u", "http://localhost:8081/insertlog"};
         //args = new String[]{"-l", "1000", "-F", "../logs/", "-b", "50", "-d", "85", "-t", "4", "-u", "http://localhost:8081/insertlog","-s","stats.csv"};
 
-        args = new String[]{"-l", "10000", "-F", "C:\\Users\\natha\\OneDrive\\Documents\\logs\\logs", "-b", "100", "-d", "1000", "-t", "10", "-u", "http://localhost:8081/insertlog","-lo"};
+        args = new String[]{"-b", "1000", "-d", "1000", "-t", "4", "-u", "http://localhost:8081/insertlog", "-l", "1000", "-F", "C:\\Users\\05tra\\Documents\\Logs", "-lo"};
+//        args = new String[]{"-l", "10000", "-F", "C:\\Users\\natha\\OneDrive\\Documents\\logs\\logs", "-b", "100", "-d", "1000", "-t", "10", "-u", "http://localhost:8081/insertlog","-lo"};
         //use this to output to out.txt in exec folder
         //args = new String[]{"-l", "10000", "-f", "in.txt"};
 

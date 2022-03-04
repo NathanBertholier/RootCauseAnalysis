@@ -6,6 +6,7 @@ import fr.uge.modules.api.model.entities.LogEntity;
 import fr.uge.modules.api.model.entities.TokenEntity;
 import fr.uge.modules.api.model.report.ReportParameter;
 import fr.uge.modules.linking.LogsLinking;
+import fr.uge.modules.linking.token.type.TokenType;
 import io.smallrye.mutiny.Multi;
 import io.smallrye.mutiny.Uni;
 
@@ -40,7 +41,7 @@ public class Synthetization {
     }
 
     private static TokensMostSeen fromTokenEntities(List<TokenEntity> entities){
-        var tokenTypeName = entities.stream().findAny().orElseThrow().token_type.name;
+        var tokenTypeName = TokenType.fromId(entities.stream().findAny().orElseThrow().idtokentype).getName();
         var values = entities.stream().map(t -> t.value).toList();
         var size = entities.size();
         return new TokensMostSeen(tokenTypeName, values, size);
