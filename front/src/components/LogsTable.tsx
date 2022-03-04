@@ -48,19 +48,18 @@ export class LogsTable extends Component<LogsTableProp, any> {
     render() {
         return (
             <div>
-                <Table striped bordered hover className="logTable">
+                <Table responsive striped bordered hover className="logTable">
                     <thead>
                     <tr>
                         <th>id</th>
                         <th>DateTime</th>
                         <th>Tokens</th>
-                        <th>Log</th>
                     </tr>
                     </thead>
                     <tbody>
                     {
                         this.state.list.map( ( log, index ) => {
-                            return  <Row id={ log.id } datetime={log.datetime} rawLog={log.rawLog} tokens={ log.tokens } key={index} />
+                            return  <Row id={ log.id } datetime={log.datetime} tokens={ log.tokens } key={index} />
                         })
                     }
                     </tbody>
