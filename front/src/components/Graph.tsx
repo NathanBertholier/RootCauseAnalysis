@@ -41,33 +41,36 @@ const layout = {
     animate: false,
 };
 
-export  const Graph = () => {
+type GraphProp = {
+    res: ReportResponse
+}
+
+export  const Graph = ({res} : GraphProp ) => {
     const [data, setData] = useState<{nodes: cytoscape.ElementDefinition[], edges: cytoscape.ElementDefinition[]}>({ nodes: [], edges: [] });
     const [mostUsedTokens, setMostUsedTokens] = useState( [] as MostUsedToken[] );
     const [cy, setCy] = useState<cytoscape.Core | null>(null);
     const [logToolTip, setLogToolTip] = useState<Log>({} as Log);
 
     useEffect(() => {
-        let fakeJson = '{"root":{"id":0, "content":"test log", "datetime":"2022-02-25T18:25:43.000Z"}, "target":{"id":4, "content":"test log target", "datetime":"2022-02-25T18:25:45.000Z"}, "tokens":[{"name":"tokenname", "value":200, "count":5}], "logs":[{"id":1, "content":"GET localhost 404", "datetime":"2022-02-25T18:25:43.000Z"}, {"id":2, "content":"GET localhost 200", "datetime":"2022-02-26T19:25:43.000Z"}, {"id":3, "content":"GET localhost 201", "datetime":"2022-02-27T20:25:43.000Z"}], "proximity":[{"id":1, "links":[{"id":2, "proximity":51}, {"id":3, "proximity":51}]}, {"id":0, "links":[{"id":1, "proximity":52}, {"id":4, "proximity":52}]}]}';
-        let x : ReportResponse = JSON.parse( fakeJson );
+        console.log( res );
         let nodes : cytoscape.ElementDefinition[] = [];
-        nodes.push( { data: { id: x.root.id.toString(), label: "Root Cause", color: "#F24E1E", log: x.root } } );
-        nodes.push( { data: { id: x.target.id.toString(), label: "Cible", color: "#4ECB71",log: x.target } } );
+        nodes.push( { data: { id: res.report.rootCause.id.toString(), label: "Root Cause", color: "#F24E1E", log: res.report.rootCause } } );
+        nodes.push( { data: { id: res.report.target.id.toString(), label: "Cible", color: "#4ECB71",log: res.report.target } } );
 
-        x.logs.forEach( log => {
+        res.report.logs.filter( log => log.id !== res.report.rootCause.id ).forEach( log => {
             nodes.push( { data: { id: log.id.toString(),  color: "#C4C4C4",log: log } } );
         })
 
         let edges : cytoscape.ElementDefinition[] = [];
-        x.proximity.forEach( proximity => {
+        res.proximity.forEach( proximity => {
             proximity.links.forEach( link => {
                 edges.push( { data: { source: proximity.id, target: link.id, label: link.proximity }} );
             } );
         });
 
-        setMostUsedTokens( x.tokens )
+        setMostUsedTokens( res.report.tokens )
         setData({ nodes: nodes, edges: edges } );
-    }, [] );
+    }, [res] );
 
     //Reload the layout Cytoscape
     useEffect(() => {

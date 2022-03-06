@@ -1,10 +1,13 @@
 import {Sidebar} from "../components/Sidebar";
-import React, {useState} from "react";
+import React, {useEffect, useState} from "react";
 import {Button, Container, Form, FormControl, Row} from "react-bootstrap";
 import {Graph} from "../components/Graph";
 import {toast} from "../tools/ToastManager";
 import {FormData, onFocusOut, setError} from "../types/FormData";
 import {ReportParams, ReportRequest} from "../types/ReportRequest";
+import DataService from "../services/DataService";
+import {Log} from "../types/TokensResponse";
+import {ReportResponse} from "../types/ReportResponse";
 
 const DEFAULT_ID_VALUE : number = 0;
 const DEFAULT_DELTA_VALUE : number = 2;
@@ -17,10 +20,22 @@ export const Report = () => {
         "networkSize":  { value:DEFAULT_OPTIONAL_VALUE, error: "", isRequired: false },
         "proximity":    { value:DEFAULT_OPTIONAL_VALUE, error: "", isRequired: false }
     } as FormData );
+    const [ x, setX] = useState<ReportResponse>( {
+    "report":{
+        "rootCause":{"id":0, "content":"test log", "datetime":"2022-02-25T18:25:43.000Z"},
+        "target":{"id":4, "content":"test log target", "datetime":"2022-02-25T18:25:45.000Z"},
+        "tokens":[{"name":"tokenname", "value":200, "count":5}],
+        "logs":[
+            {"id":1, "content":"GET localhost 404", "datetime":"2022-02-25T18:25:43.000Z"},
+            {"id":2, "content":"GET localhost 200", "datetime":"2022-02-26T19:25:43.000Z"},
+            {"id":3, "content":"GET localhost 201", "datetime":"2022-02-27T20:25:43.000Z"}
+        ]
+    },
+    "proximity":[{"id":1, "links":[{"id":2, "proximity":51}, {"id":3, "proximity":51}]}, {"id":0, "links":[{"id":1, "proximity":52}, {"id":4, "proximity":52}]}]} )
 
     const sendForm = () => {
         if ( formData["target"].value !== DEFAULT_ID_VALUE ) {
-            let params : ReportParams = { id: formData["target"].value };
+            let params : ReportParams = { expanded: true };
             if ( formData["networkSize"].value !== DEFAULT_OPTIONAL_VALUE ) {
                 params.network_size = formData["networkSize"].value;
             }
@@ -29,7 +44,16 @@ export const Report = () => {
             }
             let request : ReportRequest = { params: params };
             // send data
-            console.log( request );
+            DataService.getReport(formData["target"].value, request).then((response: any) => {
+                let a : ReportResponse = response.data
+                setX( a );
+            }).catch((e: Error) => {
+                toast.show({
+                    title: "Error",
+                    content: "Un problème est survenue",
+                    duration: 3000,
+                });
+            });
         }
         else {
             setError( formData,setFormData, "target", "*Le champs 'ID cible' est requis" );
@@ -76,7 +100,7 @@ export const Report = () => {
                             </div>
                         </Row>
                         <Row>
-                            <Graph />
+                            <Graph res={ x } />
                         </Row>
                     </Container>
                 </div>
