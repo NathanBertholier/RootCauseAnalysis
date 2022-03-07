@@ -19,7 +19,7 @@ import java.util.logging.Logger;
 public class Tokenization {
     private static final Logger LOGGER = Logger.getGlobal();
 
-    private Profile profile;
+    private Profile profile = new AWSProfile();
 
     public void chooseProfile(@Observes StartupEvent ev) {
         this.profile = switch (ConfigProvider.getConfig()

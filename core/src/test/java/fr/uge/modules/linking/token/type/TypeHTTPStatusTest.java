@@ -53,33 +53,35 @@ public class TypeHTTPStatusTest {
         TokenEntity tokenStatus500 = new TokenEntity();
         tokenStatus500.setValue("500");
 
-        /*
+
         assertAll(
+                /*
                 // empty array
-                () -> assertEquals( 0, typeHTTPStatus.computeProximity(new ArrayList<>(), new ArrayList<>(){ { add( tokenStatus200 ); } } ).proximity() ),
-                () -> assertEquals( 0, typeHTTPStatus.computeProximity(new ArrayList<>(){ { add( tokenStatus200 ); }}, new ArrayList<>() ).proximity() ),
-                () -> assertEquals( 0, typeHTTPStatus.computeProximity(new ArrayList<>(), new ArrayList<>() ).proximity() ),
+                () -> assertEquals( 0, typeHTTPStatus.computeProximity(new ArrayList<>(), new ArrayList<>(){ { add( tokenStatus200 ); } } ).getProximity() ),
+                () -> assertEquals( 0, typeHTTPStatus.computeProximity(new ArrayList<>(){ { add( tokenStatus200 ); }}, new ArrayList<>() ).getProximity() ),
+                () -> assertEquals( 0, typeHTTPStatus.computeProximity(new ArrayList<>(), new ArrayList<>() ).getProximity() ),
+                */
                 // 100% identical
-                () -> assertEquals( 100, typeHTTPStatus.computeProximity(new ArrayList<>(){ { add( tokenStatus200 ); }}, new ArrayList<>(){ { add( tokenStatus200 ); } } ).proximity() ),
-                () -> assertEquals( 100, typeHTTPStatus.computeProximity(new ArrayList<>(){ { add( tokenStatus300 ); }}, new ArrayList<>(){ { add( tokenStatus300 ); } } ).proximity() ),
-                () -> assertEquals( 100, typeHTTPStatus.computeProximity(new ArrayList<>(){ { add( tokenStatus400 ); }}, new ArrayList<>(){ { add( tokenStatus400 ); } } ).proximity() ),
-                () -> assertEquals( 100, typeHTTPStatus.computeProximity(new ArrayList<>(){ { add( tokenStatus500 ); }}, new ArrayList<>(){ { add( tokenStatus500 ); } } ).proximity() ),
-                () -> assertEquals( 100, typeHTTPStatus.computeProximity(new ArrayList<>(){ { add( tokenStatus402 ); }}, new ArrayList<>(){ { add( tokenStatus402 ); } } ).proximity() ),
+                () -> assertEquals( 100, typeHTTPStatus.computeProximity(new ArrayList<>(){ { add( tokenStatus200 ); }}, new ArrayList<>(){ { add( tokenStatus200 ); } } ).getProximity() ),
+                () -> assertEquals( 100, typeHTTPStatus.computeProximity(new ArrayList<>(){ { add( tokenStatus300 ); }}, new ArrayList<>(){ { add( tokenStatus300 ); } } ).getProximity() ),
+                () -> assertEquals( 100, typeHTTPStatus.computeProximity(new ArrayList<>(){ { add( tokenStatus400 ); }}, new ArrayList<>(){ { add( tokenStatus400 ); } } ).getProximity() ),
+                () -> assertEquals( 100, typeHTTPStatus.computeProximity(new ArrayList<>(){ { add( tokenStatus500 ); }}, new ArrayList<>(){ { add( tokenStatus500 ); } } ).getProximity() ),
+                () -> assertEquals( 100, typeHTTPStatus.computeProximity(new ArrayList<>(){ { add( tokenStatus402 ); }}, new ArrayList<>(){ { add( tokenStatus402 ); } } ).getProximity() ),
 
                 //4xx ou 5xx
-                () -> assertEquals( 95, typeHTTPStatus.computeProximity(new ArrayList<>(){ { add( tokenStatus400 ); }}, new ArrayList<>(){ { add( tokenStatus402 ); } } ).proximity() ),
-                () -> assertEquals( 90, typeHTTPStatus.computeProximity(new ArrayList<>(){ { add( tokenStatus400 ); }}, new ArrayList<>(){ { add( tokenStatus500 ); } } ).proximity() ),
-                () -> assertEquals( 90, typeHTTPStatus.computeProximity(new ArrayList<>(){ { add( tokenStatus500 ); }}, new ArrayList<>(){ { add( tokenStatus402 ); } } ).proximity() ),
-                () -> assertEquals( 0, typeHTTPStatus.computeProximity(new ArrayList<>(){ { add( tokenStatus400 ); }}, new ArrayList<>(){ { add( tokenStatus200 ); } } ).proximity() ),
-                () -> assertEquals( 0, typeHTTPStatus.computeProximity(new ArrayList<>(){ { add( tokenStatus400 ); }}, new ArrayList<>(){ { add( tokenStatus300 ); } } ).proximity() ),
+                () -> assertEquals( 95, typeHTTPStatus.computeProximity(new ArrayList<>(){ { add( tokenStatus400 ); }}, new ArrayList<>(){ { add( tokenStatus402 ); } } ).getProximity() ),
+                () -> assertEquals( 90, typeHTTPStatus.computeProximity(new ArrayList<>(){ { add( tokenStatus400 ); }}, new ArrayList<>(){ { add( tokenStatus500 ); } } ).getProximity() ),
+                () -> assertEquals( 90, typeHTTPStatus.computeProximity(new ArrayList<>(){ { add( tokenStatus500 ); }}, new ArrayList<>(){ { add( tokenStatus402 ); } } ).getProximity() ),
+                () -> assertEquals( 0, typeHTTPStatus.computeProximity(new ArrayList<>(){ { add( tokenStatus400 ); }}, new ArrayList<>(){ { add( tokenStatus200 ); } } ).getProximity() ),
+                () -> assertEquals( 0, typeHTTPStatus.computeProximity(new ArrayList<>(){ { add( tokenStatus400 ); }}, new ArrayList<>(){ { add( tokenStatus300 ); } } ).getProximity() ),
 
                 //2xx ou 3xx
-                () -> assertEquals( 95, typeHTTPStatus.computeProximity(new ArrayList<>(){ { add( tokenStatus204 ); }}, new ArrayList<>(){ { add( tokenStatus200 ); } } ).proximity() ),
-                () -> assertEquals( 25, typeHTTPStatus.computeProximity(new ArrayList<>(){ { add( tokenStatus204 ); }}, new ArrayList<>(){ { add( tokenStatus402 ); } } ).proximity() ),
-                () -> assertEquals( 25, typeHTTPStatus.computeProximity(new ArrayList<>(){ { add( tokenStatus204 ); }}, new ArrayList<>(){ { add( tokenStatus500 ); } } ).proximity() )
+                () -> assertEquals( 95, typeHTTPStatus.computeProximity(new ArrayList<>(){ { add( tokenStatus204 ); }}, new ArrayList<>(){ { add( tokenStatus200 ); } } ).getProximity() ),
+                () -> assertEquals( 25, typeHTTPStatus.computeProximity(new ArrayList<>(){ { add( tokenStatus204 ); }}, new ArrayList<>(){ { add( tokenStatus402 ); } } ).getProximity() ),
+                () -> assertEquals( 25, typeHTTPStatus.computeProximity(new ArrayList<>(){ { add( tokenStatus204 ); }}, new ArrayList<>(){ { add( tokenStatus500 ); } } ).getProximity() )
         );
 
-         */
+
 
     }
 }

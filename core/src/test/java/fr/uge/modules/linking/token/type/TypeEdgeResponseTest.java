@@ -52,38 +52,39 @@ class TypeEdgeResponseTest {
         TokenEntity error = new TokenEntity();
         error.setValue("Error");
 
-        /*
-        assertAll(
-                // empty array
-                () -> assertEquals( 50, typeEdgeResponse.computeProximity(new ArrayList<>(),                        new ArrayList<>(){{ add( hit ); }} ).proximity() ),
-                () -> assertEquals( 50, typeEdgeResponse.computeProximity(new ArrayList<>(){{ add( miss ); }},      new ArrayList<>() ).proximity() ),
-                () -> assertEquals( 50, typeEdgeResponse.computeProximity(new ArrayList<>(),                        new ArrayList<>() ).proximity() ),
 
+        assertAll(
+                /*
+                // empty array
+                () -> assertEquals( 50, typeEdgeResponse.computeProximity(new ArrayList<>(),                        new ArrayList<>(){{ add( hit ); }} ).getProximity() ),
+                () -> assertEquals( 50, typeEdgeResponse.computeProximity(new ArrayList<>(){{ add( miss ); }},      new ArrayList<>() ).getProximity() ),
+                () -> assertEquals( 50, typeEdgeResponse.computeProximity(new ArrayList<>(),                        new ArrayList<>() ).getProximity() ),
+                */
                 // 100 % identical
-                () -> assertEquals( 100, typeEdgeResponse.computeProximity(new ArrayList<>(){{ add( hit ); }},      new ArrayList<>(){{ add( hit ); }} ).proximity() ),
-                () -> assertEquals( 100, typeEdgeResponse.computeProximity(new ArrayList<>(){{ add( error ); }},    new ArrayList<>(){{ add( error ); }} ).proximity() ),
+                () -> assertEquals( 100, typeEdgeResponse.computeProximity(new ArrayList<>(){{ add( hit ); }},      new ArrayList<>(){{ add( hit ); }} ).getProximity() ),
+                () -> assertEquals( 100, typeEdgeResponse.computeProximity(new ArrayList<>(){{ add( error ); }},    new ArrayList<>(){{ add( error ); }} ).getProximity() ),
 
                 // error case
-                () -> assertEquals( 0,  typeEdgeResponse.computeProximity(new ArrayList<>(){{ add( error ); }},     new ArrayList<>(){{ add( hit ); }} ).proximity() ),
-                () -> assertEquals( 95, typeEdgeResponse.computeProximity(new ArrayList<>(){{ add( error ); }},     new ArrayList<>(){{ add( miss ); }} ).proximity() ),
+                () -> assertEquals( 0,  typeEdgeResponse.computeProximity(new ArrayList<>(){{ add( error ); }},     new ArrayList<>(){{ add( hit ); }} ).getProximity() ),
+                () -> assertEquals( 95, typeEdgeResponse.computeProximity(new ArrayList<>(){{ add( error ); }},     new ArrayList<>(){{ add( miss ); }} ).getProximity() ),
 
                 // no error case
-                () -> assertEquals( 95, typeEdgeResponse.computeProximity(new ArrayList<>(){{ add( hit ); }},       new ArrayList<>(){{ add( refreshHit ); }} ).proximity() ),
-                () -> assertEquals( 25, typeEdgeResponse.computeProximity(new ArrayList<>(){{ add( refreshHit ); }},new ArrayList<>(){{ add( error ); }} ).proximity() ),
+                () -> assertEquals( 95, typeEdgeResponse.computeProximity(new ArrayList<>(){{ add( hit ); }},       new ArrayList<>(){{ add( refreshHit ); }} ).getProximity() ),
+                () -> assertEquals( 25, typeEdgeResponse.computeProximity(new ArrayList<>(){{ add( refreshHit ); }},new ArrayList<>(){{ add( error ); }} ).getProximity() ),
 
                 // case 2 elements in target array
-                () -> assertEquals( 50,         typeEdgeResponse.computeProximity(new ArrayList<>(){{ add( hit );add( error ); }},  new ArrayList<>(){{ add( hit ); }} ).proximity() ),
-                () -> assertEquals( 125.f/2,    typeEdgeResponse.computeProximity(new ArrayList<>(){{ add( hit );add( error ); }},  new ArrayList<>(){{ add( error ); }} ).proximity() ),
-                () -> assertEquals( 95.f/2,     typeEdgeResponse.computeProximity(new ArrayList<>(){{ add( hit );add( error ); }},  new ArrayList<>(){{ add( refreshHit ); }} ).proximity() ),
-                () -> assertEquals( 120.f/2,    typeEdgeResponse.computeProximity(new ArrayList<>(){{ add( hit );add( error ); }},  new ArrayList<>(){{ add( miss ); }} ).proximity() ),
+                () -> assertEquals( 50,         typeEdgeResponse.computeProximity(new ArrayList<>(){{ add( hit );add( error ); }},  new ArrayList<>(){{ add( hit ); }} ).getProximity() ),
+                () -> assertEquals( 125.f/2,    typeEdgeResponse.computeProximity(new ArrayList<>(){{ add( hit );add( error ); }},  new ArrayList<>(){{ add( error ); }} ).getProximity() ),
+                () -> assertEquals( 95.f/2,     typeEdgeResponse.computeProximity(new ArrayList<>(){{ add( hit );add( error ); }},  new ArrayList<>(){{ add( refreshHit ); }} ).getProximity() ),
+                () -> assertEquals( 120.f/2,    typeEdgeResponse.computeProximity(new ArrayList<>(){{ add( hit );add( error ); }},  new ArrayList<>(){{ add( miss ); }} ).getProximity() ),
 
                 // case 2 element in linking
-                () -> assertEquals( 62.5,        typeEdgeResponse.computeProximity(new ArrayList<>(){{ add( hit ); }},       new ArrayList<>(){{ add( hit );add( error ); }} ).proximity() ),
-                () -> assertEquals( 50,        typeEdgeResponse.computeProximity(new ArrayList<>(){{ add( error ); }},     new ArrayList<>(){{ add( hit );add( error ); }} ).proximity() ),
-                () -> assertEquals( 60,         typeEdgeResponse.computeProximity(new ArrayList<>(){{ add( refreshHit ); }},new ArrayList<>(){{ add( hit );add( error ); }} ).proximity() ),
-                () -> assertEquals( 47.5,         typeEdgeResponse.computeProximity(new ArrayList<>(){{ add( miss ); }},      new ArrayList<>(){{ add( hit );add( error ); }} ).proximity() )
+                () -> assertEquals( 62.5,        typeEdgeResponse.computeProximity(new ArrayList<>(){{ add( hit ); }},       new ArrayList<>(){{ add( hit );add( error ); }} ).getProximity() ),
+                () -> assertEquals( 50,        typeEdgeResponse.computeProximity(new ArrayList<>(){{ add( error ); }},     new ArrayList<>(){{ add( hit );add( error ); }} ).getProximity() ),
+                () -> assertEquals( 60,         typeEdgeResponse.computeProximity(new ArrayList<>(){{ add( refreshHit ); }},new ArrayList<>(){{ add( hit );add( error ); }} ).getProximity() ),
+                () -> assertEquals( 47.5,         typeEdgeResponse.computeProximity(new ArrayList<>(){{ add( miss ); }},      new ArrayList<>(){{ add( hit );add( error ); }} ).getProximity() )
         );
 
-         */
+
     }
 }
