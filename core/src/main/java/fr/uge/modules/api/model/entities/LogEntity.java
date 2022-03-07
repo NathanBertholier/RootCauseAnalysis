@@ -14,7 +14,7 @@ import java.util.Objects;
 @Entity
 @Table(name = "log", schema = "public", catalog = "rootcause")
 @NamedQuery(name="LogEntity.findAllWithJoin", query = "SELECT l FROM LogEntity l" +
-        " JOIN fetch l.rawLog"+
+        " left JOIN fetch l.rawLog"+
         " LEFT JOIN FETCH l.tokens item  WHERE l.id <> ?1 and l.datetime between ?2 and ?3")
 
 @JsonSerialize(using = LogSerializer.class)
@@ -31,7 +31,7 @@ public class LogEntity extends PanacheEntityBase {
     @JoinColumn(name = "idlog")
     public List<TokenEntity> tokens;
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @OneToOne
     @JoinColumn(name = "id")
     public RawLogEntity rawLog;
 
