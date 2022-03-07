@@ -19,29 +19,27 @@ public class BatchQueueProcessor {
     private static final Logger LOGGER = Logger.getGlobal();
     private static final String QUEUE_NAME = "batch";
 
+    /**
+     * Start a main that read message in the queue QUEUE_NAME and add them in a batch using the ProcessBatch class.
+     */
     public static void main(String[] args) throws IOException, TimeoutException, SQLException {
         Channel channel = createChannel().orElseThrow();
         ProcessBatch processBatch = new ProcessBatch();
         processBatch.batchRunnable();
 
-        System.out.println(" [*] Waiting for LogEntity message. To exit press CTRL+C");
-//        DeliverCallback deliverCallback = (consumerTag, delivery) -> {
-//            try {
-//                String message = new String(delivery.getBody(), StandardCharsets.UTF_8);
-//                LogEntity logEntity = new JsonObject(message).mapTo(LogEntity.class);
-//                processBatch.addInBatch(logEntity);
-//            } catch (Exception e) {
-//                LOGGER.log(Level.SEVERE, "Error while inserting in database", e);
-//            }
-//        };
+        LOGGER.log(Level.INFO, "Channel started and waiting for message.");
         channel.basicConsume(QUEUE_NAME, true, getCallBack(processBatch), consumerTag -> {
         });
     }
 
+    /**
+     * Create a new channel to connect to RabbitMQ queue
+     * @return Optional of Channel if exists, Optional.Empty if an error append.
+     */
     private static Optional<Channel> createChannel() {
         try {
             ConnectionFactory factory = new ConnectionFactory();
-            factory.setHost("localhost");
+            factory.setHost("rabbitmq");
             Connection connection = factory.newConnection();
             return Optional.of(connection.createChannel());
         } catch (IOException | TimeoutException e) {
@@ -50,6 +48,11 @@ public class BatchQueueProcessor {
         }
     }
 
+    /**
+     * Create the function used for each message read in queue
+     * @param processBatch The object used to add in database as a batch
+     * @return DeliverCallBack representing the function
+     */
     private static DeliverCallback getCallBack(ProcessBatch processBatch) {
         return (consumerTag, delivery) -> {
             try {

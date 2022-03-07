@@ -20,7 +20,6 @@ import java.util.logging.Logger;
 
 import static java.util.Objects.isNull;
 
-// TODO
 public class LogsLinking {
     private static final Logger LOGGER = Logger.getLogger(LogsLinking.class.getName());
     private static final Comparator<Relation> datetimeComparator = Comparator.comparing(relation -> relation.target().datetime);

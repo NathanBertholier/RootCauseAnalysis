@@ -152,7 +152,7 @@
                     <configuration>
                         <archive>
                             <manifest>
-                                <mainClass>fr.uge.modules.tokenization.BatchQueueProcessor</mainClass>
+                                <mainClass>fr.uge.modules.queuing.BatchQueueProcessor</mainClass>
                             </manifest>
                         </archive>
                         <descriptorRefs>
@@ -166,12 +166,11 @@
                     <configuration>
                         <archive>
                             <manifest>
-                                <mainClass>fr.uge.modules.tokenization.BatchQueueProcessor</mainClass>
+                                <mainClass>fr.uge.modules.queuing.BatchQueueProcessor</mainClass>
                             </manifest>
                         </archive>
                     </configuration>
                 </plugin>
-
         </plugins>
     </build>
 </project>
