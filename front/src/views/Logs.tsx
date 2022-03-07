@@ -99,12 +99,12 @@ export const Logs = () => {
             isSelected: false,
             alone:false,
             formField: {
-                label:"IP address v4",
+                label:"IPv4 address",
                 ref: tokenIPInput,
                 placeholder: "192.168.1.1",
                 patern: "(([01]?[0-9]{1,2}|2[0-4][0-9]|25[0-5])\\.){3}([01]?[0-9]{1,2}|2[0-4][0-9]|25[0-5])",
                 validator: data => {
-                    let message = getErrorMessage( "IP address v4", tokenIPInput )
+                    let message = getErrorMessage( "IPv4 address", tokenIPInput )
                     setErrorMessage( data, FilterType.IPv4, message );
                 }
             }
@@ -115,12 +115,12 @@ export const Logs = () => {
             isSelected: false,
             alone:false,
             formField: {
-                label: "IP address v6",
+                label: "IPv6 address",
                 ref: tokenIPv6Input,
                 placeholder: "IP v6",
                 patern: "(([0-9a-fA-F]{1,4}:){7,7}[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,7}:|([0-9a-fA-F]{1,4}:){1,6}:[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,5}(:[0-9a-fA-F]{1,4}){1,2}|([0-9a-fA-F]{1,4}:){1,4}(:[0-9a-fA-F]{1,4}){1,3}|([0-9a-fA-F]{1,4}:){1,3}(:[0-9a-fA-F]{1,4}){1,4}|([0-9a-fA-F]{1,4}:){1,2}(:[0-9a-fA-F]{1,4}){1,5}|[0-9a-fA-F]{1,4}:((:[0-9a-fA-F]{1,4}){1,6})|:((:[0-9a-fA-F]{1,4}){1,7}|:)|fe80:(:[0-9a-fA-F]{0,4}){0,4}%[0-9a-zA-Z]{1,}|::(ffff(:0{1,4}){0,1}:){0,1}((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\\.){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])|([0-9a-fA-F]{1,4}:){1,4}:((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\\.){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9]))",
                 validator: data => {
-                    let message = getErrorMessage( "IP address v6", tokenIPv6Input )
+                    let message = getErrorMessage( "IPv6 address", tokenIPv6Input )
                     setErrorMessage( data, FilterType.IPv6, message );
                 }
             }
@@ -354,13 +354,13 @@ export const Logs = () => {
             }
             else if ( !logIDInput.current.validity.valid ) {
                 formIsValid = false;
-                setErrorMessage( filters, FilterType.LOG_ID, "* The field 'Log ID' takes only numbers" );
+                setErrorMessage( filters, FilterType.LOG_ID, "* The field 'Log ID' only takes numbers" );
             }
         }
         else {
             if ( !checkTextField( statusInput, FilterType.STATUT, "Status" ) ||
-                 !checkTextField( tokenIPInput, FilterType.IPv4, "IP address v4" ) ||
-                 !checkTextField( tokenIPv6Input, FilterType.IPv6, "IP address v6" ) ||
+                 !checkTextField( tokenIPInput, FilterType.IPv4, "IPv4 address" ) ||
+                 !checkTextField( tokenIPv6Input, FilterType.IPv6, "IPv6 address" ) ||
                  !checkTextField( edgeResponseInput, FilterType.EDGE_RESPONSE, "Edge Response" ) ||
                  !checkDatetimeField( startDate, FilterType.START_DATE, "Start date" ) ||
                  !checkDatetimeField( endDate, FilterType.END_DATE, "End date" )

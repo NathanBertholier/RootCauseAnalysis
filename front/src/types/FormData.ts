@@ -16,7 +16,7 @@ export let onFocusOut = function ( data: FormData, setter: React.Dispatch<React.
         return;
     }
     else if ( !valid ) {
-        setError( data, setter, key, "* The field "+ field +" takes only positive numbers" );
+        setError( data, setter, key, "* The field "+ field +" only takes positive numbers" );
         return;
     }
 
