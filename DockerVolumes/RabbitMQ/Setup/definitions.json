@@ -55,6 +55,16 @@
         "x-dead-letter-exchange":"DLX",
         "x-dead-letter-routing-key":"token"
       }
+    },
+    {
+      "name":"batch",
+      "vhost":"/",
+      "durable":true,
+      "auto_delete":false,
+      "arguments":{
+        "x-dead-letter-exchange":"DLX",
+        "x-dead-letter-routing-key":"batch"
+      }
     }
   ],
   "exchanges":[
@@ -71,6 +81,17 @@
     },
     {
       "name":"token-in",
+      "vhost":"/",
+      "type":"topic",
+      "durable":true,
+      "auto_delete":false,
+      "internal":false,
+      "arguments":{
+
+      }
+    },
+    {
+      "name":"batch-processor",
       "vhost":"/",
       "type":"topic",
       "durable":true,
@@ -97,6 +118,16 @@
       "vhost":"/",
       "destination":"token-in",
       "destination_type":"exchange",
+      "routing_key":"",
+      "arguments":{
+
+      }
+    },
+    {
+      "source":"batch-processor",
+      "vhost":"/",
+      "destination":"batch",
+      "destination_type":"queue",
       "routing_key":"",
       "arguments":{
 

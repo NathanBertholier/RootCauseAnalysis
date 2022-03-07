@@ -10,7 +10,7 @@ export type FormData = {
     [key: string]: InputField
 }
 
-export let onFocusOut = function ( data: FormData, setter: React.Dispatch<React.SetStateAction<FormData>>, key: string, value: string, valid: boolean, field: string) {
+export let onFocusOut = function ( data: FormData, setter: React.Dispatch<React.SetStateAction<FormData>>, key: string, value: string, valid: boolean, field: string, default_value: string) {
     if ( value === "" && data[ key ].isRequired ) {
         setError( data, setter, key, "*Le champs "+ field +" est vide" );
         return;
@@ -19,8 +19,9 @@ export let onFocusOut = function ( data: FormData, setter: React.Dispatch<React.
         setError( data, setter, key, "*Le champs "+ field +" ne prend que des nombres positives" );
         return;
     }
+
     let copy = {...data}
-    copy[ key ].value = parseInt(value)
+    copy[ key ].value = parseInt((value === "") ? default_value : value)
     copy[ key ].error = ""
     setter( copy )
 }

@@ -22,7 +22,6 @@ import java.util.logging.Logger;
 
 import static java.util.Objects.isNull;
 
-// TODO
 public class LogsLinking {
     private static final Logger LOGGER = Logger.getLogger(LogsLinking.class.getName());
     private static final Comparator<Relation> datetimeComparator = Comparator.comparing(relation -> relation.target().datetime);
@@ -32,7 +31,7 @@ public class LogsLinking {
     }
 
     /**
-     * Computes relations between log of id1 and log of id2 for all the tokens in tokenTypes
+     * Computes proximity between log of id1 and log of id2 for all the tokens in tokenTypes
      * @param log1
      * @param log2
      * @param delta
@@ -89,11 +88,11 @@ public class LogsLinking {
 
         var reportGenerator = new ReportLinking();
         var datetime = root.datetime;
-        return LogEntity.<LogEntity>find("id != ?1 and datetime between ?2 and ?3",
+        return LogEntity.findAllWithJoin(
                     root.id,
                     Timestamp.valueOf(datetime.toLocalDateTime().minus(Duration.ofSeconds(reportParameter.delta()))),
-                    datetime).list()
-                .map(list -> reportGenerator.computeProximityTree(root, list, reportParameter))
+                    datetime)
+                .map(list -> reportGenerator.computeProximityTree(root, list.stream().distinct().toList(), reportParameter))
                 .map(LogsLinking::fromRelationsTree)
                 .invoke(generatedReport -> LOGGER.log(Level.INFO, "Generated report for id " + root.id + ": " + generatedReport))
                 .onFailure().invoke(error -> LOGGER.severe("Error: " + error));

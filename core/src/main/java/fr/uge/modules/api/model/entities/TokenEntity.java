@@ -17,10 +17,6 @@ public class TokenEntity extends PanacheEntityBase {
     @Basic
     @Column(name = "idlog")
     public long idlog;
-    @OneToOne
-    @JoinColumn(name = "idtokentype",insertable = false, updatable = false)
-    public TokenTypeEntity token_type;
-    @JsonIgnore
     @Basic
     @Column(name = "idtokentype")
     public int idtokentype;
@@ -69,13 +65,5 @@ public class TokenEntity extends PanacheEntityBase {
                 ", idtokentype=" + idtokentype +
                 ", value='" + value + '\'' +
                 '}';
-    }
-
-    public TokenTypeEntity getToken_type() {
-        return token_type;
-    }
-
-    public void setToken_type(TokenTypeEntity token_type) {
-        this.token_type = token_type;
     }
 }

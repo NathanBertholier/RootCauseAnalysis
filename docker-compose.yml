@@ -41,8 +41,21 @@ services:
       - ./DockerVolumes/Grafana/Setup/grafana.ini:/etc/grafana/grafana.ini
       - ./DockerVolumes/Nginx/certs:/var/ssl/certs/
 
+  tokenisation:
+    build:
+      context: .
+      dockerfile: DockerfileTokenisation
+    container_name: "Tokenisation"
+    restart: always
+    depends_on:
+      - "rabbitmq"
+    networks:
+      - root-cause-net
+
   rootcause:
-    build: .
+    build:
+      context: .
+      dockerfile: DockerfileQuarkus
     container_name: "RootCause"
     restart: always
     ports:
@@ -73,9 +86,6 @@ services:
     networks:
       - root-cause-net
 
-  #certbot:
-
 networks:
   root-cause-net:
     driver: bridge
-

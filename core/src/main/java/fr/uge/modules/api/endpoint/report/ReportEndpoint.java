@@ -1,9 +1,6 @@
 package fr.uge.modules.api.endpoint.report;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.uge.modules.api.EnvRetriever;
-import fr.uge.modules.api.model.report.GenericReport;
 import fr.uge.modules.api.model.report.ReportParameter;
 import fr.uge.modules.error.EmptyReportError;
 import fr.uge.modules.error.NotYetTokenizedError;
@@ -42,18 +39,15 @@ public class ReportEndpoint {
             @PathParam("id") long idLogTarget,
             @QueryParam("expanded") Boolean expanded,
             @QueryParam("delta") Long delta,
-            @QueryParam("cache") Boolean cache,
             @QueryParam("proximity_limit") Integer proximity_limit,
-            @QueryParam("network_size") Integer network_size,
-            @QueryParam("debug") Boolean debug
+            @QueryParam("network_size") Integer network_size
     ) {
         if(expanded == null) expanded = envRetriever.reportDefaultExpanded();
         if(delta == null) delta = envRetriever.reportDefaultDelta();
-        if(cache == null) cache = envRetriever.reportDefaultCache();
         if(proximity_limit == null) proximity_limit = envRetriever.reportDefaultLimit();
         if(network_size == null) network_size = envRetriever.reportDefaultSize();
 
-        ReportParameter reportParameter = new ReportParameter(expanded, delta, cache, proximity_limit, network_size);
+        ReportParameter reportParameter = new ReportParameter(expanded, delta, proximity_limit, network_size);
 
         LOGGER.log(Level.INFO, "Received request for id " +  idLogTarget + " with parameters: " + reportParameter);
 

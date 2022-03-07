@@ -43,12 +43,10 @@ public class TokenRetriever {
         var id = tokenRequest.id();
         if(id != -1) {
             return LogEntity
-                    .find(sQuery + "and id = ?1", id)
-                    .range(0,rows).list();
+                    .<LogEntity>find(sQuery + "and id = ?1", id)
+                    .list();
         }
         return getTokensWithoutId(sQuery, tokenRequest.tokens(), rows);
-
-
     }
 
     private static Uni<List<LogEntity>> getTokensWithoutId(StringBuilder sQuery, List<TokenModel> tokens, int rows) {
@@ -70,7 +68,7 @@ public class TokenRetriever {
                     .append(tokens.get(i - 1).token_type()));
             sQuery.append(" ) ");
         }
-        return LogEntity.find(sQuery.toString())
+        return LogEntity.<LogEntity>find(sQuery.toString())
                 .range(0, rows)
                 .list();
     }
