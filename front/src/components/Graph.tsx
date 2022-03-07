@@ -51,12 +51,14 @@ export  const Graph = ({res, isLoading} : GraphProp ) => {
     const [data, setData]                       = useState<{nodes: cytoscape.ElementDefinition[], edges: cytoscape.ElementDefinition[]}>({ nodes: [], edges: [] });
     const [mostUsedTokens, setMostUsedTokens]   = useState( [] as MostUsedToken[] );
     const [logToolTip, setLogToolTip]           = useState<Log>({} as Log);
+    const [refreshCyLayout, setRefreshCyLayout] = useState( false );
 
     useEffect(() => {
         let nodes : cytoscape.ElementDefinition[] = [];
         if ( res.proximity.length > 0 ) {
             nodes.push( { data: { id: res.report.rootCause.id.toString(), label: "Root Cause", color: "#F24E1E", log: res.report.rootCause } } );
             nodes.push( { data: { id: res.report.target.id.toString(), label: "Target", color: "#4ECB71",log: res.report.target } } );
+            setRefreshCyLayout( true );
         }
 
         res.report.logs.filter( log => log.id !== res.report.rootCause.id ).forEach( log => {
@@ -81,8 +83,11 @@ export  const Graph = ({res, isLoading} : GraphProp ) => {
         });
 
         // Reload Layout
-        let dagreLayout = core.layout( layout );
-        dagreLayout.run();
+        if ( refreshCyLayout ) {
+            let fcoseLayout = core.layout( layout );
+            fcoseLayout.run();
+            setRefreshCyLayout( false );
+        }
     }
 
     return (

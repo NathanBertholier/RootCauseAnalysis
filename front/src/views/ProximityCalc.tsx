@@ -9,20 +9,25 @@ import {toast} from "../tools/ToastManager";
 import {FormData, onFocusOut} from "../types/FormData";
 
 const DEFAULT_ID_VALUE : number = 0;
-const DEFAULT_DELTA_VALUE : number = 2;
+const DEFAULT_DELTA_VALUE : number = -1;
 
 export const ProximityCalc = () => {
 
     const [ linkList, setLinkList ] = useState( { computations: [], proximity: 0} as LinkResponse );
     const [ formData, setFormData ] = useState({
-        "id1":      {value:DEFAULT_ID_VALUE, error:"", isRequired: true},
+        "id1":      { value:DEFAULT_ID_VALUE, error:"", isRequired: true},
         "id2":      { value:DEFAULT_ID_VALUE, error: "", isRequired: true },
-        "delta":    { value:DEFAULT_DELTA_VALUE, error: "", isRequired: true }
+        "delta":    { value:DEFAULT_DELTA_VALUE, error: "", isRequired: false }
     } as FormData );
 
     const sendForm = () => {
         if ( formData["id1"].value !== DEFAULT_ID_VALUE && formData["id2"].value !== DEFAULT_ID_VALUE ) {
-            let request : LinkRequest = { params: { delta: formData["delta"].value, id1: formData["id1"].value, id2: formData["id2"].value } }
+            let request : LinkRequest = { params: { id1: formData["id1"].value, id2: formData["id2"].value } }
+
+            if ( formData["delta"].value !== DEFAULT_DELTA_VALUE ) {
+                request.params.delta = formData["delta"].value
+            }
+
             DataService.getLink( request ).then( (response : any) => {
                 console.log(response)
                 let links : LinkResponse = response.data
@@ -56,7 +61,7 @@ export const ProximityCalc = () => {
                             </div>
                             <div className="proximity-filter">
                                 <Form.Text className="text-muted">Delta :</Form.Text>
-                                <FormControl onBlur={ e => onFocusOut(formData, setFormData, e.target.name, e.target.value, e.target.validity.valid, "Delta", DEFAULT_DELTA_VALUE.toString() ) } name="delta" type="text" className="custom-input" pattern="^[1-9]+[0-9]*$" defaultValue={ DEFAULT_DELTA_VALUE } />
+                                <FormControl onBlur={ e => onFocusOut(formData, setFormData, e.target.name, e.target.value, e.target.validity.valid, "Delta", DEFAULT_DELTA_VALUE.toString() ) } name="delta" type="text" className="custom-input" pattern="^[1-9]+[0-9]*$" />
                             </div>
                             <div className="proximity-filter">
                                 <Button className={`custom-filter-btn`} variant="outline-primary" onClick={ sendForm } >Validate</Button>
