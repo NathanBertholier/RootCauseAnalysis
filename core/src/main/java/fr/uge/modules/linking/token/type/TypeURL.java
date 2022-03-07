@@ -38,24 +38,27 @@ public class TypeURL implements TokenType{
                 .map(tokenL -> tokenRight.stream()
                         .map(token -> token.getValue().replaceFirst(regex, "") )
                         .map(tokenR -> {
-                            if (tokenL.equals(tokenR)) {
+                            if ( tokenL.equals( tokenR ) ) {
                                 return new Computation(this, tokenL, tokenR, 100d);
                             }
 
-                            var arrayL = tokenL.split("/");
-                            var arrayR = tokenR.split("/");
+                            var arrayL = tokenL.split( "/" );
+                            var arrayR = tokenR.split( "/" );
                             double count = 0;
-                            for (int i = 0; i < arrayL.length; i++) {
-                                if (arrayL[i].equals(arrayR[i])) {
-                                    count++;
-                                } else {
-                                    break;
+                            for ( int i =0; i < arrayL.length-1; i++ ) {
+                                if(i<= arrayR.length-1){
+                                    if ( arrayL[i].equals( arrayR[i] ) ) {
+                                        count++;
+                                    }
+                                    else {
+                                        break;
+                                    }
                                 }
                             }
-
                             return new Computation(this, tokenL, tokenR, (count / arrayL.length) * 100);
-                        }).toList()
-                ).flatMap(Collection::stream).toList();
+                        }).toList())
+                .flatMap(Collection::stream)
+                .toList();
         return new TokensLink(computations, new AverageStrategy());
     }
 
