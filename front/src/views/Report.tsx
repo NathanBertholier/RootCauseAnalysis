@@ -13,13 +13,14 @@ const DEFAULT_DELTA_VALUE : number = 2;
 const DEFAULT_OPTIONAL_VALUE : number = -1;
 
 export const Report = () => {
-    const [ formData, setFormData ] = useState({
+    const [isLoading, setIsLoading]     = useState( false );
+    const [ formData, setFormData ]     = useState({
         "target":       { value:DEFAULT_ID_VALUE, error:"", isRequired: true },
         "delta":        { value:DEFAULT_DELTA_VALUE, error: "", isRequired: false },
         "networkSize":  { value:DEFAULT_OPTIONAL_VALUE, error: "", isRequired: false },
         "proximity":    { value:DEFAULT_OPTIONAL_VALUE, error: "", isRequired: false }
     } as FormData );
-    const [ graph, setGraph] = useState<ReportResponse>( {
+    const [ graph, setGraph]            = useState<ReportResponse>( {
     "report":{
         "rootCause":{"id":-1, "content":"", "datetime":""},
         "target":{"id":-1, "content":"", "datetime":""},
@@ -30,20 +31,23 @@ export const Report = () => {
     } )
 
     const sendForm = () => {
+        setIsLoading( true );
         if ( formData["target"].value !== DEFAULT_ID_VALUE ) {
             let params : ReportParams = { expanded: true };
             if ( formData["networkSize"].value !== DEFAULT_OPTIONAL_VALUE ) {
                 params.network_size = formData["networkSize"].value;
             }
             if ( formData["proximity"].value !== DEFAULT_OPTIONAL_VALUE ) {
-                params.network_size = formData["proximity"].value;
+                params.proximity_limit = formData["proximity"].value;
             }
             let request : ReportRequest = { params: params };
-            // send data
+
             DataService.getReport(formData["target"].value, request).then((response: any) => {
                 let a : ReportResponse = response.data
+                setIsLoading( false );
                 setGraph( a );
             }).catch((e: Error) => {
+                setIsLoading( false );
                 toast.show({
                     title: "Error",
                     content: "Un problème est survenue",
@@ -52,6 +56,7 @@ export const Report = () => {
             });
         }
         else {
+            setIsLoading( false );
             setError( formData,setFormData, "target", "*Le champs 'ID cible' est requis" );
             toast.show({
                 title: "Error",
@@ -96,7 +101,7 @@ export const Report = () => {
                             </div>
                         </Row>
                         <Row>
-                            <Graph res={ graph } />
+                            <Graph res={ graph } isLoading={ isLoading } />
                         </Row>
                     </Container>
                 </div>

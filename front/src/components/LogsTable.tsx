@@ -54,12 +54,13 @@ export class LogsTable extends Component<LogsTableProp, any> {
                         <th>id</th>
                         <th>DateTime</th>
                         <th>Tokens</th>
+                        <th>Log</th>
                     </tr>
                     </thead>
                     <tbody>
                     {
                         this.state.list.map( ( log, index ) => {
-                            return  <Row id={ log.id } datetime={log.datetime} tokens={ log.tokens } key={index} />
+                            return  <Row id={ log.id } datetime={log.datetime} rawLog={log.rawLog} tokens={ log.tokens } key={index} />
                         })
                     }
                     </tbody>

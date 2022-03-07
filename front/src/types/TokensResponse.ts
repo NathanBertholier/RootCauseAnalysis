@@ -9,7 +9,7 @@ type Token = {
 }
 
 export type Log = {
-    //rawLog: RawLog
+    rawLog: RawLog
     datetime: string
     id: number
     tokens: Token[]
