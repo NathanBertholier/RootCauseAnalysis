@@ -6,7 +6,8 @@ import io.quarkus.hibernate.reactive.panache.PanacheEntityBase;
 import javax.persistence.*;
 
 /**
- * A TokenEntity represents one token in the data model. It extends the Panache entity system of the Hibernate ORM
+ * A TokenEntity represents one token in the data model.
+ * It extends the Panache entity system of the 'Hibernate ORM'.
  */
 @Entity
 @Table(name = "token", schema = "public", catalog = "rootcause")
