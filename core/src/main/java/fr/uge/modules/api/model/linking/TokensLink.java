@@ -3,6 +3,7 @@ package fr.uge.modules.api.model.linking;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import fr.uge.modules.api.serializer.TokensLinkSerializer;
 import fr.uge.modules.linking.strategy.AverageStrategy;
+import fr.uge.modules.linking.strategy.EmptyStrategy;
 import fr.uge.modules.linking.strategy.ProximityStrategy;
 
 import java.util.ArrayList;
@@ -15,7 +16,6 @@ public class TokensLink {
     private final List<Computation> computations;
     private final double proximity;
     private final ProximityStrategy proximityFunction;
-    private static final AverageStrategy averageStrategy = new AverageStrategy();
 
     public TokensLink(List<Computation> computations, ProximityStrategy proximityFunction){
         this.computations = computations;
@@ -44,7 +44,7 @@ public class TokensLink {
     }
 
     public static TokensLink withoutStrategy(double value){
-        return new TokensLink(Collections.emptyList(), averageStrategy);
+        return new TokensLink(Collections.emptyList(), new EmptyStrategy(value));
     }
 
     @Override
