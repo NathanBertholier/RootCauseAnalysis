@@ -1,12 +1,11 @@
 import {Sidebar} from "../components/Sidebar";
-import React, {useEffect, useState} from "react";
+import React, {useState} from "react";
 import {Button, Container, Form, FormControl, Row} from "react-bootstrap";
 import {Graph} from "../components/Graph";
 import {toast} from "../tools/ToastManager";
 import {FormData, onFocusOut, setError} from "../types/FormData";
 import {ReportParams, ReportRequest} from "../types/ReportRequest";
 import DataService from "../services/DataService";
-import {Log} from "../types/TokensResponse";
 import {ReportResponse} from "../types/ReportResponse";
 
 const DEFAULT_ID_VALUE : number = 0;
@@ -20,18 +19,15 @@ export const Report = () => {
         "networkSize":  { value:DEFAULT_OPTIONAL_VALUE, error: "", isRequired: false },
         "proximity":    { value:DEFAULT_OPTIONAL_VALUE, error: "", isRequired: false }
     } as FormData );
-    const [ x, setX] = useState<ReportResponse>( {
+    const [ graph, setGraph] = useState<ReportResponse>( {
     "report":{
-        "rootCause":{"id":0, "content":"test log", "datetime":"2022-02-25T18:25:43.000Z"},
-        "target":{"id":4, "content":"test log target", "datetime":"2022-02-25T18:25:45.000Z"},
-        "tokens":[{"name":"tokenname", "value":200, "count":5}],
-        "logs":[
-            {"id":1, "content":"GET localhost 404", "datetime":"2022-02-25T18:25:43.000Z"},
-            {"id":2, "content":"GET localhost 200", "datetime":"2022-02-26T19:25:43.000Z"},
-            {"id":3, "content":"GET localhost 201", "datetime":"2022-02-27T20:25:43.000Z"}
-        ]
+        "rootCause":{"id":-1, "content":"", "datetime":""},
+        "target":{"id":-1, "content":"", "datetime":""},
+        "tokens":[{"name":"", "value":-1, "count":-1}],
+        "logs":[]
     },
-    "proximity":[{"id":1, "links":[{"id":2, "proximity":51}, {"id":3, "proximity":51}]}, {"id":0, "links":[{"id":1, "proximity":52}, {"id":4, "proximity":52}]}]} )
+    "proximity":[]
+    } )
 
     const sendForm = () => {
         if ( formData["target"].value !== DEFAULT_ID_VALUE ) {
@@ -46,7 +42,7 @@ export const Report = () => {
             // send data
             DataService.getReport(formData["target"].value, request).then((response: any) => {
                 let a : ReportResponse = response.data
-                setX( a );
+                setGraph( a );
             }).catch((e: Error) => {
                 toast.show({
                     title: "Error",
@@ -75,19 +71,19 @@ export const Report = () => {
                         <Row className="report-filters-container">
                             <div className="report-filter">
                                 <Form.Text className="text-muted">ID cible :</Form.Text>
-                                <Form.Control name="target" onBlur={ e => onFocusOut( formData, setFormData, e.target.name, e.target.value, e.target.validity.valid, "ID cible" ) } type="text" className="custom-input" pattern="^[1-9]+[0-9]*$" />
+                                <Form.Control name="target" onBlur={ e => onFocusOut( formData, setFormData, e.target.name, e.target.value, e.target.validity.valid, "ID cible", DEFAULT_ID_VALUE.toString() ) } type="text" className="custom-input" pattern="^[1-9]+[0-9]*$" />
                             </div>
                             <div className="report-filter">
                                 <Form.Text className="text-muted">Delta de recherche :</Form.Text>
-                                <FormControl name="delta" onBlur={ e => onFocusOut( formData, setFormData, e.target.name, e.target.value, e.target.validity.valid, "Delta de recherche" ) } type="text" className="custom-input" pattern="^[1-9]+[0-9]*$" />
+                                <FormControl name="delta" onBlur={ e => onFocusOut( formData, setFormData, e.target.name, e.target.value, e.target.validity.valid, "Delta de recherche", DEFAULT_DELTA_VALUE.toString() ) } type="text" className="custom-input" pattern="^[1-9]+[0-9]*$" />
                             </div>
                             <div className="report-filter">
                                 <Form.Text className="text-muted">Taille du réseau :</Form.Text>
-                                <FormControl name="networkSize" onBlur={ e => onFocusOut( formData, setFormData, e.target.name, e.target.value, e.target.validity.valid, "Taille du réseau" ) } type="text" className="custom-input" pattern="^[1-9]+[0-9]*$" />
+                                <FormControl name="networkSize" onBlur={ e => onFocusOut( formData, setFormData, e.target.name, e.target.value, e.target.validity.valid, "Taille du réseau", DEFAULT_OPTIONAL_VALUE.toString() ) } type="text" className="custom-input" pattern="^[1-9]+[0-9]*$" />
                             </div>
                             <div className="report-filter">
                                 <Form.Text className="text-muted">Seuil de proximité :</Form.Text>
-                                <FormControl name="proximity" onBlur={ e => onFocusOut( formData, setFormData, e.target.name, e.target.value, e.target.validity.valid, "Seuil de proximité" ) } type="text" className="custom-input" pattern="^[1-9]+[0-9]*$" />
+                                <FormControl name="proximity" onBlur={ e => onFocusOut( formData, setFormData, e.target.name, e.target.value, e.target.validity.valid, "Seuil de proximité", DEFAULT_OPTIONAL_VALUE.toString() ) } type="text" className="custom-input" pattern="^[1-9]+[0-9]*$" />
                             </div>
                             <div className="report-filter">
                                 <Button className={`custom-filter-btn`} variant="outline-primary" onClick={ sendForm } >Valider</Button>
@@ -100,7 +96,7 @@ export const Report = () => {
                             </div>
                         </Row>
                         <Row>
-                            <Graph res={ x } />
+                            <Graph res={ graph } />
                         </Row>
                     </Container>
                 </div>
