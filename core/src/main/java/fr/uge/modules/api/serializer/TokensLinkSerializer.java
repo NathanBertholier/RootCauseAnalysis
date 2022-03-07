@@ -19,7 +19,8 @@ public class TokensLinkSerializer extends StdSerializer<TokensLink> {
     @Override
     public void serialize(TokensLink tokensLink, JsonGenerator jsonGenerator, SerializerProvider serializerProvider) throws IOException {
         jsonGenerator.writeStartObject();
-        jsonGenerator.writeNumber(1);
+        serializerProvider.defaultSerializeField("computations", tokensLink.getComputations(), jsonGenerator);
+        jsonGenerator.writeNumberField("proximity", tokensLink.getProximity());
         jsonGenerator.writeEndObject();
     }
 }

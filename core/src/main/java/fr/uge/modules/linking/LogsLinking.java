@@ -7,7 +7,9 @@ import fr.uge.modules.api.model.linking.TokensLink;
 import fr.uge.modules.api.model.report.ReportParameter;
 import fr.uge.modules.error.EmptyReportError;
 import fr.uge.modules.error.NotYetTokenizedError;
+import fr.uge.modules.linking.strategy.AverageStrategy;
 import fr.uge.modules.linking.token.type.TokenType;
+import fr.uge.modules.linking.token.type.TypeDatetime;
 import fr.uge.modules.synthetization.GeneratedReport;
 import io.smallrye.mutiny.Uni;
 
@@ -40,13 +42,24 @@ public class LogsLinking {
         var map1 = fromLog(log1);
         var map2 = fromLog(log2);
 
-        return Uni.createFrom().item(map1.entrySet().stream().mapToDouble((entry) -> {
+        var datetimeLog1 = log1.datetime;
+        var datetimeLog2 = log2.datetime;
+        var datetimeComputation = TypeDatetime.computeDateTimeProximity(datetimeLog1, datetimeLog2, delta);
+
+        var tokensLinks = map1.entrySet().stream().map((entry) -> {
             var key = entry.getKey();
             var value = entry.getValue();
 
             var toCompare = map2.getOrDefault(key, new ArrayList<>());
-            return TokenType.fromId(key).computeProximity(value, toCompare).getProximity();
-        }).sum()).map(TokensLink::withoutStrategy);
+            return TokenType.fromId(key).computeProximity(value, toCompare);
+        }).toList();
+
+        var finalComputations = tokensLinks.stream()
+                .flatMap(tklink -> tklink.getComputations().stream())
+                .toList();
+
+        var finalTokensLink = new TokensLink(finalComputations, new AverageStrategy()).addComputation(datetimeComputation);
+        return Uni.createFrom().item(finalTokensLink);
     }
 
     /***
