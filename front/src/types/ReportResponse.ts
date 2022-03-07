@@ -3,11 +3,6 @@ type Link = {
     proximity: number
 }
 
-type Proximity = {
-    id: number
-    links: Link[]
-}
-
 export type Log = {
     id: number
     content: string
@@ -20,10 +15,19 @@ export type MostUsedToken = {
     count: number
 }
 
-export type ReportResponse = {
-    root: Log
+type Proximity = {
+    id: number
+    links: Link[]
+}
+
+type Report = {
+    rootCause: Log
     target: Log
     tokens: MostUsedToken[]
     logs: Log[]
+}
+
+export type ReportResponse = {
+    report: Report
     proximity: Proximity[]
 }

@@ -3,7 +3,6 @@ package fr.uge.modules.api.serializer;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.ser.std.StdSerializer;
-import fr.uge.modules.api.model.linking.Relation;
 import fr.uge.modules.api.model.report.ReportResponseExpanded;
 
 import java.io.IOException;

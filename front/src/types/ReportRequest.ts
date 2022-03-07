@@ -1,8 +1,7 @@
 export type ReportParams = {
-    id: number
     cache?: true
     delta?: number
-    expanded?: true
+    expanded: true
     network_size?: number
     proximity_limit?: number
 }

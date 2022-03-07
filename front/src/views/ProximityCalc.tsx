@@ -48,15 +48,15 @@ export const ProximityCalc = () => {
                         <Row className="proximity-filters-container">
                             <div className="proximity-filter">
                                 <Form.Text className="text-muted">ID n°1 :</Form.Text>
-                                <Form.Control onBlur={ e => onFocusOut(formData, setFormData, e.target.name, e.target.value, e.target.validity.valid, "ID n°1") } name="id1" type="text" className="custom-input" pattern="^[1-9]+[0-9]*$" />
+                                <Form.Control onBlur={ e => onFocusOut(formData, setFormData, e.target.name, e.target.value, e.target.validity.valid, "ID n°1", DEFAULT_ID_VALUE.toString()) } name="id1" type="text" className="custom-input" pattern="^[1-9]+[0-9]*$" />
                             </div>
                             <div className="proximity-filter">
                                 <Form.Text className="text-muted">ID n°2 :</Form.Text>
-                                <FormControl onBlur={ e => onFocusOut(formData, setFormData, e.target.name, e.target.value, e.target.validity.valid,"ID n°2" ) } name="id2" type="text" className="custom-input" pattern="^[1-9]+[0-9]*$" />
+                                <FormControl onBlur={ e => onFocusOut(formData, setFormData, e.target.name, e.target.value, e.target.validity.valid,"ID n°2", DEFAULT_ID_VALUE.toString() ) } name="id2" type="text" className="custom-input" pattern="^[1-9]+[0-9]*$" />
                             </div>
                             <div className="proximity-filter">
                                 <Form.Text className="text-muted">delta :</Form.Text>
-                                <FormControl onBlur={ e => onFocusOut(formData, setFormData, e.target.name, e.target.value, e.target.validity.valid, "delta" ) } name="delta" type="text" className="custom-input" pattern="^[1-9]+[0-9]*$" defaultValue={ DEFAULT_DELTA_VALUE } />
+                                <FormControl onBlur={ e => onFocusOut(formData, setFormData, e.target.name, e.target.value, e.target.validity.valid, "delta", DEFAULT_DELTA_VALUE.toString() ) } name="delta" type="text" className="custom-input" pattern="^[1-9]+[0-9]*$" defaultValue={ DEFAULT_DELTA_VALUE } />
                             </div>
                             <div className="proximity-filter">
                                 <Button className={`custom-filter-btn`} variant="outline-primary" onClick={ sendForm } >Valider</Button>
