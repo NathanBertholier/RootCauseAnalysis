@@ -3,6 +3,8 @@ package fr.uge.modules.api.model.entities;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import fr.uge.modules.api.serializer.LogSerializer;
 import io.quarkus.hibernate.reactive.panache.PanacheEntityBase;
+import io.smallrye.mutiny.Uni;
+import org.hibernate.annotations.Fetch;
 
 import javax.persistence.*;
 import java.sql.Timestamp;
@@ -11,6 +13,10 @@ import java.util.Objects;
 
 @Entity
 @Table(name = "log", schema = "public", catalog = "rootcause")
+@NamedQuery(name="LogEntity.findAllWithJoin", query = "SELECT l FROM LogEntity l" +
+        " left JOIN fetch l.rawLog"+
+        " LEFT JOIN FETCH l.tokens item  WHERE l.id <> ?1 and l.datetime between ?2 and ?3")
+
 @JsonSerialize(using = LogSerializer.class)
 public class LogEntity extends PanacheEntityBase {
     @Id
@@ -93,4 +99,8 @@ public class LogEntity extends PanacheEntityBase {
                 ", tokens=" + tokens +
                 '}';
     }
+    public static Uni<List<LogEntity>> findAllWithJoin(Long id, Timestamp datetime1, Timestamp datetime2){
+        return LogEntity.<LogEntity>find("#LogEntity.findAllWithJoin",id,datetime1,datetime2).list();
+    }
+
 }
