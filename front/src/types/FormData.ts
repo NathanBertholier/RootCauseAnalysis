@@ -12,11 +12,11 @@ export type FormData = {
 
 export let onFocusOut = function ( data: FormData, setter: React.Dispatch<React.SetStateAction<FormData>>, key: string, value: string, valid: boolean, field: string, default_value: string) {
     if ( value === "" && data[ key ].isRequired ) {
-        setError( data, setter, key, "*Le champs "+ field +" est vide" );
+        setError( data, setter, key, "* The field "+ field +" is empty" );
         return;
     }
     else if ( !valid ) {
-        setError( data, setter, key, "*Le champs "+ field +" ne prend que des nombres positives" );
+        setError( data, setter, key, "* The field "+ field +" takes only positive numbers" );
         return;
     }
 

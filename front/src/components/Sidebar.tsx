@@ -20,8 +20,8 @@ export  const Sidebar = (prop: Menu) => {
 
             <MenuItem link="/perf" logo={perfLogo} text="Performance" isSelected={ prop.selected === "perf" } />
             <MenuItem link="/logs" logo={logsLogo} text="Logs" isSelected={prop.selected === "logs"} />
-            <MenuItem link="/proximity" logo={calcLogo} text="Calcul de proximité" isSelected={prop.selected === "proximity"} />
-            <MenuItem link="/report" logo={reportLogo} text="Rapport" isSelected={prop.selected === "report"} />
+            <MenuItem link="/proximity" logo={calcLogo} text="Proximity computing" isSelected={prop.selected === "proximity"} />
+            <MenuItem link="/report" logo={reportLogo} text="Report" isSelected={prop.selected === "report"} />
         </div>
     )
 }

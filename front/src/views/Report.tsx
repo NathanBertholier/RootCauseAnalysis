@@ -50,7 +50,7 @@ export const Report = () => {
                 setIsLoading( false );
                 toast.show({
                     title: "Error",
-                    content: "Un problème est survenue",
+                    content: "A problem has occurred",
                     duration: 3000,
                 });
             });
@@ -60,7 +60,7 @@ export const Report = () => {
             setError( formData,setFormData, "target", "*Le champs 'ID cible' est requis" );
             toast.show({
                 title: "Error",
-                content: "Le champs 'ID cible' est vide",
+                content: "The field 'Target ID' is empty",
                 duration: 3000,
             });
         }
@@ -71,28 +71,28 @@ export const Report = () => {
             <Row>
                 <Sidebar selected="report" />
                 <div id="content-wrapper" >
-                    <h1 className="title">Rapport</h1>
+                    <h1 className="title">Report</h1>
                     <Container fluid className="report-container">
                         <Row className="report-filters-container">
                             <div className="report-filter">
-                                <Form.Text className="text-muted">ID cible :</Form.Text>
-                                <Form.Control name="target" onBlur={ e => onFocusOut( formData, setFormData, e.target.name, e.target.value, e.target.validity.valid, "ID cible", DEFAULT_ID_VALUE.toString() ) } type="text" className="custom-input" pattern="^[1-9]+[0-9]*$" />
+                                <Form.Text className="text-muted">Target ID :</Form.Text>
+                                <Form.Control name="target" onBlur={ e => onFocusOut( formData, setFormData, e.target.name, e.target.value, e.target.validity.valid, "Target ID", DEFAULT_ID_VALUE.toString() ) } type="text" className="custom-input" pattern="^[1-9]+[0-9]*$" />
                             </div>
                             <div className="report-filter">
-                                <Form.Text className="text-muted">Delta de recherche :</Form.Text>
-                                <FormControl name="delta" onBlur={ e => onFocusOut( formData, setFormData, e.target.name, e.target.value, e.target.validity.valid, "Delta de recherche", DEFAULT_DELTA_VALUE.toString() ) } type="text" className="custom-input" pattern="^[1-9]+[0-9]*$" />
-                                <Form.Text className="text-muted ms-2">secondes</Form.Text>
+                                <Form.Text className="text-muted">Delta Research :</Form.Text>
+                                <FormControl name="delta" onBlur={ e => onFocusOut( formData, setFormData, e.target.name, e.target.value, e.target.validity.valid, "Delta Research", DEFAULT_DELTA_VALUE.toString() ) } type="text" className="custom-input" pattern="^[1-9]+[0-9]*$" />
+                                <Form.Text className="text-muted ms-2">seconds</Form.Text>
                             </div>
                             <div className="report-filter">
-                                <Form.Text className="text-muted">Taille du réseau :</Form.Text>
-                                <FormControl name="networkSize" onBlur={ e => onFocusOut( formData, setFormData, e.target.name, e.target.value, e.target.validity.valid, "Taille du réseau", DEFAULT_OPTIONAL_VALUE.toString() ) } type="text" className="custom-input" pattern="^[1-9]+[0-9]*$" />
+                                <Form.Text className="text-muted">Size of the network :</Form.Text>
+                                <FormControl name="networkSize" onBlur={ e => onFocusOut( formData, setFormData, e.target.name, e.target.value, e.target.validity.valid, "Size of the network", DEFAULT_OPTIONAL_VALUE.toString() ) } type="text" className="custom-input" pattern="^[1-9]+[0-9]*$" />
                             </div>
                             <div className="report-filter">
-                                <Form.Text className="text-muted">Seuil de proximité :</Form.Text>
-                                <FormControl name="proximity" onBlur={ e => onFocusOut( formData, setFormData, e.target.name, e.target.value, e.target.validity.valid, "Seuil de proximité", DEFAULT_OPTIONAL_VALUE.toString() ) } type="text" className="custom-input" pattern="^[1-9]+[0-9]*$" />
+                                <Form.Text className="text-muted">Proximity threshold :</Form.Text>
+                                <FormControl name="proximity" onBlur={ e => onFocusOut( formData, setFormData, e.target.name, e.target.value, e.target.validity.valid, "Proximity threshold", DEFAULT_OPTIONAL_VALUE.toString() ) } type="text" className="custom-input" pattern="^[1-9]+[0-9]*$" />
                             </div>
                             <div className="report-filter">
-                                <Button className={`custom-filter-btn`} variant="outline-primary" onClick={ sendForm } >Valider</Button>
+                                <Button className={`custom-filter-btn`} variant="outline-primary" onClick={ sendForm } >Validate</Button>
                             </div>
                             <div className="errors-container">
                                 <div className={`error form-error ${ formData["target"].error === "" ? "d-none" : ""}`}>{formData["target"].error}</div>

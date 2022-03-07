@@ -56,7 +56,7 @@ export  const Graph = ({res, isLoading} : GraphProp ) => {
         let nodes : cytoscape.ElementDefinition[] = [];
         if ( res.proximity.length > 0 ) {
             nodes.push( { data: { id: res.report.rootCause.id.toString(), label: "Root Cause", color: "#F24E1E", log: res.report.rootCause } } );
-            nodes.push( { data: { id: res.report.target.id.toString(), label: "Cible", color: "#4ECB71",log: res.report.target } } );
+            nodes.push( { data: { id: res.report.target.id.toString(), label: "Target", color: "#4ECB71",log: res.report.target } } );
         }
 
         res.report.logs.filter( log => log.id !== res.report.rootCause.id ).forEach( log => {
@@ -91,9 +91,9 @@ export  const Graph = ({res, isLoading} : GraphProp ) => {
                 <table>
                     <thead>
                         <tr>
-                            <th>Etiquette</th>
-                            <th>Valeur</th>
-                            <th>Citation</th>
+                            <th>Token type</th>
+                            <th>Value</th>
+                            <th>Count</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -110,27 +110,27 @@ export  const Graph = ({res, isLoading} : GraphProp ) => {
                 </table>
             </div>
             <div className={`toolTip ${Object.keys(logToolTip).length === 0  ? "d-none" : ""}`} >
-                <div><span className="toolTip-title">Nœud : </span><span className="toolTip-value">{logToolTip.id}</span></div>
+                <div><span className="toolTip-title">ID : </span><span className="toolTip-value">{logToolTip.id}</span></div>
                 <div><span className="toolTip-entity">Log : </span><span className="toolTip-value">{logToolTip.content}</span></div>
                 <div><span className="toolTip-entity">DateTime : </span><span className="toolTip-value">{logToolTip.datetime}</span></div>
             </div>
             <div className="legend">
-                <div className="legend-title">Légende</div>
+                <div className="legend-title">Legend</div>
                 <div className="hint-container">
                     <div className="hint hint-node hint-orange"/>
-                    <div className="hint-label">Log racine</div>
+                    <div className="hint-label">Root cause</div>
                 </div>
                 <div className="hint-container">
                     <div className="hint hint-node hint-green"/>
-                    <div className="hint-label">Log cible</div>
+                    <div className="hint-label">Target Log</div>
                 </div>
                 <div className="hint-container">
                     <div className="hint hint-node hint-gray">8</div>
-                    <div className="hint-label">ID du log</div>
+                    <div className="hint-label">Log ID</div>
                 </div>
                 <div className="hint-container">
                     <div className="hint hint-edge">84</div>
-                    <div className="hint-label">Indice de proximité</div>
+                    <div className="hint-label">Proximity weight</div>
                 </div>
             </div>
             <CytoscapeComponent minZoom={0.1} wheelSensitivity={0.2} cy={x => setCy(x)} elements={CytoscapeComponent.normalizeElements(data)} stylesheet={stylesheet} style={{width: '100%', height: '700px'}} layout={layout} />

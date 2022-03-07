@@ -67,11 +67,11 @@ export const Logs = () => {
     const [ filters, setFilters ]           = useState<Filter[]>( [
         {
             id: FilterType.START_DATE,
-            text:"Date début",
+            text:"Start date",
             isSelected: false,
             alone:false,
             formField: {
-                label:"Date de début",
+                label:"Start date",
                 value: startDate,
                 setter: (data, date) => {
                     updateDateTimeValueField( data, FilterType.START_DATE, date );
@@ -81,11 +81,11 @@ export const Logs = () => {
         },
         {
             id: FilterType.END_DATE,
-            text:"Date fin",
+            text:"End date",
             isSelected: false,
             alone:false,
             formField: {
-                label:"Date de fin",
+                label:"End date",
                 value: endDate,
                 setter: (data, date) => {
                     updateDateTimeValueField( data, FilterType.END_DATE, date );
@@ -99,12 +99,12 @@ export const Logs = () => {
             isSelected: false,
             alone:false,
             formField: {
-                label:"Adresse IP v4",
+                label:"IP address v4",
                 ref: tokenIPInput,
                 placeholder: "192.168.1.1",
                 patern: "(([01]?[0-9]{1,2}|2[0-4][0-9]|25[0-5])\\.){3}([01]?[0-9]{1,2}|2[0-4][0-9]|25[0-5])",
                 validator: data => {
-                    let message = getErrorMessage( "Adresse IP v4", tokenIPInput )
+                    let message = getErrorMessage( "IP address v4", tokenIPInput )
                     setErrorMessage( data, FilterType.IPv4, message );
                 }
             }
@@ -115,19 +115,19 @@ export const Logs = () => {
             isSelected: false,
             alone:false,
             formField: {
-                label: "Adresse IP v6",
+                label: "IP address v6",
                 ref: tokenIPv6Input,
                 placeholder: "IP v6",
                 patern: "(([0-9a-fA-F]{1,4}:){7,7}[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,7}:|([0-9a-fA-F]{1,4}:){1,6}:[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,5}(:[0-9a-fA-F]{1,4}){1,2}|([0-9a-fA-F]{1,4}:){1,4}(:[0-9a-fA-F]{1,4}){1,3}|([0-9a-fA-F]{1,4}:){1,3}(:[0-9a-fA-F]{1,4}){1,4}|([0-9a-fA-F]{1,4}:){1,2}(:[0-9a-fA-F]{1,4}){1,5}|[0-9a-fA-F]{1,4}:((:[0-9a-fA-F]{1,4}){1,6})|:((:[0-9a-fA-F]{1,4}){1,7}|:)|fe80:(:[0-9a-fA-F]{0,4}){0,4}%[0-9a-zA-Z]{1,}|::(ffff(:0{1,4}){0,1}:){0,1}((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\\.){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])|([0-9a-fA-F]{1,4}:){1,4}:((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\\.){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9]))",
                 validator: data => {
-                    let message = getErrorMessage( "Adresse IP v6", tokenIPv6Input )
+                    let message = getErrorMessage( "IP address v6", tokenIPv6Input )
                     setErrorMessage( data, FilterType.IPv6, message );
                 }
             }
         },
         {
             id: FilterType.STATUT,
-            text:"Statut",
+            text:"Status",
             isSelected: false,
             alone:false,
             formField: {
@@ -136,7 +136,7 @@ export const Logs = () => {
                 placeholder: "404",
                 patern: "([1-5][0-5][0-9])",
                 validator: data => {
-                    let message = getErrorMessage( "Statut", statusInput )
+                    let message = getErrorMessage( "Status", statusInput )
                     setErrorMessage( data, FilterType.STATUT, message );
                 }
             }
@@ -159,7 +159,7 @@ export const Logs = () => {
         },
         {
             id: FilterType.LOG_ID,
-            text:"ID du log",
+            text:"Log ID",
             isSelected: false,
             alone:true,
             formField: {
@@ -214,7 +214,7 @@ export const Logs = () => {
         if ( !handleValidation() ) {
             toast.show({
                 title: "Error",
-                content: "Le formulaire contient une ou plusieurs erreurs",
+                content: "The form contains one or more errors",
                 duration: 3000,
             });
             setIsBtnDisabled( false );
@@ -260,11 +260,11 @@ export const Logs = () => {
     // check rows Input is valid
     const rowsInputIsValid = () : boolean => {
         if ( checkIsEmpty(rowsNumberInput) ) {
-            setRowInputError( "* Le champ 'Nombre de ligne' est vide" );
+            setRowInputError( "* The field 'Number of lines' is empty" );
             return false;
         }
         else if ( checkIsNotValid(rowsNumberInput) ) {
-            setRowInputError( "* Le champ 'Nombre de ligne' doit être compris entre 1 et 100" );
+            setRowInputError( "* The field 'Number of lines' must be between 1 and 100" );
             return false
         }
         setRowInputError( "" );
@@ -320,10 +320,10 @@ export const Logs = () => {
     const getErrorMessage = ( fieldName: string, input: React.MutableRefObject<HTMLInputElement> ) : string => {
         let message = ""
         if ( checkIsEmpty( input ) ) {
-            message = "* Le champ '"+ fieldName +"' est vide"
+            message = "* The field '"+ fieldName +"' is empty"
         }
         else if (checkIsNotValid( input )) {
-            message = "* Le champ '"+ fieldName +"' est incorrect"
+            message = "* The field '"+ fieldName +"' is incorrect"
         }
         return message
     }
@@ -337,7 +337,7 @@ export const Logs = () => {
     const checkDatetimeField = ( input : Date, filterID: FilterType, fieldLabel: string ): boolean => {
         let filter = filters.find( f => f.id === filterID );
         if (filter && filter.isSelected && input === null) {
-            setErrorMessage( filters, filterID, "* Le champ '"+fieldLabel+"' est incorrect" );
+            setErrorMessage( filters, filterID, "* The field '"+fieldLabel+"' is incorrect" );
             return false;
         }
 
@@ -350,20 +350,20 @@ export const Logs = () => {
         if ( isLogIDFilter ) {
             if ( logIDInput.current === null || logIDInput.current.value === "" ) {
                 formIsValid = false;
-                setErrorMessage( filters, FilterType.LOG_ID, "* Le champ 'Log ID' doit contenir une valeur" );
+                setErrorMessage( filters, FilterType.LOG_ID, "* The field 'Log ID' must contain a value" );
             }
             else if ( !logIDInput.current.validity.valid ) {
                 formIsValid = false;
-                setErrorMessage( filters, FilterType.LOG_ID, "* Le champ 'Log ID' ne prend que des nombres" );
+                setErrorMessage( filters, FilterType.LOG_ID, "* The field 'Log ID' takes only numbers" );
             }
         }
         else {
-            if ( !checkTextField( statusInput, FilterType.STATUT, "Statut" ) ||
-                 !checkTextField( tokenIPInput, FilterType.IPv4, "Adresse IP v4" ) ||
-                 !checkTextField( tokenIPv6Input, FilterType.IPv6, "Adresse IP v6" ) ||
+            if ( !checkTextField( statusInput, FilterType.STATUT, "Status" ) ||
+                 !checkTextField( tokenIPInput, FilterType.IPv4, "IP address v4" ) ||
+                 !checkTextField( tokenIPv6Input, FilterType.IPv6, "IP address v6" ) ||
                  !checkTextField( edgeResponseInput, FilterType.EDGE_RESPONSE, "Edge Response" ) ||
-                 !checkDatetimeField( startDate, FilterType.START_DATE, "Date de début" ) ||
-                 !checkDatetimeField( endDate, FilterType.END_DATE, "Date de fin" )
+                 !checkDatetimeField( startDate, FilterType.START_DATE, "Start date" ) ||
+                 !checkDatetimeField( endDate, FilterType.END_DATE, "End date" )
             ) {
                 formIsValid = false
             }
@@ -430,7 +430,7 @@ export const Logs = () => {
                                             <DropdownButton
                                                 className={`add-filter-btn`}
                                                 variant="outline-secondary"
-                                                title="Ajout Filtre"
+                                                title="Add Filter"
                                                 id="custom-log-dropdown"
                                                 align="end"
                                                 onSelect={ handleSelect } >
@@ -451,9 +451,9 @@ export const Logs = () => {
                                 <Container fluid className="p-0 number-row-filter-container">
                                     <Row>
                                         <Col>
-                                            <Form.Text className="text-muted">Nombre de ligne :</Form.Text>
+                                            <Form.Text className="text-muted">Number of rows :</Form.Text>
                                             <Form.Control ref={rowsNumberInput} type="text" className="custom-input" pattern="^[1-9][0-9]?$|^100$" onBlur={ rowsInputIsValid } defaultValue="30" />
-                                            <Button className={`custom-filter-btn ${isBtnDisabled ? "disabled" : ""}`} variant="outline-primary" onClick={ () => applyFilters() } disabled={ isBtnDisabled } >Valider</Button>
+                                            <Button className={`custom-filter-btn ${isBtnDisabled ? "disabled" : ""}`} variant="outline-primary" onClick={ () => applyFilters() } disabled={ isBtnDisabled } >Validate</Button>
                                         </Col>
                                     </Row>
                                     <Row className={ rowInputError !== "" ? "" : "d-none" } >
