@@ -38,7 +38,7 @@ export class LogsTable extends Component<LogsTableProp, any> {
         }).catch((e: Error) => {
             toast.show({
                 title: "Error",
-                content: "Un problème est survenue",
+                content: "A problem has occurred",
                 duration: 3000,
             });
             this.props.gettingData( false );
@@ -51,7 +51,7 @@ export class LogsTable extends Component<LogsTableProp, any> {
                 <Table responsive striped bordered hover className="logTable">
                     <thead>
                     <tr>
-                        <th>id</th>
+                        <th>ID</th>
                         <th>DateTime</th>
                         <th>Tokens</th>
                         <th>Log</th>
