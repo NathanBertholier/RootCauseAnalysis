@@ -2,6 +2,7 @@ import React, {useEffect, useState} from "react";
 import CytoscapeComponent from "react-cytoscapejs";
 import cytoscape from "cytoscape";
 import {Log, MostUsedToken, ReportResponse} from "../types/ReportResponse";
+import { Loader } from "./Loader"
 const fcose = require( "cytoscape-fcose" )
 
 cytoscape.use(fcose);
@@ -42,12 +43,13 @@ const layout = {
 
 type GraphProp = {
     res: ReportResponse
+    isLoading: boolean
 }
 
-export  const Graph = ({res} : GraphProp ) => {
-    const [data, setData] = useState<{nodes: cytoscape.ElementDefinition[], edges: cytoscape.ElementDefinition[]}>({ nodes: [], edges: [] });
-    const [mostUsedTokens, setMostUsedTokens] = useState( [] as MostUsedToken[] );
-    const [logToolTip, setLogToolTip] = useState<Log>({} as Log);
+export  const Graph = ({res, isLoading} : GraphProp ) => {
+    const [data, setData]                       = useState<{nodes: cytoscape.ElementDefinition[], edges: cytoscape.ElementDefinition[]}>({ nodes: [], edges: [] });
+    const [mostUsedTokens, setMostUsedTokens]   = useState( [] as MostUsedToken[] );
+    const [logToolTip, setLogToolTip]           = useState<Log>({} as Log);
 
     useEffect(() => {
         let nodes : cytoscape.ElementDefinition[] = [];
@@ -131,6 +133,7 @@ export  const Graph = ({res} : GraphProp ) => {
                 </div>
             </div>
             <CytoscapeComponent minZoom={0.1} wheelSensitivity={0.2} cy={x => setCy(x)} elements={CytoscapeComponent.normalizeElements(data)} stylesheet={stylesheet} style={{width: '100%', height: '700px'}} layout={layout} />
+            <Loader show={isLoading} />
         </div>
     )
 }
