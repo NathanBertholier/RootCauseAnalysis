@@ -1,9 +1,7 @@
 package fr.uge.modules.linking.token.type;
 
-import fr.uge.modules.api.model.entities.TokenEntity;
-import org.junit.jupiter.api.Test;
 
-import java.util.ArrayList;
+import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 

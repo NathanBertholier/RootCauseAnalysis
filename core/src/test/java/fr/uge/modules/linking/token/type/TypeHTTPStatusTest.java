@@ -37,8 +37,6 @@ public class TypeHTTPStatusTest {
     }
     @Test
     void proximity() {
-
-        // TODO : here some test case maybe add more
         TypeHTTPStatus typeHTTPStatus = new TypeHTTPStatus();
         TokenEntity tokenStatus200 = new TokenEntity();
         tokenStatus200.setValue("200");
@@ -55,12 +53,12 @@ public class TypeHTTPStatusTest {
 
 
         assertAll(
-                /*
+
                 // empty array
                 () -> assertEquals( 0, typeHTTPStatus.computeProximity(new ArrayList<>(), new ArrayList<>(){ { add( tokenStatus200 ); } } ).getProximity() ),
                 () -> assertEquals( 0, typeHTTPStatus.computeProximity(new ArrayList<>(){ { add( tokenStatus200 ); }}, new ArrayList<>() ).getProximity() ),
                 () -> assertEquals( 0, typeHTTPStatus.computeProximity(new ArrayList<>(), new ArrayList<>() ).getProximity() ),
-                */
+
                 // 100% identical
                 () -> assertEquals( 100, typeHTTPStatus.computeProximity(new ArrayList<>(){ { add( tokenStatus200 ); }}, new ArrayList<>(){ { add( tokenStatus200 ); } } ).getProximity() ),
                 () -> assertEquals( 100, typeHTTPStatus.computeProximity(new ArrayList<>(){ { add( tokenStatus300 ); }}, new ArrayList<>(){ { add( tokenStatus300 ); } } ).getProximity() ),

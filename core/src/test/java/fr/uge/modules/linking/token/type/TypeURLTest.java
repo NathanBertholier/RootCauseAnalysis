@@ -46,7 +46,6 @@ public class TypeURLTest {
     @Test
     void proximity() {
         TypeURL typeURL = new TypeURL();
-        // TODO : here some test case maybe add more
         TokenEntity urlPizzaTomate = new TokenEntity();
         urlPizzaTomate.setValue("https://www.centreon.com/pizza/ingredients/tomate");
 

@@ -34,7 +34,7 @@ public class TypeDatetime implements TokenType{
         return new Computation(new TypeDatetime(), ldt1.toString(), ldt2.toString(), fromTime(Math.abs(time), delta));
     }
 
-    private static double fromTime(long time, long delta){
+    private static double fromTime(long time, float delta){
         if(time > delta) return 0;
         else if (time == 0) return 100;
         else {

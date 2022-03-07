@@ -1,6 +1,5 @@
 package fr.uge.modules.linking.token.type;
 
-import fr.uge.modules.api.model.TokenModel;
 import fr.uge.modules.api.model.entities.TokenEntity;
 import org.junit.jupiter.api.Test;
 
@@ -54,12 +53,12 @@ class TypeEdgeResponseTest {
 
 
         assertAll(
-                /*
+
                 // empty array
                 () -> assertEquals( 50, typeEdgeResponse.computeProximity(new ArrayList<>(),                        new ArrayList<>(){{ add( hit ); }} ).getProximity() ),
                 () -> assertEquals( 50, typeEdgeResponse.computeProximity(new ArrayList<>(){{ add( miss ); }},      new ArrayList<>() ).getProximity() ),
                 () -> assertEquals( 50, typeEdgeResponse.computeProximity(new ArrayList<>(),                        new ArrayList<>() ).getProximity() ),
-                */
+
                 // 100 % identical
                 () -> assertEquals( 100, typeEdgeResponse.computeProximity(new ArrayList<>(){{ add( hit ); }},      new ArrayList<>(){{ add( hit ); }} ).getProximity() ),
                 () -> assertEquals( 100, typeEdgeResponse.computeProximity(new ArrayList<>(){{ add( error ); }},    new ArrayList<>(){{ add( error ); }} ).getProximity() ),
