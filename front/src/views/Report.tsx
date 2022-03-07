@@ -81,6 +81,7 @@ export const Report = () => {
                             <div className="report-filter">
                                 <Form.Text className="text-muted">Delta de recherche :</Form.Text>
                                 <FormControl name="delta" onBlur={ e => onFocusOut( formData, setFormData, e.target.name, e.target.value, e.target.validity.valid, "Delta de recherche", DEFAULT_DELTA_VALUE.toString() ) } type="text" className="custom-input" pattern="^[1-9]+[0-9]*$" />
+                                <Form.Text className="text-muted ms-2">secondes</Form.Text>
                             </div>
                             <div className="report-filter">
                                 <Form.Text className="text-muted">Taille du réseau :</Form.Text>
