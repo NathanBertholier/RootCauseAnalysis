@@ -40,9 +40,8 @@ public class BatchQueueProcessor {
         try {
             ConnectionFactory factory = new ConnectionFactory();
             factory.setHost("rabbitmq");
-            try (Connection connection = factory.newConnection()) {
-                return Optional.of(connection.createChannel());
-            }
+            Connection connection = factory.newConnection();
+            return Optional.of(connection.createChannel());
         } catch (IOException | TimeoutException e) {
             LOGGER.log(Level.SEVERE, "Error while creating channel", e);
             return Optional.empty();
