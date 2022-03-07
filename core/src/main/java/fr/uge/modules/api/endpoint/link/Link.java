@@ -28,8 +28,7 @@ public class Link {
         final var finalDelta = delta;
         return LogEntity.<LogEntity>findById(id_log_first)
                 .chain(log1 -> LogEntity.<LogEntity>findById(id_log_second)
-                        .chain(log2 -> {
-                            return LogsLinking.computeLinks(log1, log2, finalDelta);
-                        }));
+                        .chain(log2 -> LogsLinking.computeLinks(log1, log2, finalDelta))
+                        );
     }
 }
