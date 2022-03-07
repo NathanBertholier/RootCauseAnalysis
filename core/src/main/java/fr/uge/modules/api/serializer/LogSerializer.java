@@ -24,7 +24,7 @@ public class LogSerializer extends StdSerializer<LogEntity> {
     public void serialize(LogEntity log, JsonGenerator jsonGenerator, SerializerProvider serializerProvider) throws IOException {
         jsonGenerator.writeStartObject();
         jsonGenerator.writeNumberField("id", log.id);
-        jsonGenerator.writeStringField("content", "log.rawLog.log");
+        jsonGenerator.writeStringField("content", log.rawLog.log);
         jsonGenerator.writeStringField("datetime", formatter.format(log.datetime));
         jsonGenerator.writeEndObject();
     }
