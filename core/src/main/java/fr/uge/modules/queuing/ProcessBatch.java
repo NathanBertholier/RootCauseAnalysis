@@ -1,4 +1,4 @@
-package fr.uge.modules.tokenization;
+package fr.uge.modules.queuing;
 
 import fr.uge.modules.api.model.entities.LogEntity;
 import fr.uge.modules.api.model.entities.TokenEntity;

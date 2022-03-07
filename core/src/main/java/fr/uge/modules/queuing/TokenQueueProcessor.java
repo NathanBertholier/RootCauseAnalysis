@@ -1,7 +1,8 @@
-package fr.uge.modules.tokenization;
+package fr.uge.modules.queuing;
 
 import fr.uge.modules.api.model.entities.LogEntity;
 import fr.uge.modules.api.model.entities.RawLogEntity;
+import fr.uge.modules.tokenization.Tokenization;
 import io.vertx.core.json.JsonObject;
 import org.eclipse.microprofile.reactive.messaging.Incoming;
 import org.eclipse.microprofile.reactive.messaging.Outgoing;
@@ -11,6 +12,7 @@ import javax.inject.Inject;
 
 @ApplicationScoped
 public class TokenQueueProcessor {
+
     @Inject
     Tokenization tokenization;
 

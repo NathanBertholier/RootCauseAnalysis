@@ -7,18 +7,16 @@ import fr.uge.modules.api.model.entities.LogEntity;
 import fr.uge.modules.api.model.entities.TokenEntity;
 import fr.uge.modules.api.model.report.ReportParameter;
 import fr.uge.modules.api.model.report.ReportResponseExpanded;
-import fr.uge.modules.error.EmptyReportError;
 import fr.uge.modules.linking.LogsLinking;
+import fr.uge.modules.linking.token.type.TokenType;
 import io.smallrye.mutiny.Multi;
 import io.smallrye.mutiny.Uni;
 
 import java.util.*;
-import java.util.function.Function;
 import java.util.logging.ConsoleHandler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public class Synthetization {
 
@@ -38,10 +36,10 @@ public class Synthetization {
                                         var relevantLogs = generatedReport.relevantLogs();
                                         var rootCause = generatedReport.rootCause();
                                         var report = new ReportResponse(rootCause, target, tokens, relevantLogs);
-                                        if(!reportParameter.expanded()) return report;
-                                        else {
-                                            return new ReportResponseExpanded(report, generatedReport.computations());
+                                        if(!reportParameter.expanded()) {
+                                            return report;
                                         }
+                                        return new ReportResponseExpanded(report, generatedReport.computations());
                                     })
                         )
                 );
@@ -61,7 +59,7 @@ public class Synthetization {
     }
 
     private static TokensMostSeen fromTokenEntities(List<TokenEntity> entities){
-        var tokenTypeName = entities.stream().findAny().orElseThrow().token_type.name;
+        var tokenTypeName = TokenType.fromId(entities.stream().findAny().orElseThrow().idtokentype).getName();
         var values = entities.stream()
                 .collect(Collectors.groupingBy(TokenEntity::getValue, Collectors.counting()))
                 .entrySet();
