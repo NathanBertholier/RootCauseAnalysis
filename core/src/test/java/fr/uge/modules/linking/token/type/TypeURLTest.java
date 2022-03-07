@@ -59,26 +59,23 @@ public class TypeURLTest {
         TokenEntity urlSVG = new TokenEntity();
         urlSVG.setValue("https://www.centreon.com/current/en/img/undraw_online.svg");
 
-        /*
         assertAll(
                 // empty array
-                () -> assertEquals( 50, typeURL.computeProximity(new ArrayList<>(), new ArrayList<>(){ { add( urlPizzaTomate ); } } ).proximity() ),
-                () -> assertEquals( 50, typeURL.computeProximity(new ArrayList<>(){ { add( urlPizzaTomate ); } }, new ArrayList<>() ).proximity() ),
-                () -> assertEquals( 50, typeURL.computeProximity(new ArrayList<>(), new ArrayList<>() ).proximity() ),
+                () -> assertEquals( 50, typeURL.computeProximity(new ArrayList<>(), new ArrayList<>(){ { add( urlPizzaTomate ); } } ).getProximity() ),
+                () -> assertEquals( 50, typeURL.computeProximity(new ArrayList<>(){ { add( urlPizzaTomate ); } }, new ArrayList<>() ).getProximity() ),
+                () -> assertEquals( 50, typeURL.computeProximity(new ArrayList<>(), new ArrayList<>() ).getProximity() ),
 
                 // case 1 element in array
-                () -> assertEquals( 100, typeURL.computeProximity(new ArrayList<>(){ { add( urlPizzaTomate ); } }, new ArrayList<>(){ { add( urlPizzaTomate ); } } ).proximity() ),
-                () -> assertEquals( 75, typeURL.computeProximity(new ArrayList<>(){ { add( urlPizzaTomate ); } }, new ArrayList<>(){ { add( urlPizzaBoeuf ); } } ).proximity() ),
+                () -> assertEquals( 100, typeURL.computeProximity(new ArrayList<>(){ { add( urlPizzaTomate ); } }, new ArrayList<>(){ { add( urlPizzaTomate ); } } ).getProximity() ),
+                () -> assertEquals( 75, typeURL.computeProximity(new ArrayList<>(){ { add( urlPizzaTomate ); } }, new ArrayList<>(){ { add( urlPizzaBoeuf ); } } ).getProximity() ),
 
-                () -> assertEquals( 33.33333333333333, typeURL.computeProximity(new ArrayList<>(){ { add( urlEssaiGratuit ); } }, new ArrayList<>(){ { add( urlPizzaBoeuf ); } } ).proximity() ),
+                () -> assertEquals( 33.33333333333333, typeURL.computeProximity(new ArrayList<>(){ { add( urlEssaiGratuit ); } }, new ArrayList<>(){ { add( urlPizzaBoeuf ); } } ).getProximity() ),
 
 
-                () -> assertEquals( 25, typeURL.computeProximity(new ArrayList<>(){ { add( urlPizzaTomate );add( urlPizzaBoeuf ); } }, new ArrayList<>(){ { add( urlSVG ); } } ).proximity() )
+                () -> assertEquals( 25, typeURL.computeProximity(new ArrayList<>(){ { add( urlPizzaTomate );add( urlPizzaBoeuf ); } }, new ArrayList<>(){ { add( urlSVG ); } } ).getProximity() )
 
 
         );
-
-         */
 
     }
 }

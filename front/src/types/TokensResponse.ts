@@ -9,16 +9,12 @@ type Token = {
 }
 
 export type Log = {
-    rawLog: RawLog
+    content: string
     datetime: string
     id: number
     tokens: Token[]
 }
 
-type RawLog = {
-    id: number,
-    log: string
-}
 
 export type TokensResponse = {
     log: Log[]
