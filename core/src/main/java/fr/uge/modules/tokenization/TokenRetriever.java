@@ -3,7 +3,10 @@ package fr.uge.modules.tokenization;
 import fr.uge.modules.api.model.TokenModel;
 import fr.uge.modules.api.model.TokenRequest;
 import fr.uge.modules.api.model.entities.LogEntity;
+import fr.uge.modules.error.NotYetTokenizedError;
 import io.smallrye.mutiny.Uni;
+import io.smallrye.mutiny.unchecked.Unchecked;
+
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.IntStream;

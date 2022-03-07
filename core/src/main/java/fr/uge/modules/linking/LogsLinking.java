@@ -38,6 +38,7 @@ public class LogsLinking {
      * @return
      */
     public static Uni<TokensLink> computeLinks(LogEntity log1, LogEntity log2, long delta) {
+        if(log1 == null || log2 == null) return Uni.createFrom().failure(new IllegalArgumentException());
         var map1 = fromLog(log1);
         var map2 = fromLog(log2);
 
