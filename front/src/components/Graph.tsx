@@ -38,7 +38,8 @@ const stylesheet : cytoscape.Stylesheet[] = [{
 const layout = {
     name: 'fcose',
     fit: true,
-    padding:200
+    padding:200,
+    idealEdgeLength: 200,
 };
 
 type GraphProp = {
