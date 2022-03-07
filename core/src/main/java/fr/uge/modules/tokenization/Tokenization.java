@@ -13,23 +13,34 @@ import javax.enterprise.event.Observes;
 import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.*;
-import java.util.logging.Logger;
 
 @ApplicationScoped
 public class Tokenization {
-    private static final Logger LOGGER = Logger.getGlobal();
-
     private Profile profile = new AWSProfile();
 
+    /**
+     * Construct the profile at start using quarkus variable.
+     */
     public void chooseProfile(@Observes StartupEvent ev) {
         this.profile = switch (ConfigProvider.getConfig()
                 .getOptionalValue("profile.name", String.class)
-                .orElse("standard")) {
-            case "AWS" -> new AWSProfile();
-            default -> new StandardProfile();
+                .orElse("AWS")) {
+            case "standard" -> new StandardProfile();
+            default -> new AWSProfile();
         };
     }
 
+    /**
+     * Tokenize a log using the profile, his id and a body.
+     * The tokenization takes place in 3 steps :
+     *      - split the body as words
+     *      - search for the timestamp or set the current time
+     *      - search for each token using the profile
+     *
+     * @param id    Represent the ID of the rawLog
+     * @param body  Represent the body of a log
+     * @return      A LogEntity construct with the ID and each token
+     */
     public LogEntity tokenizeLog(long id, String body) {
         Objects.requireNonNull(body);
 
@@ -50,26 +61,27 @@ public class Tokenization {
         return log;
     }
 
-    private Optional<TokenEntity> getTokenWithIndex(Integer index, TokenType tokenType, List<String> words) {
-        var token = new TokenEntity();
-        if(index < words.size() - 1 && tokenType.matcher(words.get(index)) != -1) {
-            token.setIdtokentype(tokenType.getTokenTypeId());
-            token.setValue(words.get(index));
-            return Optional.of(token);
-        }
-        return Optional.empty();
-    }
 
-    public List<TokenEntity> getTokens(List<String> words) {
+    /**
+     * Method called for search each token.
+     * It takes place in 3 steps :
+     *      - Retrieve each token saved in the profile.
+     *      - Get all tokens using the index of the profile and add the tokenType in a list if the token was not found
+     *      - Iterate over each word and call each tokenType matcher on them
+     *
+     * @param words List of String that represent the body
+     * @return      A List of TokenEntity used in the LogEntity
+     */
+    private List<TokenEntity> getTokens(List<String> words) {
         List<TokenType> tokenTypesNoFound = new ArrayList<>();
 
         List<TokenEntity> tokens = new ArrayList<>(List.copyOf(profile.getTokenTypeIndex().entrySet().stream().map((k) -> {
-            var token = getTokenWithIndex(k.getValue(), k.getKey(), words);
-            if (token.isEmpty()) {
-                tokenTypesNoFound.add(k.getKey());
-            }
-            return token;
-        }).filter(Optional::isPresent)
+                    var token = getTokenWithIndex(k.getValue(), k.getKey(), words);
+                    if (token.isEmpty()) {
+                        tokenTypesNoFound.add(k.getKey());
+                    }
+                    return token;
+                }).filter(Optional::isPresent)
                 .map(Optional::get)
                 .toList()));
 
@@ -85,5 +97,22 @@ public class Tokenization {
                 }));
 
         return tokens;
+    }
+
+    /**
+     * Retrieve a token from the index.
+     * @param index     Integer that represent the position of the token
+     * @param tokenType The Token TokenType
+     * @param words     List of String that represent the log
+     * @return          Optional of TokenEntity, Empty if none
+     */
+    private Optional<TokenEntity> getTokenWithIndex(Integer index, TokenType tokenType, List<String> words) {
+        var token = new TokenEntity();
+        if(index < words.size() - 1 && tokenType.matcher(words.get(index)) != -1) {
+            token.setIdtokentype(tokenType.getTokenTypeId());
+            token.setValue(words.get(index));
+            return Optional.of(token);
+        }
+        return Optional.empty();
     }
 }

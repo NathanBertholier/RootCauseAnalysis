@@ -5,6 +5,10 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
+/**
+ * Used in a profile to found the DateTime of a given log.
+ * The Common implementation iterates over each words of the log.
+ */
 public class CommonDateTime implements DateTimeFormatter{
 
     private final SimpleDateFormat formatter = new SimpleDateFormat("[dd/MMM/yyyy:HH:mm:ss", new Locale("en", "US"));

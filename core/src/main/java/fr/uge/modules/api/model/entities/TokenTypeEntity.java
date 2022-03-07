@@ -6,7 +6,8 @@ import javax.persistence.Entity;
 import javax.persistence.Table;
 
 /**
- * A TokenTypeEntity represents one token type in the data model. It extends the Panache entity system of the Hibernate ORM
+ * A TokenTypeEntity represents one token type in the data model.
+ * It extends the Panache entity system of the 'Hibernate ORM'.
  */
 @Entity
 @Table(name = "tokentype", schema = "public", catalog = "rootcause")

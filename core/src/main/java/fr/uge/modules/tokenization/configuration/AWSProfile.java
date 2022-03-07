@@ -8,6 +8,10 @@ import javax.enterprise.context.ApplicationScoped;
 import java.sql.Timestamp;
 import java.util.*;
 
+/**
+ * AWS Profile used to parse AWS log.
+ * It will search each token with already know index.
+ */
 @ApplicationScoped
 public class AWSProfile implements Profile {
     private final HashMap<TokenType, Integer> tokenTypeIndex = new HashMap<>();

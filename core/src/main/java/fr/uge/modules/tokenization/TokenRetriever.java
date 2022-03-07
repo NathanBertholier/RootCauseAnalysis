@@ -8,7 +8,16 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.IntStream;
 
+/*
+ * Class used to get a List of LogEntity for the /tokens endpoint.
+ */
 public class TokenRetriever {
+
+    /**
+     * Method used in endpoint to get the List of LogEntity depending on the tokenRequest parameter.
+     * @param tokenRequest  TokenRequest that contain each parameter.
+     * @return              A Uni of a List of LogEntity that represent the query result.
+     */
     public static Uni<List<LogEntity>> getTokens(TokenRequest tokenRequest){
         var rows = Objects.requireNonNullElse(tokenRequest.rows(), 30) - 1;
         StringBuilder sQuery = new StringBuilder();
@@ -49,6 +58,13 @@ public class TokenRetriever {
         return getTokensWithoutId(sQuery, tokenRequest.tokens(), rows);
     }
 
+    /**
+     * Method called if the request do not contain an ID.
+     * @param sQuery    Actual Query that contain the time
+     * @param tokens    List of TokenModel that represent each token requested.
+     * @param rows      The numbers of Row wanted.
+     * @return          A List of LogEntity that represent the query result.
+     */
     private static Uni<List<LogEntity>> getTokensWithoutId(StringBuilder sQuery, List<TokenModel> tokens, int rows) {
         if(!tokens.isEmpty()) {
             sQuery.append(" and l.id in ( select t0.idlog from TokenEntity t0 ");

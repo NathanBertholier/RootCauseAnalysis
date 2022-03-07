@@ -1,7 +1,5 @@
 package fr.uge.modules.api.model.entities;
 
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import fr.uge.modules.api.serializer.LogSerializer;
 import io.quarkus.hibernate.reactive.panache.PanacheEntityBase;
 import io.smallrye.mutiny.Uni;
 
@@ -11,7 +9,10 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- * A LogEntity represents one log line in the data model. It extends the Panache entity system of the Hibernate ORM
+ * A LogEntity represents one log line in the data model.
+ * It extends the Panache entity system of the 'Hibernate ORM'.
+ * In the database, a log contain an ID, a Timestamp and a list of Token.
+ * This entity contains a relation to a RawLog.
  */
 @Entity
 @Table(name = "log", schema = "public", catalog = "rootcause")
