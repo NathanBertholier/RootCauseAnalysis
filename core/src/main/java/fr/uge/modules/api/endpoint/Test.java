@@ -1,7 +1,6 @@
 package fr.uge.modules.api.endpoint;
 
 import fr.uge.modules.api.model.report.GenericReport;
-import fr.uge.modules.api.model.report.ReportResponse;
 import fr.uge.modules.api.model.report.ReportParameter;
 import fr.uge.modules.synthetization.Synthetization;
 import io.smallrye.mutiny.Uni;

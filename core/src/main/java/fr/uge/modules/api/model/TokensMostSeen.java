@@ -3,7 +3,6 @@ package fr.uge.modules.api.model;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import fr.uge.modules.api.serializer.TokenMostSeenSerializer;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
