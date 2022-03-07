@@ -17,8 +17,6 @@ public class TokensLink {
     private final double proximity;
     private final ProximityStrategy proximityFunction;
 
-    private static final AverageStrategy averageStrategy = new AverageStrategy();
-
     public TokensLink(List<Computation> computations, ProximityStrategy proximityFunction){
         this.computations = computations;
         this.proximityFunction = proximityFunction;

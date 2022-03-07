@@ -2,7 +2,7 @@ package fr.uge.modules.api.model;
 
 import java.util.Objects;
 
-public record TokenModel(Integer token_type, String token_value) {
+public record TokenModel(String token_type, String token_value) {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
