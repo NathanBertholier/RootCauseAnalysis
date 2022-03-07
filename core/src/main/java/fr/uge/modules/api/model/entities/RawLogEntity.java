@@ -5,6 +5,10 @@ import io.quarkus.hibernate.reactive.panache.PanacheEntity;
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 
+
+/**
+ * A RawLogEntity represents one unfiltered and unprocessed log in the data model. It extends the Panache entity system of the Hibernate ORM
+ */
 @Entity
 @Table(name = "rawlog")
 public class RawLogEntity extends PanacheEntity {
