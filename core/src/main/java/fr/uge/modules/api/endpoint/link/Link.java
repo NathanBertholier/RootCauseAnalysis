@@ -28,6 +28,13 @@ public class Link {
         final var finalDelta = delta;
         return LogEntity.<LogEntity>findById(id_log_first)
                 .chain(log1 -> LogEntity.<LogEntity>findById(id_log_second)
-                        .chain(log2 -> LogsLinking.computeLinks(log1, log2, finalDelta)));
+                        .chain(log2 -> {
+                            var tklink = LogsLinking.computeLinks(log1, log2, finalDelta);
+                            tklink.subscribeAsCompletionStage().whenComplete((tk, err) -> {
+                                System.out.println("TkLink: " + tk);
+                                System.out.println("Error: " + err);
+                            });
+                            return tklink;
+                        }));
     }
 }

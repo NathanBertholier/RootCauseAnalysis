@@ -29,12 +29,12 @@ public class TypeDatetime implements TokenType{
         return TokenTypeId.ID_DATETIME.getId();
     }
 
-    public static Computation computeDateTimeProximity(Timestamp ldt1, Timestamp ldt2, float delta){
+    public static Computation computeDateTimeProximity(Timestamp ldt1, Timestamp ldt2, long delta){
         var time = (ldt1.getTime() - ldt2.getTime()) / 1000;
         return new Computation(new TypeDatetime(), ldt1.toString(), ldt2.toString(), fromTime(Math.abs(time), delta));
     }
 
-    private static double fromTime(long time, float delta){
+    private static double fromTime(long time, long delta){
         if(time > delta) return 0;
         else if (time == 0) return 100;
         else {

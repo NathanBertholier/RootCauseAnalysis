@@ -9,7 +9,7 @@ import java.util.Collection;
 import java.util.List;
 
 public class TypeEdgeResponse implements TokenType {
-    private static final String NAME = "TokenType";
+    private static final String NAME = "edgeresponse";
     private static final String REGEX = "^((Hit)|(RefreshHit)|(Miss)|(LimitExceeded)|(CapacityExceeded)|(Error)|(Redirect))$";
     private static final List<String> ERRORS = List.of("Miss", "Error", "Redirect", "LimitExceeded", "CapacityExceeded");
 

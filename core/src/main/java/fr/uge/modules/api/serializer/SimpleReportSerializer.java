@@ -4,9 +4,12 @@ import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.ser.std.StdSerializer;
 import fr.uge.modules.api.model.TokensMostSeen;
+import fr.uge.modules.api.model.entities.LogResponse;
 import fr.uge.modules.api.model.report.GenericReport;
 
 import java.io.IOException;
+
+import static fr.uge.modules.api.model.entities.LogResponse.fromEntity;
 
 public class SimpleReportSerializer extends StdSerializer<GenericReport> {
     public SimpleReportSerializer(){
@@ -20,10 +23,10 @@ public class SimpleReportSerializer extends StdSerializer<GenericReport> {
     @Override
     public void serialize(GenericReport genericReport, JsonGenerator jsonGenerator, SerializerProvider serializerProvider) throws IOException {
         jsonGenerator.writeStartObject();
-        serializerProvider.defaultSerializeField("rootCause", genericReport.getRoot(), jsonGenerator);
-        serializerProvider.defaultSerializeField("target", genericReport.getTarget(), jsonGenerator);
+        serializerProvider.defaultSerializeField("rootCause", fromEntity(genericReport.getRoot()), jsonGenerator);
+        serializerProvider.defaultSerializeField("target", fromEntity(genericReport.getTarget()), jsonGenerator);
         serializerProvider.defaultSerializeField("tokens", genericReport.getSeenTokens().stream().toList(), jsonGenerator);
-        serializerProvider.defaultSerializeField("logs", genericReport.getRelevantLogs(), jsonGenerator);
+        serializerProvider.defaultSerializeField("logs", genericReport.getRelevantLogs().stream().map(LogResponse::fromEntity).toList(), jsonGenerator);
         jsonGenerator.writeEndObject();
     }
 }
