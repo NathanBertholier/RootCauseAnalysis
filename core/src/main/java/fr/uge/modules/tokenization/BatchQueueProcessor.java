@@ -15,7 +15,7 @@ import java.util.concurrent.TimeoutException;
 public class BatchQueueProcessor {
     public static void main(String[] args) throws IOException, TimeoutException, SQLException {
         ConnectionFactory factory = new ConnectionFactory();
-        factory.setHost("localhost");
+        factory.setHost("rabbitmq");
         Connection connection = factory.newConnection();
         Channel channel = connection.createChannel();
         ProcessBatch processBatch = new ProcessBatch();
