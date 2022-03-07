@@ -60,7 +60,6 @@ public class TypeURLTest {
 
 
         assertAll(
-
                 // empty array
                 () -> assertEquals( 50, typeURL.computeProximity(new ArrayList<>(), new ArrayList<>(){ { add( urlPizzaTomate ); } } ).getProximity() ),
                 () -> assertEquals( 50, typeURL.computeProximity(new ArrayList<>(){ { add( urlPizzaTomate ); } }, new ArrayList<>() ).getProximity() ),

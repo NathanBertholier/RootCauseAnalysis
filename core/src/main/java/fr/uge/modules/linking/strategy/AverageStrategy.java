@@ -9,6 +9,7 @@ import java.util.List;
 public class AverageStrategy implements ProximityStrategy {
     @Override
     public double computeProximity(List<Computation> computations) {
+
         DecimalFormat format = new DecimalFormat();
         format.setMaximumFractionDigits(2);
         format.setRoundingMode(RoundingMode.FLOOR);

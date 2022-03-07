@@ -98,7 +98,6 @@ class TypeIPv6Test {
                     new ArrayList<>(){ { add(firstIPv6); } } ).getProximity() ),
             () -> assertEquals(100,   typeIPv6.computeProximity( new ArrayList<>(){ { add( firstIPv6 ); add( secondtIPv6 ); } },
                     new ArrayList<>(){ { add(secondtIPv6);add(firstIPv6); } } ).getProximity() ),
-
             // Case 3 element
             () -> assertEquals(33.33, typeIPv6.computeProximity( new ArrayList<>(){ { add( firstIPv6 );add( secondtIPv6 );add( thirdIPv6 ); } },
                     new ArrayList<>(){ { add( firstIPv6 ); } } ).getProximity() ),
