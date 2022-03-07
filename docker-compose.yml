@@ -13,6 +13,7 @@ services:
       - "15672:15672"
     volumes:
       - ./DockerVolumes/RabbitMQ/Setup/:/etc/rabbitmq/
+      - ./DockerVolumes/RabbitMQ/Data/:/var/lib/rabbitmq
 
   timescale:
     image: timescale/timescaledb:2.6.0-pg12
@@ -27,6 +28,7 @@ services:
       - "5432:5432"
     volumes:
       - ./DockerVolumes/TimeScale/Setup/DBinit:/docker-entrypoint-initdb.d
+      - ./DockerVolumes/TimeScale/Data:/var/lib/postgresql/data
 
   grafana:
     image: grafana/grafana:8.4.2
@@ -49,6 +51,7 @@ services:
     restart: always
     depends_on:
       - "rabbitmq"
+      - "timescale"
     networks:
       - root-cause-net
 
@@ -61,7 +64,7 @@ services:
     ports:
       - "${QUARKUS_PORT}:8081"
     depends_on:
-          - "rabbitmq"
+          - "tokenisation"
     networks:
       - root-cause-net
     environment:
