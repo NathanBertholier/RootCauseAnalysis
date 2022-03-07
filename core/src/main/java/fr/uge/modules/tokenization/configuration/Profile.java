@@ -1,14 +1,15 @@
 package fr.uge.modules.tokenization.configuration;
 
-import fr.uge.modules.api.model.entities.TokenEntity;
 import fr.uge.modules.linking.token.type.TokenType;
 
-import javax.persistence.criteria.CriteriaBuilder;
 import java.sql.Timestamp;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * A profile is used to tokenize logs in multiples ways.
+ */
 public interface Profile {
     List<TokenType> getTokenType();
 
