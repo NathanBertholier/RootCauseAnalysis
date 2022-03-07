@@ -70,8 +70,7 @@ public class TypeURLTest {
                 () -> assertEquals( 100, typeURL.computeProximity(new ArrayList<>(){ { add( urlPizzaTomate ); } }, new ArrayList<>(){ { add( urlPizzaTomate ); } } ).getProximity() ),
                 () -> assertEquals( 75, typeURL.computeProximity(new ArrayList<>(){ { add( urlPizzaTomate ); } }, new ArrayList<>(){ { add( urlPizzaBoeuf ); } } ).getProximity() ),
 
-                () -> assertEquals( 33.33333333333333, typeURL.computeProximity(new ArrayList<>(){ { add( urlEssaiGratuit ); } }, new ArrayList<>(){ { add( urlPizzaBoeuf ); } } ).getProximity() ),
-
+                () -> assertEquals( 33.33, typeURL.computeProximity(new ArrayList<>(){ { add( urlEssaiGratuit ); } }, new ArrayList<>(){ { add( urlPizzaBoeuf ); } } ).getProximity() ),
 
                 () -> assertEquals( 25, typeURL.computeProximity(new ArrayList<>(){ { add( urlPizzaTomate );add( urlPizzaBoeuf ); } }, new ArrayList<>(){ { add( urlSVG ); } } ).getProximity() )
 
