@@ -37,7 +37,8 @@ public class InsertBatchLog {
     @OnOverflow(OnOverflow.Strategy.UNBOUNDED_BUFFER)
     Emitter<RawLogEntity> emitter;
 
-    @Inject Validator rawLogValidator;
+    @Inject
+    Validator rawLogValidator;
 
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
@@ -50,14 +51,14 @@ public class InsertBatchLog {
                 .map(ConstraintViolation::getMessage)
                 .toList();
 
-        if(!violations.isEmpty()) {
+        if (!violations.isEmpty()) {
             return Uni.createFrom().item(Response.status(400).entity(violations).build());
         }
 
         return Panache.withTransaction(
                 () -> RawLogEntity.persist(inputs)
                         .onItemOrFailure().transform((success, error) -> {
-                            if(error != null) {
+                            if (error != null) {
                                 logger.severe("Error while inserting: " + error);
                                 return withServerError.get();
                             } else {

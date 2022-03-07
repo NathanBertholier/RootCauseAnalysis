@@ -403,27 +403,25 @@ export const Logs = () => {
                                         <Col lg={10}>
                                             <Container fluid className="p-0">
                                                 {
-                                                    filters.map( (filter, index) => {
-                                                        if ( filter.isSelected ) {
-                                                            return <Row key={index} className="filter-container">
-                                                                <Col sm={3} className="input-labels" >
-                                                                    { filter.formField.label }
-                                                                </Col>
-                                                                <Col sm={8}>
-                                                                    <Container fluid className="p-0">
-                                                                        <Row>
-                                                                            { getInput( filter ) }
-                                                                        </Row>
-                                                                        <Row className={ `${ filter.formField.error === "" ? "d-none": "" }` } >
-                                                                            <div className="error form-error">{ filter.formField.error }</div>
-                                                                        </Row>
-                                                                    </Container>
-                                                                </Col>
-                                                                <Col sm={1}>
-                                                                    <Button variant="outline-danger" key={index} onClick={ () => handleUnSelectFilter( filter.id ) }><AiOutlineCloseCircle /></Button>
-                                                                </Col>
-                                                            </Row>
-                                                        }
+                                                    filters.filter( filter => filter.isSelected ).map( (filter, index) => {
+                                                        return <Row key={index} className="filter-container">
+                                                            <Col sm={3} className="input-labels" >
+                                                                { filter.formField.label }
+                                                            </Col>
+                                                            <Col sm={8}>
+                                                                <Container fluid className="p-0">
+                                                                    <Row>
+                                                                        { getInput( filter ) }
+                                                                    </Row>
+                                                                    <Row className={ `${ filter.formField.error === "" ? "d-none": "" }` } >
+                                                                        <div className="error form-error">{ filter.formField.error }</div>
+                                                                    </Row>
+                                                                </Container>
+                                                            </Col>
+                                                            <Col sm={1}>
+                                                                <Button variant="outline-danger" key={index} onClick={ () => handleUnSelectFilter( filter.id ) }><AiOutlineCloseCircle /></Button>
+                                                            </Col>
+                                                        </Row>
                                                     } )
                                                 }
                                             </Container>
@@ -437,13 +435,11 @@ export const Logs = () => {
                                                 align="end"
                                                 onSelect={ handleSelect } >
                                                 {
-                                                    filters.map( ( filter, index ) => {
-                                                        if ( !filter.isSelected ) {
-                                                            if ( filter.alone ) {
-                                                                return <div key={index} ><Dropdown.Divider /><Dropdown.Item eventKey={filter.id}>{ filter.text }</Dropdown.Item></div>
-                                                            }
-                                                            return <Dropdown.Item eventKey={filter.id} key={index}>{ filter.text }</Dropdown.Item>
+                                                    filters.filter( filter => !filter.isSelected ).map( ( filter, index ) => {
+                                                        if ( filter.alone ) {
+                                                            return <div key={index} ><Dropdown.Divider /><Dropdown.Item eventKey={filter.id}>{ filter.text }</Dropdown.Item></div>
                                                         }
+                                                        return <Dropdown.Item eventKey={filter.id} key={index}>{ filter.text }</Dropdown.Item>
                                                     })
                                                 }
                                             </DropdownButton>

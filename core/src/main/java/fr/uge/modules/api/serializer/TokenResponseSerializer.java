@@ -7,6 +7,7 @@ import com.fasterxml.jackson.databind.ser.std.StdSerializer;
 import fr.uge.modules.api.model.entities.LogEntity;
 import fr.uge.modules.api.model.entities.LogResponse;
 import fr.uge.modules.api.model.entities.TokenEntity;
+import fr.uge.modules.linking.token.type.TokenType;
 
 import java.io.IOException;
 import java.text.SimpleDateFormat;
@@ -39,7 +40,7 @@ public class TokenResponseSerializer extends StdSerializer<TokenResponseSerializ
             jsonGenerator.writeArrayFieldStart("tokens");
             for(TokenEntity tokenEntity : logResponse.tokens){
                 jsonGenerator.writeStartObject();
-                jsonGenerator.writeStringField("token_type", tokenEntity.token_type.name);
+                jsonGenerator.writeStringField("token_type", TokenType.fromId(tokenEntity.idtokentype).getName());
                 jsonGenerator.writeStringField("value", tokenEntity.value);
                 jsonGenerator.writeEndObject();
             }

@@ -2,9 +2,10 @@ import React, {useEffect, useState} from "react";
 import CytoscapeComponent from "react-cytoscapejs";
 import cytoscape from "cytoscape";
 import {Log, MostUsedToken, ReportResponse} from "../types/ReportResponse";
-import dagre from "cytoscape-dagre";
+import { Loader } from "./Loader"
+const fcose = require( "cytoscape-fcose" )
 
-cytoscape.use(dagre);
+cytoscape.use(fcose);
 
 const stylesheet : cytoscape.Stylesheet[] = [{
     selector: 'edge',
@@ -35,54 +36,52 @@ const stylesheet : cytoscape.Stylesheet[] = [{
 ]
 
 const layout = {
-    name: 'dagre',
+    name: 'fcose',
     fit: true,
-    padding:200,
-    animate: false,
+    padding:200
 };
 
-export  const Graph = () => {
-    const [data, setData] = useState<{nodes: cytoscape.ElementDefinition[], edges: cytoscape.ElementDefinition[]}>({ nodes: [], edges: [] });
-    const [mostUsedTokens, setMostUsedTokens] = useState( [] as MostUsedToken[] );
-    const [cy, setCy] = useState<cytoscape.Core | null>(null);
-    const [logToolTip, setLogToolTip] = useState<Log>({} as Log);
+type GraphProp = {
+    res: ReportResponse
+    isLoading: boolean
+}
+
+export  const Graph = ({res, isLoading} : GraphProp ) => {
+    const [data, setData]                       = useState<{nodes: cytoscape.ElementDefinition[], edges: cytoscape.ElementDefinition[]}>({ nodes: [], edges: [] });
+    const [mostUsedTokens, setMostUsedTokens]   = useState( [] as MostUsedToken[] );
+    const [logToolTip, setLogToolTip]           = useState<Log>({} as Log);
 
     useEffect(() => {
-        let fakeJson = '{"root":{"id":0, "content":"test log", "datetime":"2022-02-25T18:25:43.000Z"}, "target":{"id":4, "content":"test log target", "datetime":"2022-02-25T18:25:45.000Z"}, "tokens":[{"name":"tokenname", "value":200, "count":5}], "logs":[{"id":1, "content":"GET localhost 404", "datetime":"2022-02-25T18:25:43.000Z"}, {"id":2, "content":"GET localhost 200", "datetime":"2022-02-26T19:25:43.000Z"}, {"id":3, "content":"GET localhost 201", "datetime":"2022-02-27T20:25:43.000Z"}], "proximity":[{"id":1, "links":[{"id":2, "proximity":51}, {"id":3, "proximity":51}]}, {"id":0, "links":[{"id":1, "proximity":52}, {"id":4, "proximity":52}]}]}';
-        let x : ReportResponse = JSON.parse( fakeJson );
         let nodes : cytoscape.ElementDefinition[] = [];
-        nodes.push( { data: { id: x.root.id.toString(), label: "Root Cause", color: "#F24E1E", log: x.root } } );
-        nodes.push( { data: { id: x.target.id.toString(), label: "Cible", color: "#4ECB71",log: x.target } } );
+        if ( res.proximity.length > 0 ) {
+            nodes.push( { data: { id: res.report.rootCause.id.toString(), label: "Root Cause", color: "#F24E1E", log: res.report.rootCause } } );
+            nodes.push( { data: { id: res.report.target.id.toString(), label: "Cible", color: "#4ECB71",log: res.report.target } } );
+        }
 
-        x.logs.forEach( log => {
+        res.report.logs.filter( log => log.id !== res.report.rootCause.id ).forEach( log => {
             nodes.push( { data: { id: log.id.toString(),  color: "#C4C4C4",log: log } } );
         })
 
         let edges : cytoscape.ElementDefinition[] = [];
-        x.proximity.forEach( proximity => {
+        res.proximity.forEach( proximity => {
             proximity.links.forEach( link => {
                 edges.push( { data: { source: proximity.id, target: link.id, label: link.proximity }} );
             } );
         });
 
-        setMostUsedTokens( x.tokens )
+        setMostUsedTokens( res.report.tokens )
         setData({ nodes: nodes, edges: edges } );
-    }, [] );
+    }, [res] );
 
-    //Reload the layout Cytoscape
-    useEffect(() => {
-        if ( cy ) {
-            let dagreLayout = cy.layout( layout );
-            dagreLayout.run();
-        }
-    }, [cy] );
-
-    const initCy = (core: cytoscape.Core) => {
-        setCy( core );
+    const setCy = (core: cytoscape.Core) => {
         core.removeListener("tap");
         core.on('tap', 'node', evt => {
             setLogToolTip( evt.target.data().log );
         });
+
+        // Reload Layout
+        let dagreLayout = core.layout( layout );
+        dagreLayout.run();
     }
 
     return (
@@ -97,11 +96,15 @@ export  const Graph = () => {
                         </tr>
                     </thead>
                     <tbody>
-                        <tr>
-                            <td className="tokens-labels">1</td>
-                            <td className="tokens-values">2</td>
-                            <td className="tokens-counts">2</td>
-                        </tr>
+                        {
+                            mostUsedTokens.map( ( mostUsed, index ) => {
+                                return <tr key={index} >
+                                    <td className="tokens-labels">{mostUsed.name}</td>
+                                    <td className="tokens-values">{mostUsed.value}</td>
+                                    <td className="tokens-counts">{mostUsed.count}</td>
+                                </tr>
+                            } )
+                        }
                     </tbody>
                 </table>
             </div>
@@ -129,7 +132,8 @@ export  const Graph = () => {
                     <div className="hint-label">Indice de proximité</div>
                 </div>
             </div>
-            <CytoscapeComponent minZoom={0.1} wheelSensitivity={0.2} cy={x => initCy(x)} elements={CytoscapeComponent.normalizeElements(data)} stylesheet={stylesheet} style={{width: '100%', height: '700px'}} layout={layout} />
+            <CytoscapeComponent minZoom={0.1} wheelSensitivity={0.2} cy={x => setCy(x)} elements={CytoscapeComponent.normalizeElements(data)} stylesheet={stylesheet} style={{width: '100%', height: '700px'}} layout={layout} />
+            <Loader show={isLoading} />
         </div>
     )
 }
