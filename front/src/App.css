@@ -224,6 +224,10 @@
   color: #aaaeba;
 }
 
+.tokens-values {
+  max-width: 300px;
+}
+
 .tokens-counts {
   color: #5567ff;
   font-weight: 600;
@@ -297,6 +301,8 @@
 .toolTip-value {
   font-size: 14px;
   color: #5567ff;
+  max-width: 300px;
+  overflow-wrap: break-word;
 }
 
 /*******************************
