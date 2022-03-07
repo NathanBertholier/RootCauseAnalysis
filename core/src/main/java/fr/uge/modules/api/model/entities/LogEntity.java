@@ -17,7 +17,6 @@ import java.util.Objects;
         " left JOIN fetch l.rawLog"+
         " LEFT JOIN FETCH l.tokens item  WHERE l.id <> ?1 and l.datetime between ?2 and ?3")
 
-@JsonSerialize(using = LogSerializer.class)
 public class LogEntity extends PanacheEntityBase {
     @Id
     @Column(name = "id")

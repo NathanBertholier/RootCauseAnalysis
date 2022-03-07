@@ -1,9 +1,6 @@
 package fr.uge.modules.api.endpoint.report;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.uge.modules.api.EnvRetriever;
-import fr.uge.modules.api.model.report.GenericReport;
 import fr.uge.modules.api.model.report.ReportParameter;
 import fr.uge.modules.error.EmptyReportError;
 import fr.uge.modules.error.NotYetTokenizedError;

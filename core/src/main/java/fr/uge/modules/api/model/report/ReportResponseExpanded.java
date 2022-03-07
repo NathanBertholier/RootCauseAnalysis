@@ -9,7 +9,6 @@ import fr.uge.modules.api.serializer.ExpendedReportSerializer;
 import java.util.List;
 import java.util.PriorityQueue;
 import java.util.Set;
-import java.util.SortedSet;
 
 @JsonSerialize(using = ExpendedReportSerializer.class)
 public record ReportResponseExpanded(ReportResponse reportResponseBase, PriorityQueue<Relation> relations) implements GenericReport {
