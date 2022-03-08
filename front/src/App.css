@@ -203,14 +203,16 @@
  * Report Css
  *******************************/
 
+.report-container {
+  margin-bottom: 40px;
+}
+
 .report-filters-container {
   border-bottom: 1px solid #aaaeba;
 }
 
 .most-use-tokens {
-  position: absolute;
-  right: 0;
-  top: 20px;
+  margin-bottom: 13px;
   padding: 10px;
   background-color: #f5f6fA;
   border-radius: 10px;
@@ -222,10 +224,6 @@
 
 .tokens-labels, .tokens-values {
   color: #aaaeba;
-}
-
-.tokens-values {
-  max-width: 300px;
 }
 
 .tokens-counts {
@@ -281,9 +279,7 @@
  *******************************/
 
 .toolTip {
-  position: absolute;
-  top: 20px;
-  left: 0;
+  margin-bottom: 13px;
   padding: 10px 20px;
   background-color: #f5f6fA;
   border-radius: 10px;
