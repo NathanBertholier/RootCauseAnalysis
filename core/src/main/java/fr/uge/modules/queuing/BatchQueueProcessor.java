@@ -25,7 +25,7 @@ public class BatchQueueProcessor {
     public static void main(String[] args) throws IOException, SQLException, InterruptedException {
         Optional<Channel> channel = createChannel();
         while (channel.isEmpty()){
-            LOGGER.warning(() -> "Channel not connected, retry connecting in 5 seconds");
+            LOGGER.log(Level.WARNING,"Channel not connected, retry connecting in 5 seconds");
             Thread.sleep(5000);
             channel = createChannel();
         }
@@ -34,14 +34,14 @@ public class BatchQueueProcessor {
             try {
                 processBatch = new ProcessBatch();
             } catch (SQLException e) {
-                LOGGER.warning(() -> "Database not connected, retry connecting in 5 seconds");
+                LOGGER.log(Level.WARNING,"Database not connected, retry connecting in 5 seconds");
                 Thread.sleep(5000);
             }
         }
 
         processBatch.batchRunnable();
 
-        LOGGER.info(() -> "Channel started and waiting for message.");
+        LOGGER.log(Level.INFO, "Channel started and waiting for message.");
         channel.orElseThrow().basicConsume(QUEUE_NAME, true, getCallBack(processBatch), consumerTag -> {
         });
     }
@@ -51,9 +51,10 @@ public class BatchQueueProcessor {
      * @return Optional of Channel if exists, Optional.Empty if an error append.
      */
     private static Optional<Channel> createChannel() {
-        ConnectionFactory factory = new ConnectionFactory();
-        try (Connection connection = factory.newConnection()) {
+        try {
+            ConnectionFactory factory = new ConnectionFactory();
             factory.setHost("rabbitmq");
+            Connection connection = factory.newConnection();
             return Optional.of(connection.createChannel());
         } catch (IOException | TimeoutException e) {
             return Optional.empty();
@@ -72,7 +73,7 @@ public class BatchQueueProcessor {
                 LogEntity logEntity = new JsonObject(message).mapTo(LogEntity.class);
                 processBatch.addInBatch(logEntity);
             } catch (Exception e) {
-                LOGGER.severe(() -> "Error while inserting in database: " + e);
+                LOGGER.log(Level.SEVERE, "Error while inserting in database", e);
             }
         };
     }
