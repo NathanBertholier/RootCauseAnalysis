@@ -20,13 +20,13 @@ class TypeResourceTest {
     void regexMatch() {
         TypeResource typeResource = new TypeResource();
         assertAll(
-            () -> assertEquals(typeResource.getTokenTypeId(), typeResource.matcher("/wp-content/themes/Centreonv2/assets/fonts/radikal/radikal-webfont.ttf")),
+            () -> assertEquals(typeResource.getTokenTypeId(), typeResource.matcher("/wp-content/themes/Rootcausev2/assets/fonts/radikal/radikal-webfont.ttf")),
             () -> assertEquals(typeResource.getTokenTypeId(),typeResource.matcher("/wp-includes/css/dist/block-library/style.min.css.gzip")),
-            () -> assertEquals(typeResource.getTokenTypeId(),typeResource.matcher("/robots.txt")),
+            () -> assertEquals(typeResource.getTokenTypeId(),typeResource.matcher("/mecha.txt")),
             () -> assertEquals(typeResource.getTokenTypeId(),typeResource.matcher("/favicon.ico")),
-            () -> assertEquals(typeResource.getTokenTypeId(),typeResource.matcher("/wp-content/uploads/2019/03/aws-refarch-drupal-v20170713-1024x680.png")),
+            () -> assertEquals(typeResource.getTokenTypeId(),typeResource.matcher("/wp-content/uploads/2016/03/architecture-france-1024x680.png")),
             () -> assertEquals(typeResource.getTokenTypeId(),typeResource.matcher("/wp-content/themes/Divi/style.css.gzip")),
-            () -> assertEquals(typeResource.getTokenTypeId(),typeResource.matcher("/wp-content/plugins/sitepress-multilingual-cms/templates/language-switchers/legacy-dropdown/style.css.gzip"))
+            () -> assertEquals(typeResource.getTokenTypeId(),typeResource.matcher("/wp-content/plugins/sitepress-multilingual-cms/templates/language-switchers/legacy/style.css.gzip"))
         );
 
     }
@@ -34,9 +34,8 @@ class TypeResourceTest {
     @Test
     void regexNotMatchValue() {
         TypeResource typeResource = new TypeResource();
-        assertEquals(-1,typeResource.matcher("/wp-object\tMozilla/20100101%20Firefox/77.0"));
-        assertEquals(-1,typeResource.matcher("www.centreon.com/editions/"));
-        /*assertEquals(-1,typeResource.matcher("http://centreon.com/"));*/
+        assertEquals(-1,typeResource.matcher("/wp-object\tMozilla/201004564654%20Firefox/77.0"));
+        assertEquals(-1,typeResource.matcher("www.rootcause.com/editions/"));
         assertEquals(-1,typeResource.matcher("255.255.255.255"));
     }
 
@@ -44,7 +43,7 @@ class TypeResourceTest {
     void proximity() {
         TypeResource typeResource = new TypeResource();
         TokenEntity resRadikal = new TokenEntity();
-        resRadikal.setValue("/wp-content/themes/Centreonv2/assets/fonts/radikal/radikal-webfont.ttf");
+        resRadikal.setValue("/wp-content/themes/Rootcause/assets/fonts/kebab-webfont.ttf");
 
         TokenEntity resLibrary = new TokenEntity();
         resLibrary.setValue("/wp-includes/css/dist/block-library/style.min.css.gzip");
@@ -53,7 +52,7 @@ class TypeResourceTest {
         resCaption.setValue("/wp-content/plugins/amazing-hover-effects-pro/css/caption.css.gzip");
 
         TokenEntity resLegacy = new TokenEntity();
-        resLegacy.setValue("/wp-content/plugins/sitepress-multilingual-cms/templates/language-switchers/legacy-dropdown/style.css.gzip");
+        resLegacy.setValue("/wp-content/plugins/sitepress-multilingual-cms/templates/language-routers/legacy/style.css.gzip");
 
 
         assertAll(

@@ -9,6 +9,9 @@ import java.sql.Timestamp;
 import java.text.DecimalFormat;
 import java.util.List;
 
+/**
+ * DateTime TokenType
+ */
 public class TypeDatetime implements TokenType{
 
     private static final String NAME = "datetime";
@@ -29,11 +32,24 @@ public class TypeDatetime implements TokenType{
         return TokenTypeId.ID_DATETIME.getId();
     }
 
-    public static Computation computeDateTimeProximity(Timestamp ldt1, Timestamp ldt2, long delta){
-        var time = (ldt1.getTime() - ldt2.getTime()) / 1000;
-        return new Computation(new TypeDatetime(), ldt1.toString(), ldt2.toString(), fromTime(Math.abs(time), delta));
+    /**
+     * Result of the proximity of two datetime according to the delta
+     * @param ts1 Timestamp form log1
+     * @param ts2 Timestamp from log2
+     * @param delta the delta used to find logs
+     * @return a Computation between to datetime
+     */
+    public static Computation computeDateTimeProximity(Timestamp ts1, Timestamp ts2, long delta){
+        var time = (ts1.getTime() - ts2.getTime()) / 1000;
+        return new Computation(new TypeDatetime(), ts1.toString(), ts2.toString(), fromTime(Math.abs(time), delta));
     }
 
+    /**
+     * Computation of time within a delta
+     * @param time the distance in seconds between two datetime
+     * @param delta the delta used to find logs
+     * @return the proximity value between the timestamps
+     */
     private static double fromTime(long time, float delta){
         if(time > delta) {
             return 0;
@@ -48,6 +64,12 @@ public class TypeDatetime implements TokenType{
         }
     }
 
+    /**
+     * Method herited from the interface but it is not used
+     * @param tokenLeft Timestamps from log 1
+     * @param tokenRight Timestamps from log 2
+     * @return a TokensLink object containing a value of computation hand given
+     */
     @Override
     public TokensLink computeProximity(List<TokenEntity> tokenLeft, List<TokenEntity> tokenRight) {
         return TokensLink.withoutStrategy(0);
