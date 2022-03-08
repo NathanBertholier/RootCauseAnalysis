@@ -1,6 +1,12 @@
 package fr.uge.modules.linking.token.type;
 
-import fr.uge.modules.api.model.TokenModel;
+import fr.uge.modules.api.model.entities.TokenEntity;
+import fr.uge.modules.api.model.linking.Computation;
+import fr.uge.modules.api.model.linking.TokensLink;
+import fr.uge.modules.linking.strategy.AverageStrategy;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class TypeHTTPStatus implements TokenType{
 
@@ -23,14 +29,42 @@ public class TypeHTTPStatus implements TokenType{
     }
 
     @Override
-    public float computeProximity(TokenModel t1, TokenModel t2) {
-        if(t1.token_value().equals(t2.token_value())){
-            return 100;
-        } else if(t1.token_value().startsWith(t2.token_value().substring(0,1))){
-            return 80;
-        } else {
-            return 0;
+    public TokensLink computeProximity(List<TokenEntity> listTokensLeft, List<TokenEntity> listTokensRight) {
+        if (listTokensLeft.isEmpty() || listTokensRight.isEmpty()) return TokensLink.withoutStrategy(0);
+        var type = new TypeHTTPStatus();
+
+        List<Computation> computations = new ArrayList<>();
+
+        for (TokenEntity tokenLeft : listTokensLeft) {
+            var tokenLeftValue = tokenLeft.value;
+            for (TokenEntity tokenRight : listTokensRight) {
+                var tokenRightValue = tokenRight.value;
+                var proximity = fromValues(tokenLeftValue, tokenRightValue);
+                computations.add(new Computation(type, tokenLeftValue, tokenRightValue, proximity));
+            }
         }
+
+        return new TokensLink(computations, new AverageStrategy());
     }
 
+    private static double fromValues(String left, String right){
+        if (left.equals(right)) {
+            return 100;
+        }
+        var firstLeftChar = left.substring(0,1);
+        var firstRightChar = right.substring(0,1);
+
+        if (firstLeftChar.equals(firstRightChar)) {
+            return 95;
+        }
+
+        else if ((firstLeftChar.equals("4") || firstLeftChar.equals("5"))
+                && ( firstRightChar.equals("4") || firstRightChar.equals("5"))) {
+            return 90;
+        }
+        else if ((firstLeftChar.equals("2") || firstLeftChar.equals("3"))
+                && ( firstRightChar.equals("4") || firstRightChar.equals("5"))) {
+            return 25;
+        } else return 0;
+    }
 }

@@ -1,4 +1,5 @@
 export type TokenType = {
+    id: number
     name: string
 }
 
@@ -13,6 +14,7 @@ export type Log = {
     id: number
     tokens: Token[]
 }
+
 
 export type TokensResponse = {
     log: Log[]

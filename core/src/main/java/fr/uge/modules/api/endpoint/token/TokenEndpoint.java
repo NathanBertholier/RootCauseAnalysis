@@ -1,27 +1,26 @@
 package fr.uge.modules.api.endpoint.token;
 
-import fr.uge.modules.api.model.CompleteLog;
-import fr.uge.modules.api.model.TokensResponse;
 import fr.uge.modules.api.model.TokenRequest;
 import fr.uge.modules.tokenization.TokenRetriever;
-import io.smallrye.common.annotation.Blocking;
 import io.smallrye.mutiny.Uni;
 
+import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+import javax.ws.rs.core.MediaType;
 import java.util.logging.Logger;
+
+import static fr.uge.modules.api.serializer.TokenResponseSerializer.*;
 
 @Path("/tokens")
 public class TokenEndpoint {
     private static final Logger LOGGER = Logger.getLogger(TokenEndpoint.class.getName());
 
     @POST
-    public Uni<CompleteLog[]> getTokens(TokenRequest tokenRequest){
-        var builder = new StringBuilder();
-        builder.append("TokenRequest: ").append(tokenRequest);
-        Uni<TokensResponse> responseUni = TokenRetriever.fromLogs(TokenRetriever.getTokens(tokenRequest));
-        return responseUni.map(TokensResponse::logDemonstrators);
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Uni<TokensResponse> getTokens(TokenRequest tokenRequest){
+        return TokenRetriever.getTokens(tokenRequest).map(TokensResponse::new);
     }
-
-
 }

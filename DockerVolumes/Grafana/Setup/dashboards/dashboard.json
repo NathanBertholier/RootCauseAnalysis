@@ -21,28 +21,36 @@
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 0,
+  "id": 1,
   "links": [],
   "liveNow": false,
   "panels": [
     {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 0
+      },
+      "id": 10,
+      "panels": [],
+      "title": "Row title",
+      "type": "row"
+    },
+    {
       "fieldConfig": {
         "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
           "mappings": [],
-          "max": 7450,
           "thresholds": {
             "mode": "absolute",
             "steps": [
               {
-                "color": "green",
+                "color": "blue",
                 "value": null
-              },
-              {
-                "color": "#EAB839",
-                "value": 75
-              },
-              {
-                "color": "red",
-                "value": 85
               }
             ]
           }
@@ -53,10 +61,13 @@
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 0
+        "y": 1
       },
       "id": 6,
       "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "auto",
         "orientation": "auto",
         "reduceOptions": {
           "calcs": [
@@ -65,10 +76,9 @@
           "fields": "",
           "values": false
         },
-        "showThresholdLabels": false,
-        "showThresholdMarkers": false
+        "textMode": "auto"
       },
-      "pluginVersion": "8.3.6",
+      "pluginVersion": "8.4.2",
       "targets": [
         {
           "datasource": {
@@ -79,13 +89,13 @@
           "group": [],
           "metricColumn": "none",
           "rawQuery": false,
-          "rawSql": "SELECT\n  datetime AS \"time\",\n  avg_rate\nFROM monitoring\nWHERE\n  $__timeFilter(datetime)\nORDER BY 1",
+          "rawSql": "SELECT\n  datetime AS \"time\",\n  messages\nFROM monitoring\nORDER BY 1",
           "refId": "A",
           "select": [
             [
               {
                 "params": [
-                  "avg_rate"
+                  "messages"
                 ],
                 "type": "column"
               }
@@ -94,17 +104,11 @@
           "table": "monitoring",
           "timeColumn": "datetime",
           "timeColumnType": "timestamp",
-          "where": [
-            {
-              "name": "$__timeFilter",
-              "params": [],
-              "type": "macro"
-            }
-          ]
+          "where": []
         }
       ],
-      "title": "Panel Title",
-      "type": "gauge"
+      "title": "Messages in queue",
+      "type": "stat"
     },
     {
       "fieldConfig": {
@@ -147,10 +151,6 @@
               {
                 "color": "green",
                 "value": null
-              },
-              {
-                "color": "red",
-                "value": 80
               }
             ]
           }
@@ -158,10 +158,10 @@
         "overrides": []
       },
       "gridPos": {
-        "h": 9,
+        "h": 8,
         "w": 12,
         "x": 12,
-        "y": 0
+        "y": 1
       },
       "id": 2,
       "options": {
@@ -171,7 +171,8 @@
           "placement": "bottom"
         },
         "tooltip": {
-          "mode": "single"
+          "mode": "single",
+          "sort": "none"
         }
       },
       "targets": [
@@ -184,13 +185,21 @@
           "group": [],
           "metricColumn": "none",
           "rawQuery": false,
-          "rawSql": "SELECT\n  datetime AS \"time\",\n  avg_rate\nFROM monitoring\nWHERE\n  $__timeFilter(datetime)\nORDER BY 1",
+          "rawSql": "SELECT\n  datetime AS \"time\",\n  publish,\n  deliver\nFROM monitoring\nORDER BY 1",
           "refId": "A",
           "select": [
             [
               {
                 "params": [
-                  "avg_rate"
+                  "publish"
+                ],
+                "type": "column"
+              }
+            ],
+            [
+              {
+                "params": [
+                  "deliver"
                 ],
                 "type": "column"
               }
@@ -199,55 +208,43 @@
           "table": "monitoring",
           "timeColumn": "datetime",
           "timeColumnType": "timestamp",
-          "where": [
-            {
-              "name": "$__timeFilter",
-              "params": [],
-              "type": "macro"
-            }
-          ]
+          "where": []
         }
       ],
-      "title": "Panel Title",
+      "title": "Incoming Outcoming varations",
       "type": "timeseries"
     },
     {
       "fieldConfig": {
         "defaults": {
           "color": {
-            "mode": "palette-classic"
+            "mode": "thresholds"
           },
-          "custom": {
-            "hideFrom": {
-              "legend": false,
-              "tooltip": false,
-              "viz": false
-            }
-          },
-          "mappings": []
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          }
         },
         "overrides": []
       },
       "gridPos": {
         "h": 9,
-        "w": 12,
+        "w": 24,
         "x": 0,
-        "y": 8
+        "y": 9
       },
       "id": 4,
       "options": {
-        "displayLabels": [
-          "value",
-          "percent"
-        ],
-        "legend": {
-          "displayMode": "list",
-          "placement": "bottom",
-          "values": [
-            "value"
-          ]
-        },
-        "pieType": "pie",
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "center",
+        "orientation": "auto",
         "reduceOptions": {
           "calcs": [
             "lastNotNull"
@@ -255,11 +252,9 @@
           "fields": "",
           "values": false
         },
-        "tooltip": {
-          "mode": "single"
-        }
+        "textMode": "auto"
       },
-      "pluginVersion": "8.3.6",
+      "pluginVersion": "8.4.2",
       "targets": [
         {
           "datasource": {
@@ -269,8 +264,181 @@
           "format": "time_series",
           "group": [],
           "metricColumn": "none",
+          "rawQuery": false,
+          "rawSql": "SELECT\n  datetime AS \"time\",\n  publish,\n  deliver\nFROM monitoring\nORDER BY 1",
+          "refId": "A",
+          "select": [
+            [
+              {
+                "params": [
+                  "publish"
+                ],
+                "type": "column"
+              }
+            ],
+            [
+              {
+                "params": [
+                  "deliver"
+                ],
+                "type": "column"
+              }
+            ]
+          ],
+          "table": "monitoring",
+          "timeColumn": "datetime",
+          "timeColumnType": "timestamp",
+          "where": []
+        }
+      ],
+      "title": "Publish Deliver rates / 5 sec",
+      "type": "stat"
+    },
+    {
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "align": "center",
+            "displayMode": "auto",
+            "filterable": false
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 18
+      },
+      "id": 8,
+      "links": [],
+      "options": {
+        "footer": {
+          "fields": [
+            "id"
+          ],
+          "reducer": [
+            "count"
+          ],
+          "show": false
+        },
+        "frameIndex": 0,
+        "showHeader": true
+      },
+      "pluginVersion": "8.4.2",
+      "targets": [
+        {
+          "datasource": {
+            "type": "postgres",
+            "uid": "PDCFE74EBFE0DF657"
+          },
+          "format": "table",
+          "group": [],
+          "metricColumn": "none",
           "rawQuery": true,
-          "rawSql": "SELECT\n  datetime AS \"time\",\n  deliver,\n  publish\nFROM monitoring\nWHERE\n  $__timeFilter(datetime)\nORDER BY 1",
+          "rawSql": "SELECT\n  rawlog.id,\n  log as \"content log\"\nFROM rawlog\nleft join token on rawlog.id = token.idlog WHERE token.idlog IS NULL ",
+          "refId": "A",
+          "select": [
+            [
+              {
+                "params": [
+                  "id"
+                ],
+                "type": "column"
+              }
+            ],
+            [
+              {
+                "params": [
+                  "log"
+                ],
+                "type": "column"
+              }
+            ]
+          ],
+          "table": "rawlog",
+          "timeColumn": "id",
+          "timeColumnType": "int8",
+          "where": [
+            {
+              "name": "$__unixEpochFilter",
+              "params": [],
+              "type": "macro"
+            }
+          ]
+        }
+      ],
+      "title": "Logs without tokens",
+      "type": "table"
+    },
+    {
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 18
+      },
+      "id": 12,
+      "links": [],
+      "options": {
+        "colorMode": "none",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "count"
+          ],
+          "fields": "/^id$/",
+          "values": false
+        },
+        "text": {},
+        "textMode": "value"
+      },
+      "pluginVersion": "8.4.2",
+      "targets": [
+        {
+          "datasource": {
+            "type": "postgres",
+            "uid": "PDCFE74EBFE0DF657"
+          },
+          "format": "table",
+          "group": [],
+          "metricColumn": "none",
+          "rawQuery": true,
+          "rawSql": "SELECT\n  rawlog.id\nFROM rawlog\nleft join token on rawlog.id = token.idlog WHERE token.idlog IS NULL ",
           "refId": "A",
           "select": [
             [
@@ -294,12 +462,12 @@
           ]
         }
       ],
-      "title": "Panel Title",
-      "type": "piechart"
+      "title": "Number of logs without tokens",
+      "type": "stat"
     }
   ],
   "refresh": "5s",
-  "schemaVersion": 34,
+  "schemaVersion": 35,
   "style": "dark",
   "tags": [],
   "templating": {
@@ -311,7 +479,7 @@
   },
   "timepicker": {},
   "timezone": "",
-  "title": "rate",
+  "title": "Rootcause",
   "uid": "nMC1qBank",
   "version": 1,
   "weekStart": ""

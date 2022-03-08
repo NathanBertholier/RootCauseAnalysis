@@ -5,6 +5,10 @@ import javax.persistence.*;
 import java.sql.Timestamp;
 import java.util.Objects;
 
+/**
+ * A MonitoringEntity represents information about the current API load and status in the data model.
+ * It extends the Panache entity system of the 'Hibernate ORM'
+ */
 @Entity
 @Table(name = "monitoring")
 public class MonitoringEntity extends PanacheEntityBase {
@@ -13,13 +17,13 @@ public class MonitoringEntity extends PanacheEntityBase {
     private Timestamp datetime;
     @Basic
     @Column(name = "deliver")
-    private long deliver;
+    private double deliver;
     @Basic
     @Column(name = "publish")
-    private long publish;
+    private double publish;
     @Basic
-    @Column(name = "avg_rate")
-    private double avgRate;
+    @Column(name = "messages")
+    private double messages;
 
     public Timestamp getDatetime() {
         return datetime;
@@ -29,28 +33,28 @@ public class MonitoringEntity extends PanacheEntityBase {
         this.datetime = datetime;
     }
 
-    public long getDeliver() {
+    public double getDeliver() {
         return deliver;
     }
 
-    public void setDeliver(long deliver) {
+    public void setDeliver(double deliver) {
         this.deliver = deliver;
     }
 
-    public long getPublish() {
+    public double getPublish() {
         return publish;
     }
 
-    public void setPublish(long publish) {
+    public void setPublish(double publish) {
         this.publish = publish;
     }
 
-    public double getAvgRate() {
-        return avgRate;
+    public double getMessages() {
+        return messages;
     }
 
-    public void setAvgRate(double avgRate) {
-        this.avgRate = avgRate;
+    public void setMessages(double messages) {
+        this.messages = messages;
     }
 
     @Override
@@ -58,11 +62,21 @@ public class MonitoringEntity extends PanacheEntityBase {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         MonitoringEntity that = (MonitoringEntity) o;
-        return deliver == that.deliver && publish == that.publish && Double.compare(that.avgRate, avgRate) == 0 && Objects.equals(datetime, that.datetime);
+        return Double.compare(that.deliver, deliver) == 0 && Double.compare(that.publish, publish) == 0 && Double.compare(that.messages, messages) == 0 && Objects.equals(datetime, that.datetime);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(datetime, deliver, publish, avgRate);
+        return Objects.hash(datetime, deliver, publish, messages);
+    }
+
+    @Override
+    public String toString() {
+        return "MonitoringEntity{" +
+                "datetime=" + datetime +
+                ", deliver=" + deliver +
+                ", publish=" + publish +
+                ", messages=" + messages +
+                '}';
     }
 }

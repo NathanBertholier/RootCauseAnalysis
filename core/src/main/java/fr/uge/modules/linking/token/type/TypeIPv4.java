@@ -1,6 +1,13 @@
 package fr.uge.modules.linking.token.type;
 
-import fr.uge.modules.api.model.TokenModel;
+import fr.uge.modules.api.model.entities.TokenEntity;
+import fr.uge.modules.api.model.linking.Computation;
+import fr.uge.modules.api.model.linking.TokensLink;
+import fr.uge.modules.linking.strategy.AverageStrategy;
+
+import java.util.Collection;
+import java.util.List;
+import java.util.stream.IntStream;
 
 public class TypeIPv4 implements TokenType {
 
@@ -20,21 +27,31 @@ public class TypeIPv4 implements TokenType {
         return TokenTypeId.ID_IPV4.getId();
     }
 
-    private static float cardBetween(String t1, String t2){
-        int res = 0;
-        for(int i = 0; i < Math.min(t1.length(),t2.length()); i++){
-            if(t1.charAt(i) == t2.charAt(i))
-                res++;
-        }
-        return res;
+    private static double calculIp(String t1, String t2) {
+        var sIP1 = t1.split("\\.");
+        var sIP2 = t2.split("\\.");
+
+        return IntStream.range(0, 4).filter(i -> !sIP1[i].equals(sIP2[i]))
+                .mapToDouble(i -> switch (i) {
+                    case 1 -> 20;
+                    case 2 -> 85;
+                    case 3 -> 95;
+                    default -> 0;
+                }).findFirst().orElse(100);
     }
 
-    private static float jaccard(String t1, String t2){
-        return (cardBetween(t1, t2) / t1.length()) * 100;
-    }
+    public TokensLink computeProximity(List<TokenEntity> tokenLeft, List<TokenEntity> tokenRight) {
+        if(tokenLeft.isEmpty() || tokenRight.isEmpty()) return TokensLink.withoutStrategy(50);
+        var type = new TypeIPv4();
 
-    public float computeProximity(TokenModel t1, TokenModel t2) {
-        return jaccard(t1.token_value(), t2.token_value());
-    }
+        var computations = tokenLeft.stream()
+                    .map(TokenEntity::getValue)
+                    .map(leftIP -> tokenRight.stream()
+                            .map(TokenEntity::getValue)
+                            .map(rightIP -> new Computation(type, leftIP, rightIP, calculIp(leftIP, rightIP)))
+                            .toList()
+                    ).flatMap(Collection::stream).toList();
 
+        return new TokensLink(computations, new AverageStrategy());
+    }
 }

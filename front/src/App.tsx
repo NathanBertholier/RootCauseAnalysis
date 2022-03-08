@@ -1,12 +1,11 @@
 import React from 'react';
 import './App.css';
 import './tools/toast.css';
-import {Home} from "./views/Home";
 import {Performance} from "./views/Performance";
 import {Logs} from "./views/Logs";
 import {Report} from "./views/Report";
 import {ProximityCalc} from "./views/ProximityCalc";
-import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
+import { HashRouter as Router, Route, Switch } from "react-router-dom";
 
 function App() {
     return (
@@ -14,7 +13,7 @@ function App() {
             <div className="App">
                 <Switch>
                     <Route exact path="/">
-                        <Home />
+                        <Performance />
                     </Route>
                     <Route path="/perf">
                         <Performance />

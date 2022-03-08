@@ -16,16 +16,17 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class Publisher {
-    private final static String QUEUE_NAME = "logs";
-    private final Channel channel;
+    private final static String QUEUE_NAME = "token";
+    private final static String PATH = "C:\\Users\\05tra\\Documents\\Logs\\EOXA7WY4D4FK4.2020-06-15-12.42f83aef";
     private final static String HOST ="localhost";
     private final static Logger LOGGER = Logger.getGlobal();
+
+    private final Channel channel;
     public Publisher() throws IOException, TimeoutException {
         ConnectionFactory factory = new ConnectionFactory();
         factory.setHost(HOST);
-        try (Connection connection = factory.newConnection()) {
-            this.channel = connection.createChannel();
-        }
+        Connection connection = factory.newConnection();
+        this.channel = connection.createChannel();
     }
 
     public void create() {
@@ -34,7 +35,7 @@ public class Publisher {
             factory.setHost(HOST);
             Connection connection = factory.newConnection();
             try (var newchannel = connection.createChannel()) {
-                newchannel.exchangeDeclare(QUEUE_NAME, "fanout");
+                newchannel.exchangeDeclare(QUEUE_NAME, "direct", true, false, null);
             }
         } catch (IOException | TimeoutException e) {
             LOGGER.log(Level.SEVERE,"IOException | TimeoutException",e);
@@ -59,12 +60,13 @@ public class Publisher {
         factory.setHost(HOST);
 
         Runnable runnable;
-        try (Connection connection = factory.newConnection()) {
-            try (var channel = connection.createChannel()) {
-                channel.exchangeDeclare(QUEUE_NAME, "fanout", true, false, null);
-                runnable = send7450(channel);
-            }
-        }
+        Connection connection = factory.newConnection();
+        var channel = connection.createChannel();
+        channel.exchangeDeclare(QUEUE_NAME, "direct", true, false, null);
+        //channel.exchangeBind(QUEUE_NAME, QUEUE_NAME,"");
+        channel.queueBind(QUEUE_NAME, QUEUE_NAME, "");
+        runnable = send7450(channel);
+
         ScheduledExecutorService executorService = Executors.newScheduledThreadPool(1);
         executorService.scheduleAtFixedRate(runnable, 0, 1, TimeUnit.SECONDS);
         runnable.run();
@@ -73,11 +75,11 @@ public class Publisher {
     public static Runnable send7450(Channel channel) {
         return () -> {
             try {
-                printInputStream(new FileInputStream("rootcausecore/modules/queue/src/main/resources/log7450Lines.txt"), channel);
+                printInputStream(new FileInputStream(PATH), channel);
             } catch (FileNotFoundException e) {
                 LOGGER.log(Level.SEVERE,"FileNotFoundException",e);
             }
-            LOGGER.log(Level.INFO,"Send 7450 lines.");
+            LOGGER.log(Level.INFO,"Send lines");
         };
     }
 
@@ -94,13 +96,13 @@ public class Publisher {
 
     private static void readChannel(Channel channel, BufferedReader reader) throws IOException {
         String line;
-        int i = 0;
         while ((line = reader.readLine()) != null) {
             try {
+                String json = "{ \"log\":\"" + line + "\"}";
                 channel.basicPublish(QUEUE_NAME,
                         "",
-                        new AMQP.BasicProperties.Builder().headers(Map.of("id", i++)).build(),
-                        line.getBytes());
+                        null,
+                        json.getBytes());
             } catch (IOException e) {
                 LOGGER.log(Level.SEVERE,"IOException",e);
             }

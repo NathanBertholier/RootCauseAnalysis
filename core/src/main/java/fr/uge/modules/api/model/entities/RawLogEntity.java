@@ -1,57 +1,29 @@
 package fr.uge.modules.api.model.entities;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import io.quarkus.hibernate.reactive.panache.PanacheEntityBase;
+import io.quarkus.hibernate.reactive.panache.PanacheEntity;
 
 import javax.persistence.*;
-import java.util.Objects;
+import javax.validation.constraints.NotBlank;
 
+
+/**
+ * A RawLogEntity represents one unfiltered and unprocessed log in the data model.
+ * It extends the Panache entity system of the 'Hibernate ORM'.
+ */
 @Entity
 @Table(name = "rawlog")
-public class RawLogEntity extends PanacheEntityBase {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
-    public long id;
-
-    @Basic
-    @Column(name = "value")
+public class RawLogEntity extends PanacheEntity {
+    @NotBlank(message = "Log content cannot be blank")
     public String log;
-
-    public long getId() {
-        return id;
-    }
-
-    public void setId(long id) {
-        this.id = id;
-    }
 
     public String getLog() {
         return log;
     }
 
-    public void setLog(String log) {
-        this.log = log;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        RawLogEntity that = (RawLogEntity) o;
-        return id == that.id && Objects.equals(log, that.log);
-    }
-
     @Override
     public String toString() {
-        return "RawLog{" +
-                "id=" + id +
-                ", value='" + log + '\'' +
+        return "RawLogEntity{" +
+                "rootCause='" + log + '\'' +
                 '}';
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, log);
     }
 }
