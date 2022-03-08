@@ -79,6 +79,7 @@
   width: 60px;
   display: inline-block;
   margin-left: 10px;
+  margin-bottom: 10px;
 }
 
 .custom-filter-btn {
@@ -106,6 +107,12 @@
   margin-bottom: 20px;
 }
 
+.add-filter-btn button {
+  width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 .number-row-filter-container {
   text-align: right;
 }
@@ -113,6 +120,7 @@
 .input-labels {
   text-align: right;
   margin-top: 7px;
+  margin-bottom: 10px;
 }
 
 .disabled {
@@ -357,4 +365,10 @@
 .hint-gray {
   padding-left: 7px;
   background-color: #C4C4C4;
+}
+
+@media (max-width: 1200px) {
+  .input-labels {
+    text-align: left;
+  }
 }
