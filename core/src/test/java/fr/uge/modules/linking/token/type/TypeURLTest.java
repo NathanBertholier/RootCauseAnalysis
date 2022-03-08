@@ -8,7 +8,7 @@ import java.util.Random;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class TypeURLTest {
+class TypeURLTest {
 
     @Test
     void nullValue() {
@@ -35,8 +35,8 @@ public class TypeURLTest {
     @Test
     void regexNotMatchValue() {
         TypeURL typeURL = new TypeURL();
-        assertEquals(-1,typeURL.matcher("https://static.centreon.com/wp-content/themes/Centreonv2/style.css.gzip?x97250&ver=4.0.20191210\tMozilla/5.0%20(Windows%20NT%2010.0;%20Win64;%20x64;%20rv:77.0)%20Gecko/20100101%20Firefox/77.0"));
-        assertEquals(-1,typeURL.matcher("www.centreon.com/editions/"));
+        assertEquals(-1,typeURL.matcher("https://static.rootcause.com/wp-content/themes/rootcausev2/style.css?x97&ver=4.0.201210\tMozilla/5.0%20(20Win64;%20x64;%20rv:77.0)%20Firefox/77.0"));
+        assertEquals(-1,typeURL.matcher("www.rootcause.com/editions/"));
         assertEquals(-1,typeURL.matcher("htttp://blog.example.com"));
         assertEquals(-1,typeURL.matcher("ftp://255.255.255.255"));
         assertEquals(-1,typeURL.matcher("255.255.255.255"));
@@ -47,16 +47,19 @@ public class TypeURLTest {
     void proximity() {
         TypeURL typeURL = new TypeURL();
         TokenEntity urlPizzaTomate = new TokenEntity();
-        urlPizzaTomate.setValue("https://www.centreon.com/pizza/ingredients/tomate");
+        urlPizzaTomate.setValue("https://www.rootcause.com/pizza/ingredients/tomate");
 
         TokenEntity urlPizzaBoeuf = new TokenEntity();
-        urlPizzaBoeuf.setValue("https://www.centreon.com/pizza/ingredients/boeuf");
+        urlPizzaBoeuf.setValue("https://www.rootcause.com/pizza/ingredients/boeuf");
 
         TokenEntity urlEssaiGratuit = new TokenEntity();
-        urlEssaiGratuit.setValue("https://www.centreon.com/essai-gratuit/?origine=community&email=marcos.rodrigues@terceiro.rnp.br");
+        urlEssaiGratuit.setValue("https://www.rootcause.com/essai/?madein=china&email=monmail@test.fr");
 
         TokenEntity urlSVG = new TokenEntity();
-        urlSVG.setValue("https://www.centreon.com/current/en/img/undraw_online.svg");
+        urlSVG.setValue("https://www.rootcause.com/test/al/img/drawing.svg");
+
+        TokenEntity urlEvilCorp = new TokenEntity();
+        urlEvilCorp.setValue("https://www.evilcorp.com/fsociety/jackpot/bank-error");
 
         assertAll(
                 // empty array
@@ -65,6 +68,7 @@ public class TypeURLTest {
                 () -> assertEquals( 50, typeURL.computeProximity(new ArrayList<>(), new ArrayList<>() ).getProximity() ),
 
                 // case 1 element in array
+                () -> assertEquals( 0, typeURL.computeProximity(new ArrayList<>(){ { add( urlPizzaTomate ); } }, new ArrayList<>(){ { add( urlEvilCorp ); } } ).getProximity() ),
                 () -> assertEquals( 100, typeURL.computeProximity(new ArrayList<>(){ { add( urlPizzaTomate ); } }, new ArrayList<>(){ { add( urlPizzaTomate ); } } ).getProximity() ),
                 () -> assertEquals( 75, typeURL.computeProximity(new ArrayList<>(){ { add( urlPizzaTomate ); } }, new ArrayList<>(){ { add( urlPizzaBoeuf ); } } ).getProximity() ),
 

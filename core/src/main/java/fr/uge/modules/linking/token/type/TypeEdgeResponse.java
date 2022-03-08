@@ -8,6 +8,11 @@ import fr.uge.modules.linking.strategy.AverageStrategy;
 import java.util.Collection;
 import java.util.List;
 
+/**
+ * TypeEdgeResponse TokenType
+ * REGEX is the keywords of the token
+ * ERRORS contains the keywords considered as errors
+ */
 public class TypeEdgeResponse implements TokenType {
     private static final String NAME = "edgeresponse";
     private static final String REGEX = "^((Hit)|(RefreshHit)|(Miss)|(LimitExceeded)|(CapacityExceeded)|(Error)|(Redirect))$";
@@ -28,6 +33,13 @@ public class TypeEdgeResponse implements TokenType {
         return TokenTypeId.ID_EDGERESPONSE.getId();
     }
 
+    /**
+     * Method inherited from TokenType interface
+     * Compute the proximity between each token of the same time for two logs
+     * @param listTokensLeft Tokens from log 1
+     * @param listTokensRight Tokens from log 2
+     * @return a TokensLink object containing all the computations
+     */
     @Override
     public TokensLink computeProximity(List<TokenEntity> listTokensLeft, List<TokenEntity> listTokensRight) {
         var type = new TypeEdgeResponse();
