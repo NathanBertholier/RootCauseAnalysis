@@ -31,7 +31,7 @@ public interface TokenType {
             case 5 -> new TypeEdgeResponse();
             case 6 -> new TypeURL();
             case 7 -> new TypeResource();
-            default -> {throw new IllegalStateException("TokenType not recognized");}
+            default -> throw new IllegalStateException("TokenType not recognized");
         };
     }
 
