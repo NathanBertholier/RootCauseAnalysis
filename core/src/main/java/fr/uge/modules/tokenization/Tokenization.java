@@ -57,7 +57,7 @@ public class Tokenization {
         }
 
         log.setId(id);
-        log.setTokens(List.copyOf(this.getTokens(words)));
+        log.setTokens(this.getTokens(words));
         return log;
     }
 
@@ -75,15 +75,17 @@ public class Tokenization {
     private List<TokenEntity> getTokens(List<String> words) {
         List<TokenType> tokenTypesNoFound = new ArrayList<>();
 
-        List<TokenEntity> tokens = new ArrayList<>(List.copyOf(profile.getTokenTypeIndex().entrySet().stream().map(k -> {
+        List<TokenEntity> tokens = new ArrayList<>(profile.getTokenTypeIndex().entrySet().stream()
+                .map(k -> {
                     var token = getTokenWithIndex(k.getValue(), k.getKey(), words);
                     if (token.isEmpty()) {
                         tokenTypesNoFound.add(k.getKey());
                     }
                     return token;
-                }).filter(Optional::isPresent)
+                })
+                .filter(Optional::isPresent)
                 .map(Optional::get)
-                .toList()));
+                .toList());
 
         tokenTypesNoFound.addAll(profile.getTokenType());
 
@@ -96,7 +98,7 @@ public class Tokenization {
                     tokens.add(token);
                 }));
 
-        return tokens;
+        return Collections.unmodifiableList(tokens);
     }
 
     /**

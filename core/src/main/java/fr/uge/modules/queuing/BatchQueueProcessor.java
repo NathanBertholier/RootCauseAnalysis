@@ -30,7 +30,7 @@ public class BatchQueueProcessor {
             channel = createChannel();
         }
         ProcessBatch processBatch = null;
-        while (processBatch==null) {
+        while (processBatch == null) {
             try {
                 processBatch = new ProcessBatch();
             } catch (SQLException e) {

@@ -4,8 +4,11 @@ import fr.uge.modules.api.model.TokenModel;
 import fr.uge.modules.api.model.TokenRequest;
 import fr.uge.modules.api.model.entities.LogEntity;
 import io.smallrye.mutiny.Uni;
+
 import java.util.List;
 import java.util.Objects;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.stream.IntStream;
 
 /*
@@ -13,6 +16,7 @@ import java.util.stream.IntStream;
  */
 public class TokenRetriever {
     private static final String AND = " and ";
+    private static final Logger LOGGER = Logger.getGlobal();
 
     TokenRetriever() {}
 
@@ -22,6 +26,15 @@ public class TokenRetriever {
      * @return              A Uni of a List of LogEntity that represent the query result.
      */
     public static Uni<List<LogEntity>> getTokens(TokenRequest tokenRequest){
+        var id = tokenRequest.id();
+        if(id != -1) {
+            return LogEntity
+                    .<LogEntity>findById(tokenRequest.id()).map(List::of)
+                    .invoke(log -> LOGGER.log(Level.INFO, "Log found"))
+                    .onFailure()
+                    .invoke(e -> LOGGER.log(Level.SEVERE, "Error while finding ID", e));
+        }
+
         var rows = Objects.requireNonNullElse(tokenRequest.rows(), 30) - 1;
         StringBuilder sQuery = new StringBuilder();
         sQuery.append("select l from LogEntity l where 1 = 1 ");
@@ -52,12 +65,6 @@ public class TokenRetriever {
             }
         }
 
-        var id = tokenRequest.id();
-        if(id != -1) {
-            return LogEntity
-                    .<LogEntity>find(sQuery + "and id = ?1", id)
-                    .list();
-        }
         return getTokensWithoutId(sQuery, tokenRequest.tokens(), rows);
     }
 
