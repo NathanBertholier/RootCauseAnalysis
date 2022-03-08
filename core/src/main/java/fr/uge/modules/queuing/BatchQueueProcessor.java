@@ -24,7 +24,7 @@ public class BatchQueueProcessor {
      */
     public static void main(String[] args) throws IOException, SQLException, InterruptedException {
         Optional<Channel> channel = createChannel();
-        if(channel.isEmpty()){
+        while (channel.isEmpty()){
             LOGGER.log(Level.WARNING,"Channel not connected, retry connecting in 5 seconds");
             Thread.sleep(5000);
             channel = createChannel();
