@@ -24,7 +24,7 @@ export const Report = () => {
     "report":{
         "rootCause":{"id":-1, "content":"", "datetime":""},
         "target":{"id":-1, "content":"", "datetime":""},
-        "tokens":[{"name":"", "value":-1, "count":-1}],
+        "tokens":[],
         "logs":[]
     },
     "proximity":[]
