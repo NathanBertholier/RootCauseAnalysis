@@ -48,98 +48,123 @@ type GraphProp = {
 }
 
 export  const Graph = ({res, isLoading} : GraphProp ) => {
-    const [data, setData]                       = useState<{nodes: cytoscape.ElementDefinition[], edges: cytoscape.ElementDefinition[]}>({ nodes: [], edges: [] });
-    const [mostUsedTokens, setMostUsedTokens]   = useState( [] as MostUsedToken[] );
+    const [mostUsedTokens, setMostUsedTokens]   = useState([] as MostUsedToken[]);
     const [logToolTip, setLogToolTip]           = useState<Log>({} as Log);
-    const [refreshCyLayout, setRefreshCyLayout] = useState( false );
+    const [refreshCyLayout, setRefreshCyLayout] = useState(false);
+    const [data, setData]                       = useState<{ nodes: cytoscape.ElementDefinition[], edges: cytoscape.ElementDefinition[] }>({
+        nodes: [],
+        edges: []
+    });
 
     useEffect(() => {
-        let nodes : cytoscape.ElementDefinition[] = [];
-        if ( res.proximity.length > 0 ) {
-            nodes.push( { data: { id: res.report.rootCause.id.toString(), label: "Root Cause", color: "#F24E1E", log: res.report.rootCause } } );
-            nodes.push( { data: { id: res.report.target.id.toString(), label: "Target", color: "#4ECB71",log: res.report.target } } );
-            setRefreshCyLayout( true );
+        let nodes: cytoscape.ElementDefinition[] = [];
+        if (res.proximity.length > 0) {
+            nodes.push({
+                data: {
+                    id: res.report.rootCause.id.toString(),
+                    label: "Root Cause",
+                    color: "#F24E1E",
+                    log: res.report.rootCause
+                }
+            });
+            nodes.push({
+                data: {
+                    id: res.report.target.id.toString(),
+                    label: "Target",
+                    color: "#4ECB71",
+                    log: res.report.target
+                }
+            });
+            setRefreshCyLayout(true);
         }
 
-        res.report.logs.filter( log => log.id !== res.report.rootCause.id ).forEach( log => {
-            nodes.push( { data: { id: log.id.toString(),  color: "#C4C4C4",log: log } } );
+        res.report.logs.filter(log => log.id !== res.report.rootCause.id).forEach(log => {
+            nodes.push({data: {id: log.id.toString(), color: "#C4C4C4", log: log}});
         })
 
-        let edges : cytoscape.ElementDefinition[] = [];
-        res.proximity.forEach( proximity => {
-            proximity.links.forEach( link => {
-                edges.push( { data: { source: proximity.id, target: link.id, label: link.proximity }} );
-            } );
+        let edges: cytoscape.ElementDefinition[] = [];
+        res.proximity.forEach(proximity => {
+            proximity.links.forEach(link => {
+                edges.push({data: {source: proximity.id, target: link.id, label: link.proximity}});
+            });
         });
 
-        setMostUsedTokens( res.report.tokens )
-        setData({ nodes: nodes, edges: edges } );
-    }, [res] );
+        setMostUsedTokens(res.report.tokens)
+        setData({nodes: nodes, edges: edges});
+    }, [res]);
 
     const setCy = (core: cytoscape.Core) => {
         core.removeListener("tap");
         core.on('tap', 'node', evt => {
-            setLogToolTip( evt.target.data().log );
+            setLogToolTip(evt.target.data().log);
         });
 
         // Reload Layout
-        if ( refreshCyLayout ) {
-            let fcoseLayout = core.layout( layout );
+        if (refreshCyLayout) {
+            let fcoseLayout = core.layout(layout);
             fcoseLayout.run();
-            setRefreshCyLayout( false );
+            setRefreshCyLayout(false);
         }
     }
 
     return (
-        <div className="cytoscape-container">
-            <div className="most-use-tokens">
+        <React.Fragment>
+            <div className="cytoscape-container">
+
+                <div className="legend">
+                    <div className="legend-title">Legend</div>
+                    <div className="hint-container">
+                        <div className="hint hint-node hint-orange"/>
+                        <div className="hint-label">Root cause</div>
+                    </div>
+                    <div className="hint-container">
+                        <div className="hint hint-node hint-green"/>
+                        <div className="hint-label">Target Log</div>
+                    </div>
+                    <div className="hint-container">
+                        <div className="hint hint-node hint-gray">8</div>
+                        <div className="hint-label">Log ID</div>
+                    </div>
+                    <div className="hint-container">
+                        <div className="hint hint-edge">84</div>
+                        <div className="hint-label">Proximity weight</div>
+                    </div>
+                </div>
+                <CytoscapeComponent minZoom={0.1} wheelSensitivity={0.2} cy={x => setCy(x)}
+                                    elements={CytoscapeComponent.normalizeElements(data)} stylesheet={stylesheet}
+                                    style={{width: '100%', height: '700px'}} layout={layout}/>
+                <Loader show={isLoading}/>
+            </div>
+            <div className={`toolTip ${Object.keys(logToolTip).length === 0 ? "d-none" : ""}`}>
+                <div><span className="toolTip-title">ID : </span><span
+                    className="toolTip-value">{logToolTip.id}</span></div>
+                <div><span className="toolTip-entity">Log : </span><span
+                    className="toolTip-value">{logToolTip.content}</span></div>
+                <div><span className="toolTip-entity">DateTime : </span><span
+                    className="toolTip-value">{logToolTip.datetime}</span></div>
+            </div>
+            <div className={`most-use-tokens ${mostUsedTokens.length <= 0 ? "d-none" : ""}`}>
                 <table>
                     <thead>
-                        <tr>
-                            <th>Token type</th>
-                            <th>Value</th>
-                            <th>Count</th>
-                        </tr>
+                    <tr>
+                        <th>Token type</th>
+                        <th>Value</th>
+                        <th>Count</th>
+                    </tr>
                     </thead>
                     <tbody>
-                        {
-                            mostUsedTokens.map( ( mostUsed, index ) => {
-                                return <tr key={index} >
-                                    <td className="tokens-labels">{mostUsed.name}</td>
-                                    <td className="tokens-values">{mostUsed.value}</td>
-                                    <td className="tokens-counts">{mostUsed.count}</td>
-                                </tr>
-                            } )
-                        }
+                    {
+                        mostUsedTokens.map((mostUsed, index) => {
+                            return <tr key={index}>
+                                <td className="tokens-labels">{mostUsed.name}</td>
+                                <td className="tokens-values">{mostUsed.value}</td>
+                                <td className="tokens-counts">{mostUsed.count}</td>
+                            </tr>
+                        })
+                    }
                     </tbody>
                 </table>
             </div>
-            <div className={`toolTip ${Object.keys(logToolTip).length === 0  ? "d-none" : ""}`} >
-                <div><span className="toolTip-title">ID : </span><span className="toolTip-value">{logToolTip.id}</span></div>
-                <div><span className="toolTip-entity">Log : </span><span className="toolTip-value">{logToolTip.content}</span></div>
-                <div><span className="toolTip-entity">DateTime : </span><span className="toolTip-value">{logToolTip.datetime}</span></div>
-            </div>
-            <div className="legend">
-                <div className="legend-title">Legend</div>
-                <div className="hint-container">
-                    <div className="hint hint-node hint-orange"/>
-                    <div className="hint-label">Root cause</div>
-                </div>
-                <div className="hint-container">
-                    <div className="hint hint-node hint-green"/>
-                    <div className="hint-label">Target Log</div>
-                </div>
-                <div className="hint-container">
-                    <div className="hint hint-node hint-gray">8</div>
-                    <div className="hint-label">Log ID</div>
-                </div>
-                <div className="hint-container">
-                    <div className="hint hint-edge">84</div>
-                    <div className="hint-label">Proximity weight</div>
-                </div>
-            </div>
-            <CytoscapeComponent minZoom={0.1} wheelSensitivity={0.2} cy={x => setCy(x)} elements={CytoscapeComponent.normalizeElements(data)} stylesheet={stylesheet} style={{width: '100%', height: '700px'}} layout={layout} />
-            <Loader show={isLoading} />
-        </div>
+        </React.Fragment>
     )
 }

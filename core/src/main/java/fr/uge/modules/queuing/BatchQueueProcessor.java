@@ -22,7 +22,7 @@ public class BatchQueueProcessor {
     /**
      * Start a main that read message in the queue QUEUE_NAME and add them in a batch using the ProcessBatch class.
      */
-    public static void main(String[] args) throws IOException, TimeoutException, SQLException, InterruptedException {
+    public static void main(String[] args) throws IOException, SQLException, InterruptedException {
         Optional<Channel> channel = createChannel();
         while (channel.isEmpty()){
             LOGGER.log(Level.WARNING,"Channel not connected, retry connecting in 5 seconds");
@@ -30,7 +30,7 @@ public class BatchQueueProcessor {
             channel = createChannel();
         }
         ProcessBatch processBatch = null;
-        while (processBatch==null) {
+        while (processBatch == null) {
             try {
                 processBatch = new ProcessBatch();
             } catch (SQLException e) {

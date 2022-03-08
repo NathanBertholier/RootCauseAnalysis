@@ -9,13 +9,12 @@ import fr.uge.modules.api.model.report.ReportParameter;
 import fr.uge.modules.linking.strategy.AverageStrategy;
 import fr.uge.modules.linking.token.type.TokenType;
 import fr.uge.modules.linking.token.type.TypeDatetime;
-import org.jboss.logmanager.Level;
 
 import java.util.*;
 import java.util.function.Function;
-import java.util.logging.ConsoleHandler;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
+
 
 import static java.util.stream.Collectors.mapping;
 
@@ -66,10 +65,6 @@ public class ReportLinking {
     private static final RelationManager relationManager = new RelationManager();
     private static final Logger LOGGER = Logger.getLogger(ReportLinking.class.getName());
 
-    static {
-        LOGGER.addHandler(new ConsoleHandler());
-    }
-
     public PriorityQueue<Relation> computeProximityTree(LogEntity logTarget, List<LogEntity> logWithinDelta, ReportParameter rp){
         var targetDatetime = logTarget.datetime;
 
@@ -83,8 +78,7 @@ public class ReportLinking {
                     var relation = relationManager.computeRelation(logTarget, log);
                     Computation datetimeComputation = TypeDatetime.computeDateTimeProximity(log.datetime, targetDatetime, delta);
                     var finalRelation = relationManager.addToRelation(relation, datetimeComputation);
-
-                    LOGGER.log(Level.DEBUG, "Relation created between " + logTarget + " and " + log + ": " + relation);
+                    LOGGER.info(() -> "Relation created between " + logTarget + " and " + log + ": " + relation);
                     return finalRelation;
                 })
                 .forEach(relation -> {
@@ -100,7 +94,7 @@ public class ReportLinking {
                     }
                 });
 
-        LOGGER.log(Level.DEBUG, "Generated tree for id " + logTarget.id + ": " + proximityQ);
+        LOGGER.info(() -> "Generated tree for id " + logTarget.id + ": " + proximityQ);
         return proximityQ;
     }
 }

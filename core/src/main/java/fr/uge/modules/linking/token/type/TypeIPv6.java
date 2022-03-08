@@ -9,6 +9,11 @@ import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
 
+/**
+ * TypeIPv6 TokenType
+ * The current REGEX matches on compressed IPv6.
+ * If you want to only match uncompressed IPv6 use the other REGEX
+ */
 public class TypeIPv6 implements TokenType{
 
     private static final String NAME = "ipv6";
@@ -28,12 +33,19 @@ public class TypeIPv6 implements TokenType{
         return TokenTypeId.ID_IPV6.getId();
     }
 
+    /**
+     * Method inherited from TokenType interface
+     * Compute the proximity between each token of the same time for two logs
+     * @param listTokensLeft Tokens from log 1
+     * @param listTokensRight Tokens from log 2
+     * @return a TokensLink object containing all the computations
+     */
     @Override
-    public TokensLink computeProximity(List<TokenEntity> tokenLeft, List<TokenEntity> tokenRight) {
-        if (tokenLeft.isEmpty() || tokenRight.isEmpty()) return TokensLink.withoutStrategy(0);
+    public TokensLink computeProximity(List<TokenEntity> listTokensLeft, List<TokenEntity> listTokensRight) {
+        if (listTokensLeft.isEmpty() || listTokensRight.isEmpty()) return TokensLink.withoutStrategy(0);
         var type = new TypeIPv6();
 
-        var computations = tokenLeft.stream().map(tokenL -> tokenRight.stream()
+        var computations = listTokensLeft.stream().map(tokenL -> listTokensRight.stream()
                 .map(tokenR -> {
                     if(tokenR.equals(tokenL))
                         return new Computation(type, tokenL.value, tokenR.value, 100d);
@@ -42,7 +54,7 @@ public class TypeIPv6 implements TokenType{
                 .toList())
                 .flatMap(Collection::stream)
                 .sorted(Comparator.comparingDouble(computation -> - computation.proximity()))
-                .limit(Integer.max(tokenLeft.size(), tokenRight.size()))
+                .limit(Integer.max(listTokensLeft.size(), listTokensRight.size()))
                 .toList();
 
         return new TokensLink(computations, new AverageStrategy());

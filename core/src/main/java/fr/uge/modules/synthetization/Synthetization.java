@@ -13,23 +13,24 @@ import io.smallrye.mutiny.Multi;
 import io.smallrye.mutiny.Uni;
 
 import java.util.*;
-import java.util.logging.ConsoleHandler;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 public class Synthetization {
-
     private static final Logger LOGGER = Logger.getLogger(Synthetization.class.getName());
 
-    static {
-        LOGGER.addHandler(new ConsoleHandler());
-    }
+    Synthetization() {}
 
+    /**
+     * Generate a report from the logTarget and parameters
+     * @param idLogTarget       Log used to create a report
+     * @param reportParameter   Parameters used for the report
+     * @return                  An object implementing the GenericReport interface, depending on the parameters
+     */
     public static Uni<GenericReport> getReport(long idLogTarget, ReportParameter reportParameter) {
-        LOGGER.log(Level.INFO, "Retrieving rootCause cause for target: {0}", idLogTarget);
+        LOGGER.info(() -> "Retrieving rootCause cause for target: " + idLogTarget);
         return LogEntity.<LogEntity>findById(idLogTarget)
-                .invoke(target -> LOGGER.log(Level.INFO, "Retrieved log target: {0}", target))
+                .invoke(target -> LOGGER.info(() -> "Retrieved log target: " + target))
                 .chain(target -> LogsLinking.linkedLogs(target, reportParameter)
                         .chain(generatedReport -> getMostSeenTokens(generatedReport.relevantLogs())
                                     .map(tokens -> {
@@ -45,6 +46,11 @@ public class Synthetization {
                 );
     }
 
+    /**
+     * Get the most seen tokens among a list of logEntity
+     * @param logs  List of LogEntity used to iterate and found most seed tokens
+     * @return      A treeSet of the most token seen.
+     */
     private static Uni<TreeSet<TokensMostSeen>> getMostSeenTokens(List<LogEntity> logs) {
         Comparator<TokensMostSeen> comparator = Comparator.comparingLong(TokensMostSeen::count);
         return Multi.createFrom().items(logs.stream().flatMap(logEntity -> logEntity.tokens.stream()))
@@ -55,9 +61,14 @@ public class Synthetization {
                         .subscribeAsCompletionStage()
                         .thenAccept((set::add))
                 )
-                .invoke(set -> LOGGER.log(Level.INFO, "Most tokens seen: {0}", set));
+                .invoke(set -> LOGGER.info(() -> "Most tokens seen: " + set));
     }
 
+    /**
+     * Get the most seen token among a TokenType.
+     * @param entities  List of entities with the same tokenType.
+     * @return          A TokensMostSeen record that represent a tokenType, a list of value that have the same count and a count.
+     */
     private static TokensMostSeen fromTokenEntities(List<TokenEntity> entities){
         var tokenTypeName = TokenType.fromId(entities.stream().findAny().orElseThrow().idtokentype).getName();
         var values = entities.stream()

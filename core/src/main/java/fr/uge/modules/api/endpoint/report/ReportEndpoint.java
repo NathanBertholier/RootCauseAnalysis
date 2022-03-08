@@ -12,8 +12,6 @@ import javax.inject.Inject;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Response;
 import java.util.function.Function;
-import java.util.logging.ConsoleHandler;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
@@ -29,31 +27,27 @@ public class ReportEndpoint {
                     .entity(rootCauseError.getMessage())
                     .build();
 
-    static {
-        LOGGER.addHandler(new ConsoleHandler());
-    }
-
     @GET
     @Produces(APPLICATION_JSON)
     public Uni<Response> getReport(
             @PathParam("id") long idLogTarget,
             @QueryParam("expanded") Boolean expanded,
             @QueryParam("delta") Long delta,
-            @QueryParam("proximity_limit") Integer proximity_limit,
-            @QueryParam("network_size") Integer network_size
+            @QueryParam("proximity_limit") Integer proximityLimit,
+            @QueryParam("network_size") Integer networkSize
     ) {
         if(expanded == null) expanded = envRetriever.reportDefaultExpanded();
         if(delta == null) delta = envRetriever.reportDefaultDelta();
-        if(proximity_limit == null) proximity_limit = envRetriever.reportDefaultLimit();
-        if(network_size == null) network_size = envRetriever.reportDefaultSize();
+        if(proximityLimit == null) proximityLimit = envRetriever.reportDefaultLimit();
+        if(networkSize == null) networkSize = envRetriever.reportDefaultSize();
 
-        ReportParameter reportParameter = new ReportParameter(expanded, delta, proximity_limit, network_size);
+        ReportParameter reportParameter = new ReportParameter(expanded, delta, proximityLimit, networkSize);
 
-        LOGGER.log(Level.INFO, "Received request for id " +  idLogTarget + " with parameters: " + reportParameter);
+        LOGGER.info(() -> "Received request for id " + idLogTarget + " with parameters: " + reportParameter);
 
         return Synthetization.getReport(idLogTarget, reportParameter)
                 .map(report -> {
-                    LOGGER.log(Level.INFO, "Generated report: {0}", report);
+                    LOGGER.info(() -> "Generated report: " + report);
                     return Response.ok(report).build();
                 })
                 .onFailure(NotYetTokenizedError.class).recoverWithItem(withRootCauseError.apply(new NotYetTokenizedError()))

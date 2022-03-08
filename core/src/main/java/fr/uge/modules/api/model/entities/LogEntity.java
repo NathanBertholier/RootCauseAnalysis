@@ -5,6 +5,7 @@ import io.smallrye.mutiny.Uni;
 
 import javax.persistence.*;
 import java.sql.Timestamp;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
@@ -56,7 +57,7 @@ public class LogEntity extends PanacheEntityBase {
     }
 
     public List<TokenEntity> getTokens() {
-        return this.tokens;
+        return Collections.unmodifiableList(tokens);
     }
 
     public void setDatetime(Timestamp datetime) {

@@ -9,6 +9,9 @@ import java.util.Collection;
 import java.util.List;
 import java.util.stream.IntStream;
 
+/**
+ * TypeIPv4 TokenType
+ */
 public class TypeIPv4 implements TokenType {
 
     private static final String NAME = "ipv4";
@@ -27,6 +30,12 @@ public class TypeIPv4 implements TokenType {
         return TokenTypeId.ID_IPV4.getId();
     }
 
+    /**
+     * Computes the proximity between to IP as strings
+     * @param t1 ip 1
+     * @param t2 ip 2
+     * @return the double result of the computation between two IPs
+     */
     private static double calculIp(String t1, String t2) {
         var sIP1 = t1.split("\\.");
         var sIP2 = t2.split("\\.");
@@ -40,13 +49,21 @@ public class TypeIPv4 implements TokenType {
                 }).findFirst().orElse(100);
     }
 
-    public TokensLink computeProximity(List<TokenEntity> tokenLeft, List<TokenEntity> tokenRight) {
-        if(tokenLeft.isEmpty() || tokenRight.isEmpty()) return TokensLink.withoutStrategy(50);
+    /**
+     * Method inherited from TokenType interface
+     * Compute the proximity between each token of the same time for two logs
+     * @param listTokensLeft Tokens from log 1
+     * @param listTokensRight Tokens from log 2
+     * @return a TokensLink object containing all the computations
+     */
+    @Override
+    public TokensLink computeProximity(List<TokenEntity> listTokensLeft, List<TokenEntity> listTokensRight) {
+        if(listTokensLeft.isEmpty() || listTokensRight.isEmpty()) return TokensLink.withoutStrategy(50);
         var type = new TypeIPv4();
 
-        var computations = tokenLeft.stream()
+        var computations = listTokensLeft.stream()
                     .map(TokenEntity::getValue)
-                    .map(leftIP -> tokenRight.stream()
+                    .map(leftIP -> listTokensRight.stream()
                             .map(TokenEntity::getValue)
                             .map(rightIP -> new Computation(type, leftIP, rightIP, calculIp(leftIP, rightIP)))
                             .toList()
