@@ -84,6 +84,41 @@ Une fois les logs soumis, la solution renvoi une liste d'id associant chaque log
 ]
 ```
 #### GET report
+La route report permet de générer un rapport basé sur un log donné dans le chemin de la requéte API et indiquant une root cause et un ensemble de logs liée au log pris en paramètre
+
+Si on cherche à générer un rapport pour le log 31, ont envoi la requéte `/report/31` et on reçoit une réponse dans le format suivant :
+```json
+{
+  "root": {
+    "id": "id du log root cause",
+    "content": "corps du log",
+    "datetime": "date time du log"
+  },
+"target": {
+    "id": "id du log target",
+    "content": "corps du log",
+    "datetime": "date time du log"
+  },
+  "tokens": [
+    {
+      "name": "type du token",
+      "value": "tableau de valeur les plus citée du token",
+      "count": "nombre de citation de la valeur"
+    }
+  ],
+  "logs": [
+    {
+      "id": "id du log",
+      "content": "corps du log",
+      "datetime": "date time du log"
+    }
+  ]
+}
+```
+Il existe 3 options pour créer un rapport qui seront transmis comme paramètre de la requéte :
+- delta : valeur en seconde indiquant l'intervalle de recherche (Ex : si l'intervalle est de 3600 et que le datetime 
+du log cible est 2020-01-01 12:00:00.000000, le système ne comparera que les logs ayant un datetime compris entre 11:00:00.000000 et 12:00:00.000000)
+- 
 
 #### POST tokens
 
