@@ -75,7 +75,7 @@ public class Tokenization {
     private List<TokenEntity> getTokens(List<String> words) {
         List<TokenType> tokenTypesNoFound = new ArrayList<>();
 
-        List<TokenEntity> tokens = profile.getTokenTypeIndex().entrySet().stream()
+        List<TokenEntity> tokens = new ArrayList<>(profile.getTokenTypeIndex().entrySet().stream()
                 .map(k -> {
                     var token = getTokenWithIndex(k.getValue(), k.getKey(), words);
                     if (token.isEmpty()) {
@@ -85,7 +85,7 @@ public class Tokenization {
                 })
                 .filter(Optional::isPresent)
                 .map(Optional::get)
-                .toList();
+                .toList());
 
         tokenTypesNoFound.addAll(profile.getTokenType());
 

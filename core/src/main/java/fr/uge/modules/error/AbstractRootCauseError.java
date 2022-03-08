@@ -1,7 +1,6 @@
 package fr.uge.modules.error;
 
 import javax.ws.rs.core.Response;
-import java.util.function.Function;
 
 public abstract class AbstractRootCauseError extends RuntimeException implements RootCauseError {
     AbstractRootCauseError() {

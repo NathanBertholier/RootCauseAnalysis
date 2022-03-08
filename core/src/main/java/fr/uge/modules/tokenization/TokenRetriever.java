@@ -3,12 +3,12 @@ package fr.uge.modules.tokenization;
 import fr.uge.modules.api.model.TokenModel;
 import fr.uge.modules.api.model.TokenRequest;
 import fr.uge.modules.api.model.entities.LogEntity;
-import fr.uge.modules.error.NotYetTokenizedError;
 import io.smallrye.mutiny.Uni;
-import io.smallrye.mutiny.unchecked.Unchecked;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.stream.IntStream;
 
 /*
@@ -16,6 +16,7 @@ import java.util.stream.IntStream;
  */
 public class TokenRetriever {
     private static final String AND = " and ";
+    private static final Logger LOGGER = Logger.getGlobal();
 
     TokenRetriever() {}
 
@@ -58,8 +59,13 @@ public class TokenRetriever {
         var id = tokenRequest.id();
         if(id != -1) {
             return LogEntity
-                    .<LogEntity>find(sQuery + "and id = ?1", id)
-                    .list();
+                    .<LogEntity>find(sQuery + " and id = ?1 ", id)
+                    .range(0,rows)
+                    .list()
+                    .onItem()
+                    .invoke(() -> LOGGER.log(Level.INFO, "Log found"))
+                    .onFailure()
+                    .invoke(e -> LOGGER.log(Level.SEVERE, "Error while finding ID", e));
         }
         return getTokensWithoutId(sQuery, tokenRequest.tokens(), rows);
     }

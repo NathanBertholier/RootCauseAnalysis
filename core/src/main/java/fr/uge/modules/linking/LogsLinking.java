@@ -17,7 +17,6 @@ import java.sql.Timestamp;
 import java.time.Duration;
 import java.util.*;
 import java.util.logging.ConsoleHandler;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import static java.util.Objects.isNull;

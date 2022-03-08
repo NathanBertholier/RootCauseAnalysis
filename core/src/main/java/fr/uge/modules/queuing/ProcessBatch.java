@@ -12,7 +12,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class ProcessBatch {
-    private static final Logger LOGGER = Logger.getLogger(ProcessBatch.class.getName());
+    private static final Logger LOGGER = Logger.getGlobal();
     private static final long BATCH_SECONDS = 3;
 
     private final PreparedStatement preparedLog;
@@ -96,6 +96,7 @@ public class ProcessBatch {
         try {
             preparedLog.executeBatch();
             preparedToken.executeBatch();
+            LOGGER.log(Level.INFO, "Execute batch.");
         } catch (SQLException e) {
             LOGGER.severe(() -> "Error while executing the batch" + e);
         }

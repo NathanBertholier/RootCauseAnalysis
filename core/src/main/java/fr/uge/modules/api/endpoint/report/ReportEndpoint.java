@@ -11,13 +11,9 @@ import io.smallrye.mutiny.Uni;
 import javax.inject.Inject;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Response;
-import java.text.MessageFormat;
 import java.util.function.Function;
-import java.util.logging.ConsoleHandler;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import static java.text.MessageFormat.*;
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 
 @Path("/report/{id}")

@@ -23,10 +23,10 @@ public class TokenEndpoint {
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Uni<Response> getTokens(TokenRequest tokenRequest){
+    public Uni<Response> getTokens(TokenRequest tokenRequest) {
         return TokenRetriever.getTokens(tokenRequest)
                 .map(TokensResponse::new)
-                .map(tokensResponse -> Response.ok(tokensResponse).build() )
+                .map(tokensResponse -> Response.ok(tokensResponse).build())
                 .onFailure(NotYetTokenizedError.class).recoverWithItem(fromError(new NotYetTokenizedError()))
                 .onFailure().invoke(
                         error -> LOGGER.severe(() -> "Error while retrieving tokens: " + error)
