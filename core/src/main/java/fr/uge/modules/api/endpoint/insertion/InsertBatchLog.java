@@ -26,6 +26,13 @@ import java.util.function.Predicate;
 import java.util.logging.Logger;
 import java.util.stream.LongStream;
 
+
+/**
+ * Endpoint used to insert logs inside the database. This endpoint accepts one or many logs, contained in an array.
+ * Performs batch in order to increase insertion speediness. Returns an array that contains ids of inserted logs.
+ * Returns an error if one of the submitted logs does not respect standard format.
+ * Insertions respect ACID constraints.
+ */
 @Path("/insertlog")
 public class InsertBatchLog {
     private static final Function<Object, Response> withCreated = entity -> Response.created(URI.create("/insert/batch")).entity(entity).build();
@@ -34,6 +41,7 @@ public class InsertBatchLog {
 
     private static final Logger LOGGER = Logger.getLogger(InsertBatchLog.class.getName());
 
+    // Queue to tokenizer module
     @Channel("token-out")
     @OnOverflow(OnOverflow.Strategy.UNBOUNDED_BUFFER)
     Emitter<RawLogEntity> emitter;
@@ -52,10 +60,12 @@ public class InsertBatchLog {
                 .map(ConstraintViolation::getMessage)
                 .toList();
 
+        // Constraints validator. If one of the submitted logs does not respect standard format, returns an error.
         if (!violations.isEmpty()) {
             return Uni.createFrom().item(Response.status(400).entity(violations).build());
         }
 
+        // Otherwise, performs transaction in order to insert data in DB.
         return Panache.withTransaction(
                 () -> PanacheEntityBase.persist(inputs)
                         .onItemOrFailure().transform((success, error) -> {
