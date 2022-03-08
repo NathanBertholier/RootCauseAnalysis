@@ -9,6 +9,7 @@ import java.math.RoundingMode;
 import java.text.DecimalFormat;
 import java.util.Collection;
 import java.util.List;
+import java.util.stream.IntStream;
 
 public class TypeResource implements TokenType{
 
@@ -42,17 +43,12 @@ public class TypeResource implements TokenType{
                             var startsWith = "/";
                             var arrayL = tokenL.split(startsWith);
                             var arrayR = tokenR.split(startsWith);
-                            double count = 0;
-                            for ( int i = 1; i < arrayL.length - 1; i++ ) {
-                                if(i<= arrayR.length-1){
-                                    if ( arrayL[i].equals( arrayR[i] ) ) {
-                                        count++;
-                                    } else {
-                                        break;
-                                    }
-                                }
-                            }
-                            var res = Double.parseDouble(format.format((count / Math.min(arrayL.length, arrayR.length)) * 100).replace(",", "."));
+                            double count = IntStream.range(1, arrayL.length - 1)
+                                    .filter(i -> arrayR.length > i)
+                                    .filter(i -> !arrayR[i].equals(arrayL[i]))
+                                    .findFirst()
+                                    .orElse(0);
+                            var res = Double.parseDouble(format.format(((count - 1) / Math.min(arrayL.length, arrayR.length)) * 100).replace(",", "."));
                             return new Computation(this, tokenL, tokenR, res);
                         } )
                         .toList())

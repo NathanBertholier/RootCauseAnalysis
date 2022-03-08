@@ -35,9 +35,11 @@ public class TypeDatetime implements TokenType{
     }
 
     private static double fromTime(long time, float delta){
-        if(time > delta) return 0;
-        else if (time == 0) return 100;
-        else {
+        if(time > delta) {
+            return 0;
+        } else if (time == 0) {
+            return 100;
+        } else {
             double res = (1 - (time / delta)) * 100;
             DecimalFormat format = new DecimalFormat();
             format.setMaximumFractionDigits(2);
