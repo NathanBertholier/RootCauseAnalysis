@@ -405,11 +405,11 @@ export const Logs = () => {
                                                 {
                                                     filters.filter( filter => filter.isSelected ).map( (filter, index) => {
                                                         return <Row key={index} className="filter-container">
-                                                            <Col xl={3} sm={4} className="input-labels" >
+                                                            <Col xl={3} sm={12} className="input-labels" >
                                                                 { filter.formField.label }
                                                             </Col>
                                                             <Col xl={7}
-                                                                 sm={ filter.id === FilterType.START_DATE || filter.id === FilterType.END_DATE ? 12 : 8}>
+                                                                 sm={10}>
                                                                 <Container fluid className="p-0">
                                                                     <Row>
                                                                         { getInput( filter ) }

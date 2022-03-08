@@ -79,6 +79,7 @@
   width: 60px;
   display: inline-block;
   margin-left: 10px;
+  margin-bottom: 10px;
 }
 
 .custom-filter-btn {
@@ -119,6 +120,7 @@
 .input-labels {
   text-align: right;
   margin-top: 7px;
+  margin-bottom: 10px;
 }
 
 .disabled {
