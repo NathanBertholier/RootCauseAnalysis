@@ -31,8 +31,11 @@ public class MonitorInserter {
     String rabbitmqport;
 
 
+    /**
+     * Method called every 5 seconds to insert new monitoringEntity in database.
+     */
     @Scheduled(every="5s")
-    public void getValueFromAPI() throws IOException {
+    public void getValueFromAPI() {
         try {
             MonitoringEntity monitoring = new MonitoringEntity();
 
@@ -54,7 +57,11 @@ public class MonitorInserter {
         }
     }
 
-    public Optional<URL> urlMaker() {
+    /**
+     * Create a new URL Object from URL
+     * @return  an Optional of URL if present, otherwise empty
+     */
+    private Optional<URL> urlMaker() {
         try {
             String sURL = "http://"
                     + this.rabbitmqurl
@@ -67,7 +74,11 @@ public class MonitorInserter {
         }
     }
 
-    public Optional<InputStream> getInputStream() {
+    /**
+     * Get a stream of element from the request
+     * @return  Optional of inputStream if present, otherwise empty
+     */
+    private Optional<InputStream> getInputStream() {
         try {
             String userPass = "guest" + ":" + "guest";
             String basicAuth = "Basic " + Base64.getEncoder().encodeToString(userPass.getBytes());
@@ -75,7 +86,7 @@ public class MonitorInserter {
             urlConnection.setRequestProperty("Authorization", basicAuth);
             return Optional.of((InputStream) urlConnection.getContent());
         } catch (IOException e) {
-            logger.severe(() -> "Unsuccesfull connection at the database: " + e);
+            logger.severe(() -> "Unsuccessful connection at the database: " + e);
             return Optional.empty();
         }
     }
