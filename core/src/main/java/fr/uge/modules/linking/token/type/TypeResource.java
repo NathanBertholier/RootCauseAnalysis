@@ -5,6 +5,8 @@ import fr.uge.modules.api.model.linking.Computation;
 import fr.uge.modules.api.model.linking.TokensLink;
 import fr.uge.modules.linking.strategy.AverageStrategy;
 
+import java.math.RoundingMode;
+import java.text.DecimalFormat;
 import java.util.Collection;
 import java.util.List;
 
@@ -27,6 +29,9 @@ public class TypeResource implements TokenType{
         if(tokenLeft.isEmpty() || tokenRight.isEmpty()) {
             return TokensLink.withoutStrategy(50);
         }
+        DecimalFormat format = new DecimalFormat();
+        format.setMaximumFractionDigits(2);
+        format.setRoundingMode(RoundingMode.FLOOR);
         var computations = tokenLeft.stream().map(TokenEntity::getValue)
                 .map(tokenL -> tokenRight.stream()
                         .map(TokenEntity::getValue)
@@ -38,17 +43,17 @@ public class TypeResource implements TokenType{
                             var arrayL = tokenL.split(startsWith);
                             var arrayR = tokenR.split(startsWith);
                             double count = 0;
-                            for ( int i =0; i < arrayL.length-1; i++ ) {
+                            for ( int i = 1; i < arrayL.length - 1; i++ ) {
                                 if(i<= arrayR.length-1){
                                     if ( arrayL[i].equals( arrayR[i] ) ) {
                                         count++;
-                                    }
-                                    else {
+                                    } else {
                                         break;
                                     }
                                 }
                             }
-                            return new Computation(this, tokenL, tokenR, (count / arrayL.length) * 100);
+                            var res = Double.parseDouble(format.format((count / Math.min(arrayL.length, arrayR.length)) * 100).replace(",", "."));
+                            return new Computation(this, tokenL, tokenR, res);
                         } )
                         .toList())
                 .flatMap(Collection::stream)
