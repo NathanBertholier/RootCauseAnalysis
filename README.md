@@ -4,7 +4,16 @@ La manière la plus simple de lancer la solution est de cloner le repos et de la
 niveau du fichier `docker-compose.yml`
 
 ## Variable d'environment
+Les variables d'environnement sont accessible et modifiable dans le fichier [.env](.env) a la racine.
 
+|  **_Nom de Variable_** |             **_Description_**            | **_Type_** | **_Valeur par défaut_** |
+|:----------------------:|:----------------------------------------:|:----------:|:-----------------------:|
+|     REPORT_EXPANDED    | Génération du rapport au format expanded |   Boolean  |          FALSE          |
+|      REPORT_DELTA      |           Delta de temps en ms           |   Integer  |           7200          |
+| REPORT_PROXIMITY_LIMIT |        Indice minimum de proximité       |   Integer  |            50           |
+|   REPORT_NETWORK_SIZE  |             Taille du réseau             |   Integer  |            15           |
+|      QUARKUS_PORT      |          Port du serveur Quarkus         |   Integer  |           8081          |
+|         PROFILE        |        Type de log (AWS, standard)       |   String   |           AWS           |
 ## Docker
 La solution utilise les images suivantes:
 - RabbitMQ : Pour échanger des messages entre les différents composants et tenir une congestion lors des pics
