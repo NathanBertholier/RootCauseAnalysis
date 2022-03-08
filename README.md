@@ -23,8 +23,9 @@ La solution utilise les images suivantes:
 
 ### API
 
-L'API RootCause propose 2 routes majeures et 3 routes destinées au démonstrateur
-Le Swagger est disponible sur la route `/swagger` une fois la solution lancée
+L'API RootCause propose 2 routes majeures et 3 routes destinées au démonstrateur Le Swagger est disponible sur la
+route `/swagger` une fois la solution lancée
+
 #### POST insertlog
 
 Insertlog permet de faire ingérer des logs à l'API, la requéte HTTP doit soumettre les logs au format suivant :
@@ -83,10 +84,15 @@ Une fois les logs soumis, la solution renvoi une liste d'id associant chaque log
   4
 ]
 ```
-#### GET report
-La route report permet de générer un rapport basé sur un log donné dans le chemin de la requéte API et indiquant une root cause et un ensemble de logs liée au log pris en paramètre
 
-Si on cherche à générer un rapport pour le log 31, ont envoi la requéte `/report/31` et on reçoit une réponse dans le format suivant :
+#### GET report
+
+La route report permet de générer un rapport basé sur un log donné dans le chemin de la requéte API et indiquant une
+root cause et un ensemble de logs liée au log pris en paramètre
+
+Si on cherche à générer un rapport pour le log 31, ont envoi la requéte `/report/31` et on reçoit une réponse dans le
+format suivant :
+
 ```json
 {
   "root": {
@@ -94,7 +100,7 @@ Si on cherche à générer un rapport pour le log 31, ont envoi la requéte `/re
     "content": "corps du log",
     "datetime": "date time du log"
   },
-"target": {
+  "target": {
     "id": "id du log target",
     "content": "corps du log",
     "datetime": "date time du log"
@@ -115,19 +121,58 @@ Si on cherche à générer un rapport pour le log 31, ont envoi la requéte `/re
   ]
 }
 ```
+
 Il existe 3 options pour créer un rapport qui seront transmis comme paramètre de la requéte :
-- delta : valeur en seconde indiquant l'intervalle de recherche (Ex : si l'intervalle est de 3600 et que le datetime 
-du log cible est 2020-01-01 12:00:00.000000, le système ne comparera que les logs ayant un datetime compris entre 11:00:00.000000 et 12:00:00.000000)
-- 
 
-#### POST tokens
+- `delta` : valeur en seconde indiquant l'intervalle de recherche (Ex : si l'intervalle est de 3600 et que le datetime
+  du log cible est 2020-01-01 12:00:00.000000, le système ne comparera que les logs ayant un datetime compris entre 11:
+  00:00.000000 et 12:00:00.000000)
+- `expanded` : valeur boolean permettant de générer une liste d'adjacence des liens
+- `network_size` : valeur numérique indiquant le nombre de logs disponible dans le rapport
+- `proximity_limit` : valeurs de proximité basses prises en compte dans le rapport (seul les valeurs de proxitmité
+  supérieur ou égale à la proximity limit sont prisent en comptes dans le rapport)
 
-#### GET tokentypes
+Si la valeur expanded est à true, le rapport a le format suivant :
 
-#### GET link
-
-### FrontEnd
-
+```json
+{
+  "root": {
+    "id": "id du log root cause",
+    "content": "corps du log",
+    "datetime": "date time du log"
+  },
+  "target": {
+    "id": "id du log target",
+    "content": "corps du log",
+    "datetime": "date time du log"
+  },
+  "tokens": [
+    {
+      "name": "type du token",
+      "value": "tableau de valeur les plus citée du token",
+      "count": "nombre de citation de la valeur"
+    }
+  ],
+  "logs": [
+    {
+      "id": "id du log",
+      "content": "corps du log",
+      "datetime": "date time du log"
+    }
+  ],
+  "proximity": [
+    {
+      "id": "id du log parent",
+      "links": [
+        {
+          "id": "id du log enfant",
+          "proximity": "valeur de proximité entre le parent et l’enfant"
+        }
+      ]
+    }
+  ]
+}
+```
 ## Divers
 
 ### Performances
@@ -139,3 +184,5 @@ du log cible est 2020-01-01 12:00:00.000000, le système ne comparera que les lo
 | 8vCœurs/8Threads à 2.6GHz, 8G DDR4@2133  | ~500                                   |
 
 ### Bugs identifiés
+- Sur Linux, le dossier DockerVolumes semble avoir des problèmes de droits, si on cherche à relancer les dockers apres 
+qu'ils aient écrits dans les volumes ->  `sudo chown -R $USER DockerVolumes/` pour régler le problème
