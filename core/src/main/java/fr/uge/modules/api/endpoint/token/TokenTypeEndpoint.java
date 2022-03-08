@@ -1,6 +1,7 @@
 package fr.uge.modules.api.endpoint.token;
 
 import fr.uge.modules.api.model.entities.TokenTypeEntity;
+import io.quarkus.hibernate.reactive.panache.PanacheEntityBase;
 import io.smallrye.mutiny.Uni;
 
 import javax.ws.rs.GET;
@@ -11,7 +12,7 @@ import java.util.List;
 public class TokenTypeEndpoint {
     @GET
     public Uni<List<String>> getTokenTypes() {
-        return TokenTypeEntity
+        return PanacheEntityBase
                 .<TokenTypeEntity>listAll()
                 .map(list -> list.stream().map(tokentype -> tokentype.name).toList());
     }

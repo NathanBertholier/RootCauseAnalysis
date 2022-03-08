@@ -5,13 +5,11 @@ import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.StdSerializer;
 import fr.uge.modules.api.model.entities.LogEntity;
-import fr.uge.modules.api.model.entities.LogResponse;
 import fr.uge.modules.api.model.entities.TokenEntity;
 import fr.uge.modules.linking.token.type.TokenType;
 
 import java.io.IOException;
 import java.text.SimpleDateFormat;
-import java.util.Collection;
 import java.util.List;
 
 public class TokenResponseSerializer extends StdSerializer<TokenResponseSerializer.TokensResponse> {

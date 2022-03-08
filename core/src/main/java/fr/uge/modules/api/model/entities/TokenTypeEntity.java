@@ -2,6 +2,7 @@ package fr.uge.modules.api.model.entities;
 
 import io.quarkus.hibernate.reactive.panache.PanacheEntity;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 
@@ -12,5 +13,6 @@ import javax.persistence.Table;
 @Entity
 @Table(name = "tokentype", schema = "public", catalog = "rootcause")
 public class TokenTypeEntity extends PanacheEntity {
+    @Column
     public String name;
 }
