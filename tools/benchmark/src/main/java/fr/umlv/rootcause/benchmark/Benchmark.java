@@ -12,20 +12,33 @@ import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class Benchmark {
+    private static final Logger LOGGER = Logger.getGlobal();
+    private static final String FOLDER = "folder";
+    private static final String OUTPUT = "output";
+    private static final String NEW_TIME_STAMP = "newTimeStamp";
+    private static final String BATCH_SIZE = "batchSize";
+    private static final String LINES_COUNT = "linesCount";
+    private static final String DELAY = "delay";
+    private static final String THREAD_COUNT = "threadCount";
+    private static final String URI_TARGET = "uriTarget";
+    private static final String LOOP_ON_DATA = "loopOnData";
+    private static final String STAT_PATH = "statPath";
 
     public static void main(String[] args) throws ParseException, IOException, InterruptedException {
-        //use this to try out spamming rabbitmq with different parameters
-        //args = new String[]{"-l", "100000", "-F", "../logs/", "-b", "50", "-d", "85", "-t", "8", "-u", "http://localhost:8081/insertlog", "-nT", "2022-02-18 11:57:00"};
-        //args = new String[]{"-l", "100000", "-F", "../logs/", "-b", "50", "-d", "85", "-t", "8", "-u", "http://localhost:8081/insertlog"};
-        //args = new String[]{"-l", "1000", "-F", "../logs/", "-b", "50", "-d", "85", "-t", "4", "-u", "http://localhost:8081/insertlog","-s","stats.csv"};
+        /*
+        use this to try out spamming rabbitmq with different parameters
+        args = new String[]{"-l", "100000", "-F", "../logs/", "-b", "50", "-d", "85", "-t", "8", "-u", "http://localhost:8081/insertlog"};
+        args = new String[]{"-l", "1000", "-F", "../logs/", "-b", "50", "-d", "85", "-t", "4", "-u", "http://localhost:8081/insertlog","-s","stats.csv"};
+         */
 
-        args = new String[]{"-l", "10000", "-F", "../logs/", "-b", "500", "-d", "1000", "-t", "50", "-u", "http://localhost:8081/insertlog","-s","stat.csv"};
+
         //use this to output to out.txt in exec folder
-        //args = new String[]{"-l", "10000", "-f", "in.txt"};
 
         /*generate command line argument reader*/
         final Options firstOptions = configFirstParameters();
@@ -42,7 +55,7 @@ public class Benchmark {
         try {
             line = parser.parse(options, args, true);
         } catch (MissingOptionException e) {
-            System.err.println(e.getMessage());
+            LOGGER.log(Level.SEVERE, e.getMessage());
             printHelp(options);
         }
 
@@ -50,52 +63,52 @@ public class Benchmark {
         Stream<String> stream;
         assert line != null;
         if (!line.hasOption("file")) {
-            if (!line.hasOption("folder")) {
-                System.err.println("No folder or file has been supplied as argument, one of the two is needed");
+            if (!line.hasOption(FOLDER)) {
+                LOGGER.log(Level.SEVERE,"No folder or file has been supplied as argument, one of the two is needed" );
                 printHelp(options);
             }
-            stream = getFilesFromFolder(Paths.get(line.getOptionValue("folder")), lineLimit(line));
+            stream = getFilesFromFolder(Paths.get(line.getOptionValue(FOLDER)), lineLimit(line));
         } else {
             stream = getStreamFromFile(Paths.get(line.getOptionValue("file")));
         }
 
         List<String> stringList = stream
                 .limit(lineLimit(line))
-                .collect(Collectors.toList());
+                .toList();
         try {
             Path outputPath;
-            if (line.hasOption("output")) {
-                outputPath = Path.of(line.getOptionValue("output"));
+            if (line.hasOption(OUTPUT)) {
+                outputPath = Path.of(line.getOptionValue(OUTPUT));
             } else {
                 outputPath = Path.of("out.txt");
             }
-            System.out.println("Writing to file...");
+            LOGGER.log(Level.INFO, "Writing to file...");
             Files.write(outputPath,stringList);
         } catch (NoSuchFileException e) {
-            System.err.println("File not found, check file path : " + e.getMessage());
+            LOGGER.log(Level.SEVERE, "File not found, check file path : ", e);
         }
         Timestamp ts = null;
-        if(line.hasOption("newTimeStamp")) {
-            ts = Timestamp.valueOf(line.getOptionValue("newTimeStamp"));
+        if(line.hasOption(NEW_TIME_STAMP)) {
+            ts = Timestamp.valueOf(line.getOptionValue(NEW_TIME_STAMP));
         }
-        String URITarget = line.getOptionValue("uriTarget");
-        int threadCount = Integer.parseInt(line.getOptionValue("threadCount"));
-        int batchSize = Integer.parseInt(line.getOptionValue("batchSize"));
-        int delay = Integer.parseInt(line.getOptionValue("delay"));
-        boolean loopOnData = line.hasOption("loopOnData");
+        String uriTarget = line.getOptionValue(URI_TARGET);
+        int threadCount = Integer.parseInt(line.getOptionValue(THREAD_COUNT));
+        int batchSize = Integer.parseInt(line.getOptionValue(BATCH_SIZE));
+        int delay = Integer.parseInt(line.getOptionValue(DELAY));
+        boolean loopOnData = line.hasOption(LOOP_ON_DATA);
 
         Path statPath;
-        if (line.hasOption("statPath")) {
-            statPath = Path.of(line.getOptionValue("statPath"));
+        if (line.hasOption(STAT_PATH)) {
+            statPath = Path.of(line.getOptionValue(STAT_PATH));
         } else {
             statPath = Path.of("stat.csv");
         }
 
-        sendToServer(stringList, threadCount, batchSize, delay, ts, URITarget, loopOnData, statPath);
+        sendToServer(stringList, threadCount, batchSize, delay, ts, uriTarget, loopOnData, statPath);
     }
 
     /*Main functioning function : launches the different threads and sets them up with the arguments provided at program launch*/
-    private static void sendToServer(List<String> stringSource, int threadCount, int batchSize, int millisDelay, Timestamp ts, String URITarget, boolean loop, Path statPath) throws InterruptedException {
+    private static void sendToServer(List<String> stringSource, int threadCount, int batchSize, int millisDelay, Timestamp ts, String uriTarget, boolean loop, Path statPath) throws InterruptedException {
         Thread[] threads = new Thread[threadCount];
         ArrayList<List<String>> subLists = new ArrayList<>();
 
@@ -106,9 +119,9 @@ public class Benchmark {
             threads[i] = new Thread(() -> {
                 BenchHTTPClient client;
                 if(finalI == 0){
-                    client = new BenchHTTPClient(batchSize, ts, URITarget, statPath);
+                    client = new BenchHTTPClient(batchSize, ts, uriTarget, statPath);
                 } else {
-                    client = new BenchHTTPClient(batchSize, ts, URITarget, null);
+                    client = new BenchHTTPClient(batchSize, ts, uriTarget, null);
                 }
                 client.sendToServer(subLists.get(finalI), millisDelay, loop);
             });
@@ -131,7 +144,7 @@ public class Benchmark {
      * @return a Long integer containing the max number of lines to read
      */
     private static Long lineLimit(CommandLine line) {
-        return line.hasOption("linesCount") ? Long.parseLong(line.getOptionValue("linesCount")) : Long.MAX_VALUE;
+        return line.hasOption(LINES_COUNT) ? Long.parseLong(line.getOptionValue(LINES_COUNT)) : Long.MAX_VALUE;
     }
 
     /**
@@ -152,7 +165,7 @@ public class Benchmark {
             });
             long l = atomicLong.get();
             if (l % 250 == 0) {
-                System.out.println(Math.round((float) l / limit * 1000.0) / 10.0 + " % complete");
+                LOGGER.log(Level.INFO, () -> Math.round((float) l / limit * 1000.0) / 10.0 + " % complete");
             }
             if (l >= limit) {
                 break;
@@ -196,25 +209,25 @@ public class Benchmark {
         final Option filePathOption = Option.builder("f").longOpt("file") //
                 .desc("File to read").hasArg(true).argName("filePath").required(false).build();
 
-        final Option folderPathOption = Option.builder("F").longOpt("folder").desc("Folder to read, in this mode only logs starting with \"EOX\" will be read").hasArg(true).argName("folderPath").required(false).build();
+        final Option folderPathOption = Option.builder("F").longOpt(FOLDER).desc("Folder to read, in this mode only logs starting with \"EOX\" will be read").hasArg(true).argName("folderPath").required(false).build();
 
-        final Option linesOption = Option.builder("l").longOpt("linesCount").desc("Max number of lines to keep").hasArg(true).argName("lines").required(false).build();
+        final Option linesOption = Option.builder("l").longOpt(LINES_COUNT).desc("Max number of lines to keep").hasArg(true).argName("lines").required(false).build();
 
-        final Option outputOption = Option.builder("o").longOpt("output").desc("Path of Output File if output needed (automatically overwrites, be careful !), will be out.txt if left blank").hasArg(true).argName("outputPath").required(false).build();
+        final Option outputOption = Option.builder("o").longOpt(OUTPUT).desc("Path of Output File if output needed (automatically overwrites, be careful !), will be out.txt if left blank").hasArg(true).argName("outputPath").required(false).build();
 
-        final Option batchSizeOption = Option.builder("b").longOpt("batchSize").desc("Number of lines to send in each HTTP request to server").hasArg(true).argName("batchSize").required(true).build();
+        final Option batchSizeOption = Option.builder("b").longOpt(BATCH_SIZE).desc("Number of lines to send in each HTTP request to server").hasArg(true).argName(BATCH_SIZE).required(true).build();
 
-        final Option delayOption = Option.builder("d").longOpt("delay").desc("Delay between each HTTP request (each thread uses this delay, so for example with 8 threads and a 100ms delay there will be 80 requests per second").hasArg(true).argName("delay").required(true).build();
+        final Option delayOption = Option.builder("d").longOpt(DELAY).desc("Delay between each HTTP request (each thread uses this delay, so for example with 8 threads and a 100ms delay there will be 80 requests per second").hasArg(true).argName(DELAY).required(true).build();
 
-        final Option threadCountOption = Option.builder("t").longOpt("threadCount").desc("Number of threads to use as HTTP senders, this doesn't change the behavior or performance of the rest of the program").hasArg(true).argName("delay").required(true).build();
+        final Option threadCountOption = Option.builder("t").longOpt(THREAD_COUNT).desc("Number of threads to use as HTTP senders, this doesn't change the behavior or performance of the rest of the program").hasArg(true).argName(THREAD_COUNT).required(true).build();
 
-        final Option newTimeStampOption = Option.builder("nT").longOpt("newTimeStamp").desc("Replace read time stamps with current time stamp").hasArg(true).argName("newTimeStamp").required(false).build();
+        final Option newTimeStampOption = Option.builder("nT").longOpt(NEW_TIME_STAMP).desc("Replace read time stamps with current time stamp").hasArg(true).argName(NEW_TIME_STAMP).required(false).build();
 
-        final Option URITargetOption = Option.builder("u").longOpt("uriTarget").desc("Indicate target URI to send the HTTP requests to").hasArg(true).argName("uriTarget").required(true).build();
+        final Option uriTargetOption = Option.builder("u").longOpt(URI_TARGET).desc("Indicate target URI to send the HTTP requests to").hasArg(true).argName(URI_TARGET).required(true).build();
 
-        final Option loopOption = Option.builder("lo").longOpt("loopOnData").desc("Using this option will make the sender loop on the data loaded, instead of shutting down after sending all lines read").hasArg(false).required(false).build();
+        final Option loopOption = Option.builder("lo").longOpt(LOOP_ON_DATA).desc("Using this option will make the sender loop on the data loaded, instead of shutting down after sending all lines read").hasArg(false).required(false).build();
 
-        final Option statOption = Option.builder("s").longOpt("statPath").desc("Using this option will activate HTTP response time logging, a path for the stat file will be required as well. The application will update the file every 10 seconds and statistics are only collected on thread 0").required(true).hasArg(true).required(false).build();
+        final Option statOption = Option.builder("s").longOpt(STAT_PATH).desc("Using this option will activate HTTP response time logging, a path for the stat file will be required as well. The application will update the file every 10 seconds and statistics are only collected on thread 0").required(true).hasArg(true).required(false).build();
 
         final Options options = new Options();
 
@@ -230,7 +243,7 @@ public class Benchmark {
         options.addOption(delayOption);
         options.addOption(threadCountOption);
         options.addOption(newTimeStampOption);
-        options.addOption(URITargetOption);
+        options.addOption(uriTargetOption);
         options.addOption(loopOption);
         options.addOption(statOption);
 
@@ -242,6 +255,7 @@ public class Benchmark {
  * HTTP Client designed to upload logs provided to it to the server, according to its set parameters.
  */
 class BenchHTTPClient{
+    private static final Logger LOGGER = Logger.getGlobal();
 
     private final Map<Integer,List<Long>> responseTimes;
     private final HttpClient httpClient;
@@ -253,18 +267,17 @@ class BenchHTTPClient{
     private final Path statPath;
     private final Thread statThread;
 
-    public BenchHTTPClient(int batchSize, Timestamp ts, String URITarget, Path statPath) {
+    public BenchHTTPClient(int batchSize, Timestamp ts, String uriTarget, Path statPath) {
         this.httpClient = HttpClient.newBuilder().version(HttpClient.Version.HTTP_2).followRedirects(HttpClient.Redirect.NORMAL).build();
         this.batchSize = batchSize;
-        this.sendURI = URI.create(URITarget);
+        this.sendURI = URI.create(uriTarget);
         this.creation = Timestamp.from(Instant.now()).getTime();
 
         this.statPath = statPath;
         if(ts != null){
             modifiedTimestamp = true;
             this.ts = ts;
-        }
-        else{
+        } else {
             this.ts = null;
             modifiedTimestamp = false;
         }
@@ -286,15 +299,15 @@ class BenchHTTPClient{
                         Files.write(statPath, builder.toString().getBytes());
                     }
                 } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
                     return;
                 } catch (IOException e) {
-                    e.printStackTrace();
+                    LOGGER.log(Level.SEVERE, "Error with ", e);
                 }
-                System.out.println("Stat logger shutting down.");
+                LOGGER.log(Level.INFO, "Stat logger shutting down.");
             });
 
-        }
-        else {
+        } else {
             responseTimes = null;
             statThread = null;
         }
@@ -322,7 +335,7 @@ class BenchHTTPClient{
         try{
             HttpResponse<String> send = httpClient.send(httpRequest, HttpResponse.BodyHandlers.ofString());
             if(send.statusCode() != 200) {
-                System.out.println(send.statusCode());
+                LOGGER.log(Level.INFO, () -> "" + send.statusCode());
             }
             if(statPath != null){
                 long resTime = System.currentTimeMillis() - start;
@@ -336,7 +349,7 @@ class BenchHTTPClient{
                 });
             }
         } catch (IOException e){
-            System.err.println(e.getMessage());
+            LOGGER.log(Level.SEVERE, "Error", e);
         }
     }
 
@@ -379,7 +392,9 @@ class BenchHTTPClient{
                     Thread.sleep(millisDelay);
                 }
             } catch (IOException | InterruptedException e) {
-                e.printStackTrace();
+                loop = false;
+                Thread.currentThread().interrupt();
+                LOGGER.log(Level.SEVERE, "Error", e);
             }
         } while(loop);
         if(statThread != null) {
