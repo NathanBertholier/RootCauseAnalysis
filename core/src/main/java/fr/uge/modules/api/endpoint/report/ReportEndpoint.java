@@ -39,15 +39,15 @@ public class ReportEndpoint {
             @PathParam("id") long idLogTarget,
             @QueryParam("expanded") Boolean expanded,
             @QueryParam("delta") Long delta,
-            @QueryParam("proximity_limit") Integer proximity_limit,
-            @QueryParam("network_size") Integer network_size
+            @QueryParam("proximity_limit") Integer proximityLimit,
+            @QueryParam("network_size") Integer networkSize
     ) {
         if(expanded == null) expanded = envRetriever.reportDefaultExpanded();
         if(delta == null) delta = envRetriever.reportDefaultDelta();
-        if(proximity_limit == null) proximity_limit = envRetriever.reportDefaultLimit();
-        if(network_size == null) network_size = envRetriever.reportDefaultSize();
+        if(proximityLimit == null) proximityLimit = envRetriever.reportDefaultLimit();
+        if(networkSize == null) networkSize = envRetriever.reportDefaultSize();
 
-        ReportParameter reportParameter = new ReportParameter(expanded, delta, proximity_limit, network_size);
+        ReportParameter reportParameter = new ReportParameter(expanded, delta, proximityLimit, networkSize);
 
         LOGGER.log(Level.INFO, "Received request for id " +  idLogTarget + " with parameters: " + reportParameter);
 

@@ -17,7 +17,7 @@ public class ProcessBatch {
     private final Logger logger = Logger.getGlobal();
     private final ReentrantLock lock = new ReentrantLock();
 
-    private final long BATCH_SECONDS = 3;
+    private static final long BATCH_SECONDS = 3;
 
     /**
      * Create connection to database using jdbc and initiate statement for batch processing.

@@ -12,6 +12,9 @@ import java.util.stream.IntStream;
  * Class used to get a List of LogEntity for the /tokens endpoint.
  */
 public class TokenRetriever {
+    private static final String AND = " and ";
+
+    TokenRetriever() {}
 
     /**
      * Method used in endpoint to get the List of LogEntity depending on the tokenRequest parameter.
@@ -28,19 +31,19 @@ public class TokenRetriever {
 
         if(end.isEmpty()) {
             if(!start.isEmpty()) {
-                  sQuery.append(" and ")
+                  sQuery.append(AND)
                           .append(" l.datetime > '")
                           .append(start)
                           .append("'");
             }
         } else {
             if(start.isEmpty()) {
-               sQuery.append(" and ")
+               sQuery.append(AND)
                        .append(" l.datetime < '")
                        .append(end)
                        .append("'");
             } else {
-                sQuery.append(" and ")
+                sQuery.append(AND)
                         .append(" datetime between '")
                         .append(start)
                         .append("' and '")

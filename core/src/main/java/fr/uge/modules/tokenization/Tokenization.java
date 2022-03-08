@@ -75,7 +75,7 @@ public class Tokenization {
     private List<TokenEntity> getTokens(List<String> words) {
         List<TokenType> tokenTypesNoFound = new ArrayList<>();
 
-        List<TokenEntity> tokens = new ArrayList<>(List.copyOf(profile.getTokenTypeIndex().entrySet().stream().map((k) -> {
+        List<TokenEntity> tokens = new ArrayList<>(List.copyOf(profile.getTokenTypeIndex().entrySet().stream().map(k -> {
                     var token = getTokenWithIndex(k.getValue(), k.getKey(), words);
                     if (token.isEmpty()) {
                         tokenTypesNoFound.add(k.getKey());
