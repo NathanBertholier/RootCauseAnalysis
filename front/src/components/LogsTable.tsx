@@ -29,7 +29,6 @@ export class LogsTable extends Component<LogsTableProp, any> {
 
     filter( request: TokensRequest ) {
         DataService.getAll(request).then((response: any) => {
-            console.log( response )
             let logs : Log[] = response.data
             this.setState( {
                 list: logs

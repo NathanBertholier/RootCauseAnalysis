@@ -9,14 +9,11 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
-import java.util.logging.Logger;
 
 import static fr.uge.modules.api.serializer.TokenResponseSerializer.*;
 
 @Path("/tokens")
 public class TokenEndpoint {
-    private static final Logger LOGGER = Logger.getLogger(TokenEndpoint.class.getName());
-
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)

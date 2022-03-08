@@ -28,7 +28,7 @@ deploy:
   tags:
     - prod
   script:
-    - cd /root/RootCause
+    - cd /root/RootCause/rootcause
     - git checkout dev
     - git pull
     - docker-compose up --force-recreate --build -d

@@ -20,14 +20,14 @@ public class Link {
     @Consumes(APPLICATION_JSON)
     @Produces(APPLICATION_JSON)
     public Uni<TokensLink> getProximity(
-            @QueryParam("id1") @NotNull long id_log_first,
-            @QueryParam("id2") @NotNull long id_log_second,
+            @QueryParam("id1") @NotNull long idLogFirst,
+            @QueryParam("id2") @NotNull long idLogSecond,
             @QueryParam("delta") Long delta){
         if(delta == null) delta = envRetriever.reportDefaultDelta();
 
         final var finalDelta = delta;
-        return LogEntity.<LogEntity>findById(id_log_first)
-                .chain(log1 -> LogEntity.<LogEntity>findById(id_log_second)
+        return LogEntity.<LogEntity>findById(idLogFirst)
+                .chain(log1 -> LogEntity.<LogEntity>findById(idLogSecond)
                         .chain(log2 -> LogsLinking.computeLinks(log1, log2, finalDelta))
                         );
     }
