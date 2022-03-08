@@ -17,7 +17,6 @@ import java.sql.Timestamp;
 import java.time.Duration;
 import java.util.*;
 import java.util.logging.ConsoleHandler;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import static java.util.Objects.isNull;
@@ -25,6 +24,8 @@ import static java.util.Objects.isNull;
 public class LogsLinking {
     private static final Logger LOGGER = Logger.getLogger(LogsLinking.class.getName());
     private static final Comparator<Relation> datetimeComparator = Comparator.comparing(relation -> relation.target().datetime);
+
+    LogsLinking() {}
 
     static {
         LOGGER.addHandler(new ConsoleHandler());
@@ -38,6 +39,7 @@ public class LogsLinking {
      * @return
      */
     public static Uni<TokensLink> computeLinks(LogEntity log1, LogEntity log2, long delta) {
+        if(log1 == null || log2 == null) return Uni.createFrom().failure(new NotYetTokenizedError());
         var map1 = fromLog(log1);
         var map2 = fromLog(log2);
 
@@ -45,7 +47,7 @@ public class LogsLinking {
         var datetimeLog2 = log2.datetime;
         var datetimeComputation = TypeDatetime.computeDateTimeProximity(datetimeLog1, datetimeLog2, delta);
 
-        var tokensLinks = map1.entrySet().stream().map((entry) -> {
+        var tokensLinks = map1.entrySet().stream().map(entry -> {
             var key = entry.getKey();
             var value = entry.getValue();
 
@@ -83,7 +85,7 @@ public class LogsLinking {
      * @return
      */
     public static Uni<GeneratedReport> linkedLogs(LogEntity root, ReportParameter reportParameter){
-        LOGGER.log(Level.INFO, "Linking logs to {0}", root);
+        LOGGER.info(() -> "Linking logs to " + root);
         if(isNull(root)) throw new NotYetTokenizedError();
 
         var reportGenerator = new ReportLinking();
@@ -94,8 +96,8 @@ public class LogsLinking {
                     datetime)
                 .map(list -> reportGenerator.computeProximityTree(root, list.stream().distinct().toList(), reportParameter))
                 .map(LogsLinking::fromRelationsTree)
-                .invoke(generatedReport -> LOGGER.log(Level.INFO, "Generated report for id " + root.id + ": " + generatedReport))
-                .onFailure().invoke(error -> LOGGER.severe("Error: " + error));
+                .invoke(generatedReport -> LOGGER.info(() -> "Generated report for id " + root.id + ": " + generatedReport))
+                .onFailure().invoke(error -> LOGGER.severe(() -> "Error: " + error));
     }
 
     private static GeneratedReport fromRelationsTree(PriorityQueue<Relation> proximityQ){

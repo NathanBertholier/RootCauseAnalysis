@@ -13,7 +13,6 @@
     <artifactId>tools</artifactId>
 
     <modules>
-        <module>rabbitmq</module>
         <module>benchmark</module>
     </modules>
 

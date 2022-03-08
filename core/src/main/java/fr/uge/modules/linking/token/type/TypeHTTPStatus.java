@@ -8,6 +8,10 @@ import fr.uge.modules.linking.strategy.AverageStrategy;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * TypeHTTPStatus TokenType
+ * The REGEX matches on most common HTTP status
+ */
 public class TypeHTTPStatus implements TokenType{
 
     private static final String NAME = "status";
@@ -28,6 +32,13 @@ public class TypeHTTPStatus implements TokenType{
         return TokenTypeId.ID_STATUS.getId();
     }
 
+    /**
+     * Method inherited from TokenType interface
+     * Compute the proximity between each token of the same time for two logs
+     * @param listTokensLeft Tokens from log 1
+     * @param listTokensRight Tokens from log 2
+     * @return a TokensLink object containing all the computations
+     */
     @Override
     public TokensLink computeProximity(List<TokenEntity> listTokensLeft, List<TokenEntity> listTokensRight) {
         if (listTokensLeft.isEmpty() || listTokensRight.isEmpty()) return TokensLink.withoutStrategy(0);
@@ -47,6 +58,12 @@ public class TypeHTTPStatus implements TokenType{
         return new TokensLink(computations, new AverageStrategy());
     }
 
+    /**
+     * Computes the proximity between two HTTP Status
+     * @param left left HTTP Status
+     * @param right right HHTP Status
+     * @return the double result of the computation
+     */
     private static double fromValues(String left, String right){
         if (left.equals(right)) {
             return 100;

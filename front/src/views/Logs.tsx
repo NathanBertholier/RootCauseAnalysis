@@ -397,18 +397,19 @@ export const Logs = () => {
                     <h1 className="title" >Logs</h1>
                     <Container fluid className="logs-container">
                         <Row className="logs-filters-container" >
-                            <Col sm={8}>
+                            <Col lg={8}>
                                 <Container fluid className="p-0">
                                     <Row>
-                                        <Col lg={10}>
+                                        <Col xl={10}>
                                             <Container fluid className="p-0">
                                                 {
                                                     filters.filter( filter => filter.isSelected ).map( (filter, index) => {
                                                         return <Row key={index} className="filter-container">
-                                                            <Col sm={3} className="input-labels" >
+                                                            <Col xl={3} sm={12} className="input-labels" >
                                                                 { filter.formField.label }
                                                             </Col>
-                                                            <Col sm={8}>
+                                                            <Col xl={7}
+                                                                 sm={10}>
                                                                 <Container fluid className="p-0">
                                                                     <Row>
                                                                         { getInput( filter ) }
@@ -418,7 +419,7 @@ export const Logs = () => {
                                                                     </Row>
                                                                 </Container>
                                                             </Col>
-                                                            <Col sm={1}>
+                                                            <Col sm={2}>
                                                                 <Button variant="outline-danger" key={index} onClick={ () => handleUnSelectFilter( filter.id ) }><AiOutlineCloseCircle /></Button>
                                                             </Col>
                                                         </Row>
@@ -426,7 +427,7 @@ export const Logs = () => {
                                                 }
                                             </Container>
                                         </Col>
-                                        <Col lg={2}>
+                                        <Col xl={2}>
                                             <DropdownButton
                                                 className={`add-filter-btn`}
                                                 variant="outline-secondary"
@@ -447,7 +448,7 @@ export const Logs = () => {
                                     </Row>
                                 </Container>
                             </Col>
-                            <Col sm={4}>
+                            <Col lg={4}>
                                 <Container fluid className="p-0 number-row-filter-container">
                                     <Row>
                                         <Col>

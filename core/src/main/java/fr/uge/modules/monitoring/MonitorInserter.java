@@ -18,13 +18,12 @@ import java.time.Instant;
 import java.util.Base64;
 import java.util.Map;
 import java.util.Optional;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 @ApplicationScoped
 public class MonitorInserter {
     private static final String QUEUE_NAME = "token";
-    private final Logger logger = Logger.getGlobal();
+    private final Logger logger = Logger.getLogger(MonitorInserter.class.getName());
 
     @ConfigProperty(name = "rabbitmq-host")
     String rabbitmqurl;
@@ -76,7 +75,7 @@ public class MonitorInserter {
             urlConnection.setRequestProperty("Authorization", basicAuth);
             return Optional.of((InputStream) urlConnection.getContent());
         } catch (IOException e) {
-            logger.log(Level.SEVERE, "Unsuccesfull connection at the database", e);
+            logger.severe(() -> "Unsuccesfull connection at the database: " + e);
             return Optional.empty();
         }
     }
