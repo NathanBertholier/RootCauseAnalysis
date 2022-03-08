@@ -16,27 +16,25 @@ import io.smallrye.mutiny.Uni;
 import java.sql.Timestamp;
 import java.time.Duration;
 import java.util.*;
-import java.util.logging.ConsoleHandler;
 import java.util.logging.Logger;
 
 import static java.util.Objects.isNull;
 
+/*
+Class used to get link between 2 logs
+ */
 public class LogsLinking {
     private static final Logger LOGGER = Logger.getLogger(LogsLinking.class.getName());
     private static final Comparator<Relation> datetimeComparator = Comparator.comparing(relation -> relation.target().datetime);
 
     LogsLinking() {}
 
-    static {
-        LOGGER.addHandler(new ConsoleHandler());
-    }
-
     /**
      * Computes proximity between log of id1 and log of id2 for all the tokens in tokenTypes
-     * @param log1
-     * @param log2
-     * @param delta
-     * @return
+     * @param log1  Log to compare
+     * @param log2  Log to compare
+     * @param delta Time in second to evaluate between each log
+     * @return      TokensLink Object representing relations between 2 logs
      */
     public static Uni<TokensLink> computeLinks(LogEntity log1, LogEntity log2, long delta) {
         if(log1 == null || log2 == null) return Uni.createFrom().failure(new NotYetTokenizedError());
@@ -65,7 +63,7 @@ public class LogsLinking {
 
     /***
      * Returns a Map of <TokenTypeId, List<TokenEntity>> that groups every type of token of a rootCause with its entities
-     * @param log
+     * @param log   Get a map from this log
      * @return a map of token entities associated with its type id
      */
     private static Map<Integer, List<TokenEntity>> fromLog(LogEntity log){
@@ -80,9 +78,9 @@ public class LogsLinking {
 
     /**
      * Retrieves all linked logs of a rootCause one within given delta
-     * @param root
-     * @param reportParameter
-     * @return
+     * @param root              Log root
+     * @param reportParameter   Parameters for the report
+     * @return                  A GeneratedReport Object that represent the JSON to send with data
      */
     public static Uni<GeneratedReport> linkedLogs(LogEntity root, ReportParameter reportParameter){
         LOGGER.info(() -> "Linking logs to " + root);
@@ -100,6 +98,11 @@ public class LogsLinking {
                 .onFailure().invoke(error -> LOGGER.severe(() -> "Error: " + error));
     }
 
+    /**
+     * Get a report from a priorityQueue sorted by proximity
+     * @param proximityQ    PriorityQueue that represent each relation between logs
+     * @return              A GeneratedReport representing the root cause and the logs found.
+     */
     private static GeneratedReport fromRelationsTree(PriorityQueue<Relation> proximityQ){
         var rootcause = proximityQ.stream()
                 .min(datetimeComparator)

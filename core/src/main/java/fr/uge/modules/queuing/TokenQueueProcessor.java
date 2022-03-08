@@ -16,6 +16,11 @@ public class TokenQueueProcessor {
     @Inject
     Tokenization tokenization;
 
+    /**
+     * Get message from queue Token in exchanges 'token-in'
+     * @param incoming  Message in JSON contained in the queue
+     * @return          A LogEntity inserted in a new exchange batch-processor linked in the queue.
+     */
     @Incoming(value = "token-in")
     @Outgoing(value = "batch-processor")
     public LogEntity processTokenization(JsonObject incoming) {
