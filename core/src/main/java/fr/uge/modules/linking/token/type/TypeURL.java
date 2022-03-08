@@ -7,6 +7,7 @@ import fr.uge.modules.linking.strategy.AverageStrategy;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.stream.IntStream;
 
 /**
  * TypeURL TokenType
@@ -43,30 +44,25 @@ public class TypeURL implements TokenType{
             return TokensLink.withoutStrategy(50);
         }
 
-        String regex = "^(http[s]?://www\\.|http[s]?://|www\\.)";
+        var regex = "^(http[s]?://www\\.|http[s]?://|www\\.)";
 
         var computations = listTokensLeft.stream().map(token -> token.getValue().replaceFirst(regex, ""))
                 .map(tokenL -> listTokensRight.stream()
                         .map(token -> token.getValue().replaceFirst(regex, "") )
                         .map(tokenR -> {
-                            if ( tokenL.equals( tokenR ) ) {
+                            if (tokenL.equals(tokenR)) {
                                 return new Computation(this, tokenL, tokenR, 100d);
                             }
 
                             var arrayL = tokenL.split( "/" );
                             var arrayR = tokenR.split( "/" );
-                            double count = 0;
-                            for ( int i =0; i < arrayL.length-1; i++ ) {
-                                if(i<= arrayR.length-1){
-                                    if ( arrayL[i].equals( arrayR[i] ) ) {
-                                        count++;
-                                    }
-                                    else {
-                                        break;
-                                    }
-                                }
-                            }
-                            return new Computation(this, tokenL, tokenR, (count / arrayL.length) * 100);
+                            double count = IntStream.range(0, arrayL.length - 1)
+                                    .filter(i -> arrayR.length > i)
+                                    .filter(i -> arrayR[i].equals(arrayL[i]))
+                                    .mapToDouble(i -> 1)
+                                    .sum();
+
+                            return new Computation(this, tokenL, tokenR, (count / Math.min(arrayL.length, arrayR.length)) * 100);
                         }).toList())
                 .flatMap(Collection::stream)
                 .toList();
