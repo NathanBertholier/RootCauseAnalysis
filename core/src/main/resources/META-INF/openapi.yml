@@ -1,0 +1,35 @@
+openapi: 3.0.0
+info:
+  version: 0.3.0
+  title: RootCause - API
+  description: |2-
+     API designed to use Root Cause features.  
+     Implemented features:                     
+     - [POST] insertlog
+     - [GET]  report/{id}
+     - [GET]  link
+     - [GET]  tokens
+     - [GET]  tokentypes
+
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+paths:
+  /insertlog:
+    post:
+      requestBody:
+        content:
+          'application/json':
+            schema:
+              type: array
+              example:  [ { "log" : "string" }]
+      responses:
+        '200':
+          description: Successful insertion
+          content:
+            application/json:
+              schema:
+                type: array
+                example:  [1,2]
+        '400':
+          description: Invalid parameter. Insertion failed
