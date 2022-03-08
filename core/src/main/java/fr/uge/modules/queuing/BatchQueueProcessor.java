@@ -42,7 +42,7 @@ public class BatchQueueProcessor {
         processBatch.batchRunnable();
 
         LOGGER.log(Level.INFO, "Channel started and waiting for message.");
-        channel.get().basicConsume(QUEUE_NAME, true, getCallBack(processBatch), consumerTag -> {
+        channel.orElseThrow().basicConsume(QUEUE_NAME, true, getCallBack(processBatch), consumerTag -> {
         });
     }
 
