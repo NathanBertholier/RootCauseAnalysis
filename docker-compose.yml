@@ -34,7 +34,7 @@ services:
     image: grafana/grafana:8.4.2
     container_name: "grafana"
     ports:
-      - "${GRAFANA_PORT}:3000"
+      - "3001:3000"
     networks:
       - root-cause-net
     volumes:
@@ -69,7 +69,6 @@ services:
       - root-cause-net
     environment:
       REPORT_EXPANDED: ${REPORT_EXPANDED}
-      REPORT_NO_CACHE: ${REPORT_NO_CACHE}
       REPORT_DELTA: ${REPORT_DELTA}
       REPORT_PROXIMITY_LIMIT: ${REPORT_PROXIMITY_LIMIT}
       REPORT_NETWORK_SIZE: ${REPORT_NETWORK_SIZE}
