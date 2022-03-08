@@ -22,14 +22,10 @@ public class Synthetization {
 
     private static final Logger LOGGER = Logger.getLogger(Synthetization.class.getName());
 
-    static {
-        LOGGER.addHandler(new ConsoleHandler());
-    }
-
     public static Uni<GenericReport> getReport(long idLogTarget, ReportParameter reportParameter) {
-        LOGGER.log(Level.INFO, "Retrieving rootCause cause for target: {0}", idLogTarget);
+        LOGGER.info(() -> "Retrieving rootCause cause for target: " + idLogTarget);
         return LogEntity.<LogEntity>findById(idLogTarget)
-                .invoke(target -> LOGGER.log(Level.INFO, "Retrieved log target: {0}", target))
+                .invoke(target -> LOGGER.info(() -> "Retrieved log target: " + target))
                 .chain(target -> LogsLinking.linkedLogs(target, reportParameter)
                         .chain(generatedReport -> getMostSeenTokens(generatedReport.relevantLogs())
                                     .map(tokens -> {
@@ -55,7 +51,7 @@ public class Synthetization {
                         .subscribeAsCompletionStage()
                         .thenAccept((set::add))
                 )
-                .invoke(set -> LOGGER.log(Level.INFO, "Most tokens seen: {0}", set));
+                .invoke(set -> LOGGER.info(() -> "Most tokens seen: " + set));
     }
 
     private static TokensMostSeen fromTokenEntities(List<TokenEntity> entities){

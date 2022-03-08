@@ -8,6 +8,9 @@ import javax.enterprise.context.ApplicationScoped;
 import java.sql.Timestamp;
 import java.util.*;
 
+/**
+ * The Standard Profile will iterate over each words to found token.
+ */
 @ApplicationScoped
 public class StandardProfile implements Profile {
     private final HashMap<TokenType, Integer> tokenTypeIndex = new HashMap<>();

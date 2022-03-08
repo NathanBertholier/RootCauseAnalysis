@@ -1,12 +1,15 @@
 package fr.uge.modules.tokenization.configuration.timestamp;
 
-import javax.enterprise.context.ApplicationScoped;
 import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * Used in a profile to found the DateTime of a given log.
+ * AWS profile takes the first and second word of the log.
+ */
 public class AWSDateTime implements DateTimeFormatter {
     private final SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 

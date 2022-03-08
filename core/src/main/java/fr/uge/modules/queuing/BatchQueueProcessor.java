@@ -22,13 +22,27 @@ public class BatchQueueProcessor {
     /**
      * Start a main that read message in the queue QUEUE_NAME and add them in a batch using the ProcessBatch class.
      */
-    public static void main(String[] args) throws IOException, TimeoutException, SQLException {
-        Channel channel = createChannel().orElseThrow();
-        ProcessBatch processBatch = new ProcessBatch();
+    public static void main(String[] args) throws IOException, SQLException, InterruptedException {
+        Optional<Channel> channel = createChannel();
+        while (channel.isEmpty()){
+            LOGGER.warning(() -> "Channel not connected, retry connecting in 5 seconds");
+            Thread.sleep(5000);
+            channel = createChannel();
+        }
+        ProcessBatch processBatch = null;
+        while (processBatch==null) {
+            try {
+                processBatch = new ProcessBatch();
+            } catch (SQLException e) {
+                LOGGER.warning(() -> "Database not connected, retry connecting in 5 seconds");
+                Thread.sleep(5000);
+            }
+        }
+
         processBatch.batchRunnable();
 
-        LOGGER.log(Level.INFO, "Channel started and waiting for message.");
-        channel.basicConsume(QUEUE_NAME, true, getCallBack(processBatch), consumerTag -> {
+        LOGGER.info(() -> "Channel started and waiting for message.");
+        channel.orElseThrow().basicConsume(QUEUE_NAME, true, getCallBack(processBatch), consumerTag -> {
         });
     }
 
@@ -37,13 +51,11 @@ public class BatchQueueProcessor {
      * @return Optional of Channel if exists, Optional.Empty if an error append.
      */
     private static Optional<Channel> createChannel() {
-        try {
-            ConnectionFactory factory = new ConnectionFactory();
+        ConnectionFactory factory = new ConnectionFactory();
+        try (Connection connection = factory.newConnection()) {
             factory.setHost("rabbitmq");
-            Connection connection = factory.newConnection();
             return Optional.of(connection.createChannel());
         } catch (IOException | TimeoutException e) {
-            LOGGER.log(Level.SEVERE, "Error while creating channel", e);
             return Optional.empty();
         }
     }
@@ -60,7 +72,7 @@ public class BatchQueueProcessor {
                 LogEntity logEntity = new JsonObject(message).mapTo(LogEntity.class);
                 processBatch.addInBatch(logEntity);
             } catch (Exception e) {
-                LOGGER.log(Level.SEVERE, "Error while inserting in database", e);
+                LOGGER.severe(() -> "Error while inserting in database: " + e);
             }
         };
     }

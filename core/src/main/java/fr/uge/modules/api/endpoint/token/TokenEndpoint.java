@@ -1,15 +1,9 @@
 package fr.uge.modules.api.endpoint.token;
 
 import fr.uge.modules.api.model.TokenRequest;
-import fr.uge.modules.api.model.entities.LogEntity;
-import fr.uge.modules.api.model.entities.LogResponse;
-import fr.uge.modules.api.serializer.TokenResponseSerializer;
-import fr.uge.modules.error.AbstractRootCauseError;
 import fr.uge.modules.error.NotYetTokenizedError;
-import fr.uge.modules.error.RootCauseError;
 import fr.uge.modules.tokenization.TokenRetriever;
 import io.smallrye.mutiny.Uni;
-import org.jboss.logmanager.Level;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
@@ -17,10 +11,6 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.function.Function;
 import java.util.logging.Logger;
 
 import static fr.uge.modules.api.serializer.TokenResponseSerializer.*;

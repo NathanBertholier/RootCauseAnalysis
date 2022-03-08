@@ -29,7 +29,6 @@ export const ProximityCalc = () => {
             }
 
             DataService.getLink( request ).then( (response : any) => {
-                console.log(response)
                 let links : LinkResponse = response.data
                 setLinkList( links );
             } )

@@ -58,7 +58,6 @@ public class TypeURLTest {
         TokenEntity urlSVG = new TokenEntity();
         urlSVG.setValue("https://www.centreon.com/current/en/img/undraw_online.svg");
 
-
         assertAll(
                 // empty array
                 () -> assertEquals( 50, typeURL.computeProximity(new ArrayList<>(), new ArrayList<>(){ { add( urlPizzaTomate ); } } ).getProximity() ),
@@ -75,8 +74,5 @@ public class TypeURLTest {
 
 
         );
-
-
-
     }
 }

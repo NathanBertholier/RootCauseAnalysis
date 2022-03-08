@@ -6,7 +6,8 @@ import java.sql.Timestamp;
 import java.util.Objects;
 
 /**
- * A MonitoringEntity represents information about the current API load and status in the data model. It extends the Panache entity system of the Hibernate ORM
+ * A MonitoringEntity represents information about the current API load and status in the data model.
+ * It extends the Panache entity system of the 'Hibernate ORM'
  */
 @Entity
 @Table(name = "monitoring")

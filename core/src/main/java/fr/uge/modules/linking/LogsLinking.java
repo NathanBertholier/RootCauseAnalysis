@@ -26,6 +26,8 @@ public class LogsLinking {
     private static final Logger LOGGER = Logger.getLogger(LogsLinking.class.getName());
     private static final Comparator<Relation> datetimeComparator = Comparator.comparing(relation -> relation.target().datetime);
 
+    LogsLinking() {}
+
     static {
         LOGGER.addHandler(new ConsoleHandler());
     }
@@ -46,7 +48,7 @@ public class LogsLinking {
         var datetimeLog2 = log2.datetime;
         var datetimeComputation = TypeDatetime.computeDateTimeProximity(datetimeLog1, datetimeLog2, delta);
 
-        var tokensLinks = map1.entrySet().stream().map((entry) -> {
+        var tokensLinks = map1.entrySet().stream().map(entry -> {
             var key = entry.getKey();
             var value = entry.getValue();
 

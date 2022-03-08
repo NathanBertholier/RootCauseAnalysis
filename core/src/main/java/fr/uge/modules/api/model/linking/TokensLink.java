@@ -2,7 +2,6 @@ package fr.uge.modules.api.model.linking;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import fr.uge.modules.api.serializer.TokensLinkSerializer;
-import fr.uge.modules.linking.strategy.AverageStrategy;
 import fr.uge.modules.linking.strategy.EmptyStrategy;
 import fr.uge.modules.linking.strategy.ProximityStrategy;
 
