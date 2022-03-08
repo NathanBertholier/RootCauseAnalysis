@@ -36,14 +36,10 @@ public class TokenEndpoint {
     public Uni<Response> getTokens(TokenRequest tokenRequest){
         return TokenRetriever.getTokens(tokenRequest)
                 .map(TokensResponse::new)
-                .onItemOrFailure()
-                .transform(((tokensResponse, error) -> {
-                    if(error != null) {
-                        LOGGER.log(Level.SEVERE, "Error: {0}", error);
-                        return Response.serverError().entity(error).build();
-                    }
-                    else if (tokensResponse.logs().isEmpty()) return fromError(new NotYetTokenizedError());
-                    else return Response.ok(tokensResponse).build();
-                } ));
+                .map(tokensResponse -> Response.ok(tokensResponse).build() )
+                .onFailure(NotYetTokenizedError.class).recoverWithItem(fromError(new NotYetTokenizedError()))
+                .onFailure().invoke(
+                        error -> LOGGER.severe(() -> "Error while retrieving tokens: " + error)
+                );
     }
 }

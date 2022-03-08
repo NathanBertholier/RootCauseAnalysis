@@ -11,11 +11,13 @@ import io.smallrye.mutiny.Uni;
 import javax.inject.Inject;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Response;
+import java.text.MessageFormat;
 import java.util.function.Function;
 import java.util.logging.ConsoleHandler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import static java.text.MessageFormat.*;
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 
 @Path("/report/{id}")
@@ -28,10 +30,6 @@ public class ReportEndpoint {
                     .status(rootCauseError.getStatus())
                     .entity(rootCauseError.getMessage())
                     .build();
-
-    static {
-        LOGGER.addHandler(new ConsoleHandler());
-    }
 
     @GET
     @Produces(APPLICATION_JSON)
@@ -49,11 +47,11 @@ public class ReportEndpoint {
 
         ReportParameter reportParameter = new ReportParameter(expanded, delta, proximity_limit, network_size);
 
-        LOGGER.log(Level.INFO, "Received request for id " +  idLogTarget + " with parameters: " + reportParameter);
+        LOGGER.info(() -> "Received request for id " + idLogTarget + " with parameters: " + reportParameter);
 
         return Synthetization.getReport(idLogTarget, reportParameter)
                 .map(report -> {
-                    LOGGER.log(Level.INFO, "Generated report: {0}", report);
+                    LOGGER.info(() -> "Generated report: " + report);
                     return Response.ok(report).build();
                 })
                 .onFailure(NotYetTokenizedError.class).recoverWithItem(withRootCauseError.apply(new NotYetTokenizedError()))
