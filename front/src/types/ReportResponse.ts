@@ -11,7 +11,7 @@ export type Log = {
 
 export type MostUsedToken = {
     name: string
-    value: number
+    value: string[]
     count: number
 }
 

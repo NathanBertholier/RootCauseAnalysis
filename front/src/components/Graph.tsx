@@ -157,7 +157,13 @@ export  const Graph = ({res, isLoading} : GraphProp ) => {
                         mostUsedTokens.map((mostUsed, index) => {
                             return <tr key={index}>
                                 <td className="tokens-labels">{mostUsed.name}</td>
-                                <td className="tokens-values">{mostUsed.value}</td>
+                                <td className="tokens-values">
+                                    {
+                                        mostUsed.value.map( (value, index) => {
+                                            return <div key={index}>{value}</div>
+                                        } )
+                                    }
+                                </td>
                                 <td className="tokens-counts">{mostUsed.count}</td>
                             </tr>
                         })
