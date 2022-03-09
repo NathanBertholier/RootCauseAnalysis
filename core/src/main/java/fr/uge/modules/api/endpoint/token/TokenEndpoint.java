@@ -11,7 +11,6 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import java.util.logging.ConsoleHandler;
 import java.util.logging.Logger;
 
 import static fr.uge.modules.api.serializer.TokenResponseSerializer.*;
@@ -25,10 +24,12 @@ public class TokenEndpoint {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Uni<Response> getTokens(TokenRequest tokenRequest) {
+
         return TokenRetriever.getTokens(tokenRequest)
-                .map(TokensResponse::new)
+                .map(logs -> new TokensResponse(logs, null))
                 .map(tokensResponse -> Response.ok(tokensResponse).build())
-                .onFailure(NotYetTokenizedError.class).recoverWithItem(fromError(new NotYetTokenizedError()))
+                .onFailure()
+                .recoverWithItem(Response.ok(new TokensResponse(null, "Token not yet tokenized")).build())
                 .onFailure().invoke(
                         error -> LOGGER.severe(() -> "Error while retrieving tokens: " + error)
                 );

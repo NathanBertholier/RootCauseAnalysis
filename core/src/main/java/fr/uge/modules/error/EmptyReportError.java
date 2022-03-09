@@ -1,7 +1,6 @@
 package fr.uge.modules.error;
 
-public class EmptyReportError extends AbstractRootCauseError{
-
+public class EmptyReportError extends AbstractRootCauseError {
     @Override
     public int getStatus() {
         return 500;
