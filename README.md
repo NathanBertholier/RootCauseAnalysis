@@ -47,7 +47,7 @@ Insertlog permet de faire ingérer des logs à l'API, la requéte HTTP doit soum
 ]
 ```
 
-Le corps peut contenir plusieurs logs
+Le corps peut contenir plusieurs logs, la taille maximum d'envoi est de 10240K 
 
 ```json
 [
@@ -186,7 +186,8 @@ Si la valeur expanded est à true, le rapport a le format suivant :
 
 Les calculs entre deux tokens sont un score sur 100.
 Ces différents calculs sont implémentés dans les différents TokenTypes.
-Ils se trouvent à l'adresse suivante : rootcause/core/src/main/java/fr.uge.modules/linking/token.type
+Ils se trouvent [Ici](core/src/main/java/fr/uge/modules/linking/token/type)
+
 Si un log contient plusieurs fois un token (plusieurs IP par exemple), nous effectuerons une moyenne sur les 
 valeurs obtenues.
 
