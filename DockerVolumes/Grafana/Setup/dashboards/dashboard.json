@@ -291,7 +291,7 @@
           "where": []
         }
       ],
-      "title": "Publish Deliver rates / 5 sec",
+      "title": "Publish Deliver rates / sec",
       "type": "stat"
     },
     {

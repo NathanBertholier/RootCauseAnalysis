@@ -6,22 +6,13 @@ import fr.uge.modules.api.serializer.RelationSerializer;
 
 import java.util.Objects;
 
+/**
+ * Record used to represent a relation between two logs. It contains the two compared logs and a specific object
+ * representing every computation used to determine the log proximity, according to a given function.
+ * A relation is serialized using a RelationSerializer object.
+ */
 @JsonSerialize(using = RelationSerializer.class)
 public record Relation(LogEntity source, LogEntity target, TokensLink tokensLink) {
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Relation relation = (Relation) o;
-        return source.equals(relation.source) && target.equals(relation.target) && tokensLink.equals(relation.tokensLink);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(source, target, tokensLink);
-    }
-
     @Override
     public String toString() {
         return "Relation{" +

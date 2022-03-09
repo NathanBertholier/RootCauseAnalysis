@@ -4,7 +4,7 @@ import {Row} from "./TableRowLog";
 import DataService from "../services/DataService";
 import {toast} from "../tools/ToastManager";
 import {TokensRequest} from "../types/TokensRequest";
-import {Log} from "../types/TokensResponse";
+import {Log, TokensResponse} from "../types/TokensResponse";
 
 export const default_request : TokensRequest = {
     "init_datetime": "",
@@ -29,10 +29,20 @@ export class LogsTable extends Component<LogsTableProp, any> {
 
     filter( request: TokensRequest ) {
         DataService.getAll(request).then((response: any) => {
-            let logs : Log[] = response.data
-            this.setState( {
-                list: logs
-            })
+            let logs : TokensResponse = response.data
+            if ( logs.error !== "" ) {
+                toast.show({
+                    title: "Error",
+                    content: logs.error,
+                    duration: 3000,
+                });
+            }
+            else {
+                this.setState( {
+                    list: logs.logs
+                })
+            }
+
             this.props.gettingData( false );
         }).catch((e: Error) => {
             toast.show({

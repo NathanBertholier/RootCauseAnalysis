@@ -1,4 +1,9 @@
 # Root-Cause
+L'objectif du projet RootCause est de proposer une solution permettant d'ingérer des logs et de demander la création d'un rapport sur un log.
+
+Le rapport a pour objectif d'identifier la rootcause (le log déclencheur des événements) et de donner le maximum d'informations sur les logs semblables aux logs pris en paramètre du rapport
+
+Pour faciliter la compréhension des logs, la solution propose une interface web pour visualiser les logs et les liens entre les logs
 
 ## Installation
 
@@ -29,7 +34,10 @@ La solution utilise les images suivantes:
 - `Tokenisation` : Pour insérer en batch les logs tokénisé
 
 ## Fonctionnement de la solution
+La solution ingérer des logs par le biais de l'API REST, une fois insérer, les logs sont tokénisé (découper pour isoler chaque élément qui compose un log : un token).
 
+Au moment de la demande d'un rapport, le client précise un id de log à étudier, le système va alors identifié les logs plus anciens que le log cible dans un interval de temps
+et va calculer un indice de proximité en comparant les different tokens et faire ressortir un rapport identifiant une rootcause et un ensemble de logs proche du log cible
 ### API
 
 L'API RootCause propose 2 routes majeures et 3 routes destinées au démonstrateur Le Swagger est disponible sur la
@@ -47,7 +55,7 @@ Insertlog permet de faire ingérer des logs à l'API, la requéte HTTP doit soum
 ]
 ```
 
-Le corps peut contenir plusieurs logs
+Le corps peut contenir plusieurs logs, la taille maximum d'envoi est de 10240K (elle peut étre augmenter en modifiant la propriété `quarkus.http.limits.max-body-size` [ici](core/src/main/resources/application.properties))
 
 ```json
 [
@@ -186,7 +194,8 @@ Si la valeur expanded est à true, le rapport a le format suivant :
 
 Les calculs entre deux tokens sont un score sur 100.
 Ces différents calculs sont implémentés dans les différents TokenTypes.
-Ils se trouvent à l'adresse suivante : rootcause/core/src/main/java/fr.uge.modules/linking/token.type
+Ils se trouvent [Ici](core/src/main/java/fr/uge/modules/linking/token/type)
+
 Si un log contient plusieurs fois un token (plusieurs IP par exemple), nous effectuerons une moyenne sur les 
 valeurs obtenues.
 
@@ -255,3 +264,44 @@ Nous comparons les deux resources et voici le calcul effectué :
 ### Bugs identifiés
 - Sur Linux, le dossier DockerVolumes semble avoir des problèmes de droits, si on cherche à relancer les dockers apres 
 qu'ils aient écrits dans les volumes ->  `sudo chown -R $USER DockerVolumes/` pour régler le problème
+
+
+- Le port de grafana ne pouvant être modifié via une variable d'environnement il doit être modifié dans les fichiers 
+suivants:
+  - [Docker-compose.yml](docker-compose.yml) : 
+    ```yml
+    - grafana:
+      image: grafana/grafana:8.4.2
+      container_name: "grafana"
+      ports:
+          - "[New Port]:3000"
+    ```
+  - [Performance.tsx](front/src/views/Performance.tsx)
+    ```tsx
+    <Container fluid>
+         <Row className="graph-container" >
+               <Col>
+                  <iframe src={"https://"+window.location.hostname+":[New Port]/d-solo/nMC1qBank/rootcause?orgId=1&refresh=5s&panelId=6"}
+                      width="100%" height="400" frameBorder="0" title="panel1" />
+               </Col>
+               <Col lg md sm xl xs xxl={8}>
+                  <iframe src={"https://"+window.location.hostname+":[New Port]/d-solo/nMC1qBank/rootcause?orgId=1&refresh=5s&panelId=2"}
+                      width="100%" height="400" frameBorder="0" title="panel2" />
+               </Col>
+               <Col><iframe src={"https://"+window.location.hostname+":[New Port]/d-solo/nMC1qBank/rootcause?orgId=1&refresh=5s&panelId=4"}
+                      width="100%" height="400" frameBorder="0" title="panel3" />
+               </Col>
+         </Row>
+         <Row className="graph-container">
+               <Col lg md sm xl xs xxl={8}>
+                  <iframe src={"https://"+window.location.hostname+":[New Port]/d-solo/nMC1qBank/rootcause?orgId=1&refresh=5s&panelId=8"}
+                      width="100%" height="400" frameBorder="0" title="panel4"/>
+               </Col>
+               <Col>
+                  <iframe src={"https://"+window.location.hostname+":[New Port]/d-solo/nMC1qBank/rootcause?orgId=1&refresh=5s&panelId=12"}
+                      width="100%" height="400" frameBorder="0" title="panel5"/>
+               </Col>
+         </Row>
+    </Container>
+    ```
+- Sur la page des logs, sélectionner un nouveau filtre peut entraîner une inversion des valeurs déjà saisi.

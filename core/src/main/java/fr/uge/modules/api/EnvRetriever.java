@@ -4,6 +4,10 @@ import org.eclipse.microprofile.config.inject.ConfigProperty;
 
 import javax.enterprise.context.ApplicationScoped;
 
+/**
+ * Class used to retrieve environment variables from the application's properties.
+ * This Object is ApplicationScoped, meaning that you can inject it in any variable of a class without manually instancing it.
+ */
 @ApplicationScoped
 public class EnvRetriever {
     @ConfigProperty(name = "report.default.expanded") boolean DEFAULT_EXPANDED;
