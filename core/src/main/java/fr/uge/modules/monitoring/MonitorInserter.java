@@ -32,7 +32,7 @@ public class MonitorInserter {
 
 
     @Scheduled(every="5s")
-    public void getValueFromAPI() throws IOException {
+    public void getValueFromAPI() {
         try {
             MonitoringEntity monitoring = new MonitoringEntity();
 

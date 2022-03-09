@@ -10,6 +10,9 @@ import org.eclipse.microprofile.reactive.messaging.Outgoing;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
+/**
+ * Class used to process token queue insertion
+ */
 @ApplicationScoped
 public class TokenQueueProcessor {
 
