@@ -32,7 +32,12 @@ public class TokenEndpoint {
                 .map(logs -> new TokensResponse(logs, ""))
                 .map(tokensResponse -> Response.ok(tokensResponse).build())
                 .onFailure()
-                .recoverWithItem(Response.ok(new TokensResponse(new ArrayList<>(), "Log no found with id : " + tokenRequest.id())).build())
+                .recoverWithItem(() -> {
+                    if(tokenRequest.id() == -1) {
+                        return Response.ok(new TokensResponse(new ArrayList<>(), "No data found.")).build();
+                    }
+                    return Response.ok(new TokensResponse(new ArrayList<>(), "Log no found with id : " + tokenRequest.id())).build();
+                })
                 .onFailure().invoke(
                         error -> LOGGER.severe(() -> "Error while retrieving tokens: " + error)
                 ));
