@@ -4,9 +4,12 @@ import {LogsTable, default_request} from "../components/LogsTable";
 import {Button, Col, Container, Dropdown, DropdownButton, Form, FormControl, Row} from "react-bootstrap";
 import { AiOutlineCloseCircle } from "react-icons/ai";
 import {toast} from "../tools/ToastManager";
-import DateTimePicker from 'react-datetime-picker';
 import {TokenModel, TokensRequest} from "../types/TokensRequest";
 import { Loader } from "../components/Loader"
+import Datetime from 'react-datetime';
+import "react-datetime/css/react-datetime.css";
+import moment, {Moment} from 'moment';
+import 'moment/locale/fr';
 
 enum FilterType {
     START_DATE,
@@ -21,7 +24,7 @@ enum FilterType {
 type DateTimeInput = {
     label: string
     value: Date
-    setter: (filters: Filter[], date: Date) => void
+    setter: (filters: Filter[], date: string | Moment ) => void
     error?: string
 }
 
@@ -64,6 +67,8 @@ export const Logs = () => {
     const logIDInput                    = useRef<HTMLInputElement>(null!);
     const rowsNumberInput               = useRef<HTMLInputElement>(null!);
 
+
+
     const [ filters, setFilters ]           = useState<Filter[]>( [
         {
             id: FilterType.START_DATE,
@@ -74,8 +79,15 @@ export const Logs = () => {
                 label:"Start date",
                 value: startDate,
                 setter: (data, date) => {
-                    updateDateTimeValueField( data, FilterType.START_DATE, date );
-                    setStartDate( date );
+                    let dateObj = moment( date ).toDate();
+                    let message = getDateTimeErrorMessage( dateObj, endDate, FilterType.END_DATE );
+                    setErrorMessage( data, FilterType.START_DATE, message);
+
+                    if ( message === "" ) {
+                        setErrorMessage( data, FilterType.END_DATE, "");
+                        updateDateTimeValueField( data, FilterType.START_DATE, dateObj );
+                        setStartDate( dateObj );
+                    }
                 }
             }
         },
@@ -88,8 +100,15 @@ export const Logs = () => {
                 label:"End date",
                 value: endDate,
                 setter: (data, date) => {
-                    updateDateTimeValueField( data, FilterType.END_DATE, date );
-                    setEndDate( date )
+                    let dateObj = moment( date ).toDate();
+                    let message = getDateTimeErrorMessage( startDate, dateObj, FilterType.START_DATE );
+                    setErrorMessage( data, FilterType.END_DATE, message);
+
+                    if ( message === "" ) {
+                        setErrorMessage( data, FilterType.START_DATE, "");
+                        updateDateTimeValueField(data, FilterType.END_DATE, dateObj);
+                        setEndDate(dateObj)
+                    }
                 }
             }
         },
@@ -302,7 +321,17 @@ export const Logs = () => {
 
     // recupere la date en format YY-MM-DD hh:mm:ss
     const getDate = ( date: Date ) : string => {
-        return date.toISOString( ).split("T")[0] + " " + date.toLocaleTimeString( "fr-FR" );
+        try {
+            return date.toISOString( ).split("T")[0] + " " + date.toLocaleTimeString( "fr-FR" );
+        }
+        catch (e: any) {
+            toast.show({
+                title: "Error",
+                content: "The date format is incorrect",
+                duration: 3000,
+            });
+            return "";
+        }
     }
 
     /******************************************************
@@ -328,16 +357,41 @@ export const Logs = () => {
         return message
     }
 
+    const getDateTimeErrorMessage = ( start: Date, end: Date, otherID: FilterType ) : string => {
+        let otherDateFilter     = filters.find( filter => filter.id === otherID );
+        let message             = ""
+
+        if ( otherDateFilter && otherDateFilter.isSelected && start >= end ) {
+            if ( otherDateFilter.id === FilterType.START_DATE ) {
+                message = "* The end date cannot be greater than the start date";
+            }
+            else {
+                message = "* The start date cannot be greater than the end date";
+            }
+        }
+
+        return message
+    }
+
     const checkTextField = ( input : React.MutableRefObject<HTMLInputElement>, filterID: FilterType, fieldLabel: string ): boolean => {
         let message = getErrorMessage( fieldLabel, input );
         setErrorMessage( filters, filterID, message );
         return message === "";
     }
 
-    const checkDatetimeField = ( input : Date, filterID: FilterType, fieldLabel: string ): boolean => {
+    const checkDatetimeField = ( input : Date, filterID: FilterType, fieldLabel: string, otherInput : Date, otherFilterID : FilterType ): boolean => {
         let filter = filters.find( f => f.id === filterID );
+        let otherFilter = filters.find( f => f.id === otherFilterID );
+        let checkErrStartDate = filterID === FilterType.START_DATE && input >= otherInput
+        let checkErrEndDate = filterID === FilterType.END_DATE && input <= otherInput
+
         if (filter && filter.isSelected && input === null) {
             setErrorMessage( filters, filterID, "* The field '"+fieldLabel+"' is incorrect" );
+            return false;
+        }
+        else if ( otherFilter && filter && filter.isSelected && otherFilter.isSelected && ( checkErrStartDate || checkErrEndDate) ){
+            setErrorMessage( filters, filterID,
+                (checkErrStartDate) ? "* The start date cannot be greater than the end date" : "* The end date cannot be greater than the start date");
             return false;
         }
 
@@ -362,8 +416,8 @@ export const Logs = () => {
                  !checkTextField( tokenIPInput, FilterType.IPv4, "IPv4 address" ) ||
                  !checkTextField( tokenIPv6Input, FilterType.IPv6, "IPv6 address" ) ||
                  !checkTextField( edgeResponseInput, FilterType.EDGE_RESPONSE, "Edge Response" ) ||
-                 !checkDatetimeField( startDate, FilterType.START_DATE, "Start date" ) ||
-                 !checkDatetimeField( endDate, FilterType.END_DATE, "End date" )
+                 !checkDatetimeField( startDate, FilterType.START_DATE, "Start date", endDate, FilterType.END_DATE ) ||
+                 !checkDatetimeField( endDate, FilterType.END_DATE, "End date", startDate, FilterType.START_DATE )
             ) {
                 formIsValid = false
             }
@@ -383,7 +437,7 @@ export const Logs = () => {
     const getInput = ( filter: Filter ) => {
         if (filter.id === FilterType.START_DATE || filter.id === FilterType.END_DATE) {
             let dateTimeInput = filter.formField as DateTimeInput;
-            return <DateTimePicker onChange={v => dateTimeInput.setter(filters, v) } value={ dateTimeInput.value } format="yyyy-MM-dd hh:mm:ss a" />
+            return <Datetime className="datetime-picker" locale="fr" timeFormat={"HH:mm:ss"} onChange={ value => dateTimeInput.setter( filters, value ) } value={ dateTimeInput.value } />
         }
         let input = filter.formField as Input;
         return <FormControl ref={ input.ref } type="text" pattern={ input.patern } placeholder={input.placeholder} onBlur={ () => input.validator( filters ) } />
@@ -438,9 +492,9 @@ export const Logs = () => {
                                                 {
                                                     filters.filter( filter => !filter.isSelected ).map( ( filter, index ) => {
                                                         if ( filter.alone ) {
-                                                            return <div key={index} ><Dropdown.Divider /><Dropdown.Item eventKey={filter.id}>{ filter.text }</Dropdown.Item></div>
+                                                            return <div key={index} ><Dropdown.Divider /><Dropdown.Item className="filters-items" eventKey={filter.id}>{ filter.text }</Dropdown.Item></div>
                                                         }
-                                                        return <Dropdown.Item eventKey={filter.id} key={index}>{ filter.text }</Dropdown.Item>
+                                                        return <Dropdown.Item className="filters-items" eventKey={filter.id} key={index}>{ filter.text }</Dropdown.Item>
                                                     })
                                                 }
                                             </DropdownButton>
