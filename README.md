@@ -304,3 +304,4 @@ suivants:
          </Row>
     </Container>
     ```
+- Sur la page des logs, sélectionner un nouveau filtre peut entraîner une inversion des valeurs déjà saisi.
