@@ -17,5 +17,6 @@ export type Log = {
 
 
 export type TokensResponse = {
-    log: Log[]
+    logs: Log[]
+    error: string
 }
