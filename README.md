@@ -1,4 +1,9 @@
 # Root-Cause
+L'objectif du projet RootCause est de proposer une solution permettant d'ingérer des logs et de demander la création d'un rapport sur un log.
+
+Le rapport a pour objectif d'identifier la rootcause (le log déclencheur des événements) et de donner le maximum d'informations sur les logs semblables aux logs pris en paramètre du rapport
+
+Pour faciliter la compréhension des logs, la solution propose une interface web pour visualiser les logs et les liens entre les logs
 
 ## Installation
 
@@ -29,7 +34,10 @@ La solution utilise les images suivantes:
 - `Tokenisation` : Pour insérer en batch les logs tokénisé
 
 ## Fonctionnement de la solution
+La solution ingérer des logs par le biais de l'API REST, une fois insérer, les logs sont tokénisé (découper pour isoler chaque élément qui compose un log : un token).
 
+Au moment de la demande d'un rapport, le client précise un id de log à étudier, le système va alors identifié les logs plus anciens que le log cible dans un interval de temps
+et va calculer un indice de proximité en comparant les different tokens et faire ressortir un rapport identifiant une rootcause et un ensemble de logs proche du log cible
 ### API
 
 L'API RootCause propose 2 routes majeures et 3 routes destinées au démonstrateur Le Swagger est disponible sur la
