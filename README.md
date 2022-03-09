@@ -47,7 +47,7 @@ Insertlog permet de faire ingérer des logs à l'API, la requéte HTTP doit soum
 ]
 ```
 
-Le corps peut contenir plusieurs logs, la taille maximum d'envoi est de 10240K 
+Le corps peut contenir plusieurs logs, la taille maximum d'envoi est de 10240K (elle peut étre augmenter en modifiant la propriété `quarkus.http.limits.max-body-size` [ici](core/src/main/resources/application.properties))
 
 ```json
 [
