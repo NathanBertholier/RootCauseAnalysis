@@ -20,8 +20,8 @@ import java.util.logging.Logger;
 
 import static java.util.Objects.isNull;
 
-/*
-Class used to get link between 2 logs
+/**
+ * Class used to compute relations between different logs
  */
 public class LogsLinking {
     private static final Logger LOGGER = Logger.getLogger(LogsLinking.class.getName());
@@ -30,21 +30,25 @@ public class LogsLinking {
     LogsLinking() {}
 
     /**
-     * Computes proximity between log of id1 and log of id2 for all the tokens in tokenTypes
-     * @param log1  Log to compare
-     * @param log2  Log to compare
-     * @param delta Time in second to evaluate between each log
-     * @return      TokensLink Object representing relations between 2 logs
+     * Computes proximity between two given logs
+     * @param log1 LogEntity object representing the first log to compare
+     * @param log2 LogEntity object representing the second log to compare
+     * @param delta long value representing the time variable used in the datetime token proximity computation
+     * @return An Uni<TokensLink> representing the relation between those two logs
      */
     public static Uni<TokensLink> computeLinks(LogEntity log1, LogEntity log2, long delta) {
         if(log1 == null || log2 == null) return Uni.createFrom().failure(new NotYetTokenizedError());
+
+        // Group tokens according to their tokentype_id
         var map1 = fromLog(log1);
         var map2 = fromLog(log2);
 
+        // Compute the time proximity
         var datetimeLog1 = log1.datetime;
         var datetimeLog2 = log2.datetime;
         var datetimeComputation = TypeDatetime.computeDateTimeProximity(datetimeLog1, datetimeLog2, delta);
 
+        // Compute every other tokens proximities and group them in a list in order to retrieve every computation
         var tokensLinks = map1.entrySet().stream().map(entry -> {
             var key = entry.getKey();
             var value = entry.getValue();
@@ -53,18 +57,21 @@ public class LogsLinking {
             return TokenType.fromId(key).computeProximity(value, toCompare);
         }).toList();
 
+        // Retrieve every computation of the tokenslink objects
         var finalComputations = tokensLinks.stream()
                 .flatMap(tklink -> tklink.getComputations().stream())
                 .toList();
 
+        // Add the datetime computation to the computations list and create a final TokensLink to return
         var finalTokensLink = new TokensLink(finalComputations, new AverageStrategy()).addComputation(datetimeComputation);
         return Uni.createFrom().item(finalTokensLink);
     }
 
     /***
-     * Returns a Map of <TokenTypeId, List<TokenEntity>> that groups every type of token of a rootCause with its entities
-     * @param log   Get a map from this log
-     * @return a map of token entities associated with its type id
+     * Returns a Map of <TokenTypeId, List<TokenEntity>> that groups every type of token of a rootCause with its objects,
+     * according to their tokentype_id
+     * @param log LogEntity representing the container of the tokens
+     * @return a map of token entities according to their tokentype_id
      */
     private static Map<Integer, List<TokenEntity>> fromLog(LogEntity log){
         var map = new HashMap<Integer, List<TokenEntity>>();
@@ -77,33 +84,37 @@ public class LogsLinking {
     }
 
     /**
-     * Retrieves all linked logs of a rootCause one within given delta
-     * @param root              Log root
-     * @param reportParameter   Parameters for the report
-     * @return                  A GeneratedReport Object that represent the JSON to send with data
+     * Retrieves all linked logs of a targeted one according to the report parameters
+     * @param target the targeted log
+     * @param reportParameter the report generation parameters
+     * @return a GeneratedReport containing information about the report
      */
-    public static Uni<GeneratedReport> linkedLogs(LogEntity root, ReportParameter reportParameter){
-        LOGGER.info(() -> "Linking logs to " + root);
-        if(isNull(root)) throw new NotYetTokenizedError();
+    public static Uni<GeneratedReport> linkedLogs(LogEntity target, ReportParameter reportParameter){
+        LOGGER.info(() -> "Linking logs to " + target);
+        if(isNull(target)) throw new NotYetTokenizedError();
 
         var reportGenerator = new ReportLinking();
-        var datetime = root.datetime;
+        var datetime = target.datetime;
+
+        // Retrieve every linked logs to the targeted one
         return LogEntity.findAllWithJoin(
-                    root.id,
+                    target.id,
                     Timestamp.valueOf(datetime.toLocalDateTime().minus(Duration.ofSeconds(reportParameter.delta()))),
                     datetime)
-                .map(list -> reportGenerator.computeProximityTree(root, list.stream().distinct().toList(), reportParameter))
-                .map(LogsLinking::fromRelationsTree)
-                .invoke(generatedReport -> LOGGER.info(() -> "Generated report for id " + root.id + ": " + generatedReport))
+                // Compute the proximity tree between the related logs and the targeted one
+                .map(list -> reportGenerator.computeProximityQueue(target, list.stream().distinct().toList(), reportParameter))
+                // Create a GeneratedReport object according to the returned queue
+                .map(LogsLinking::fromRelationQueue)
+                .invoke(generatedReport -> LOGGER.info(() -> "Generated report for id " + target.id + ": " + generatedReport))
                 .onFailure().invoke(error -> LOGGER.severe(() -> "Error: " + error));
     }
 
     /**
-     * Get a report from a priorityQueue sorted by proximity
-     * @param proximityQ    PriorityQueue that represent each relation between logs
-     * @return              A GeneratedReport representing the root cause and the logs found.
+     * Creates a GeneratedReport object according to the relation priority queue
+     * @param proximityQ the relation priority queue of the related logs
+     * @return a GeneratedReport containing information about the generated report
      */
-    private static GeneratedReport fromRelationsTree(PriorityQueue<Relation> proximityQ){
+    private static GeneratedReport fromRelationQueue(PriorityQueue<Relation> proximityQ){
         var rootcause = proximityQ.stream()
                 .min(datetimeComparator)
                 .orElseThrow(EmptyReportError::new)

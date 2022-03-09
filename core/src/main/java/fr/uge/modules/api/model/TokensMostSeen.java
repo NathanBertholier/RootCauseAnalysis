@@ -6,21 +6,15 @@ import fr.uge.modules.api.serializer.TokenMostSeenSerializer;
 import java.util.List;
 import java.util.Objects;
 
+/**
+ * Record representing the most viewed tokens according to fetched logs
+ * A TokensMostSeen object contains the following attributes:
+ * - token_type, a string representing the specific type of the tokens
+ * - token_values, a list containing each token value
+ * - count, the number of those tokens values
+ */
 @JsonSerialize(using = TokenMostSeenSerializer.class)
 public record TokensMostSeen(String token_type, List<String> token_values, long count) {
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        TokensMostSeen that = (TokensMostSeen) o;
-        return count == that.count && token_type.equals(that.token_type) && token_values.equals(that.token_values);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(token_type, token_values, count);
-    }
-
     @Override
     public String toString() {
         return "TokensMostSeen{" +

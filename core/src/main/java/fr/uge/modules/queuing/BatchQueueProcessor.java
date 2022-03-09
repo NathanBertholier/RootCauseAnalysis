@@ -15,6 +15,9 @@ import java.util.concurrent.TimeoutException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+/**
+ * Class used to perform batch operations
+ */
 public class BatchQueueProcessor {
     private static final Logger LOGGER = Logger.getGlobal();
     private static final String QUEUE_NAME = "batch";
@@ -22,7 +25,7 @@ public class BatchQueueProcessor {
     /**
      * Start a main that read message in the queue QUEUE_NAME and add them in a batch using the ProcessBatch class.
      */
-    public static void main(String[] args) throws IOException, SQLException, InterruptedException {
+    public static void main(String[] args) throws IOException, InterruptedException {
         Optional<Channel> channel = createChannel();
         while (channel.isEmpty()){
             LOGGER.log(Level.WARNING,"Channel not connected, retry connecting in 5 seconds");
