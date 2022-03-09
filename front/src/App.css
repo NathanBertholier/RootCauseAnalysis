@@ -82,6 +82,10 @@
   margin-bottom: 10px;
 }
 
+.filters-items:active {
+  background-color: #5567FF;
+}
+
 .custom-filter-btn {
   color: #5567FF;
   border-color: #5567FF;
@@ -142,14 +146,12 @@
   padding-top: 10px;
 }
 
-.react-datetime-picker {
+.datetime-picker {
   padding: 0;
-  text-align: center;
 }
 
-.react-datetime-picker .react-datetime-picker__wrapper {
-  border-radius: 0.25rem;
-  padding: 5px;
+.datetime-picker input {
+  text-align: center;
 }
 
 .graph-container {
