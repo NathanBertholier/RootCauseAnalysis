@@ -34,7 +34,7 @@ public class TokenEndpoint {
                 .onFailure()
                 .recoverWithItem(() -> {
                     if(tokenRequest.id() == -1) {
-                        return Response.ok(new TokensResponse(new ArrayList<>(), "No data found")).build();
+                        return Response.ok(new TokensResponse(new ArrayList<>(), "No data found.")).build();
                     }
                     return Response.ok(new TokensResponse(new ArrayList<>(), "Log no found with id : " + tokenRequest.id())).build();
                 })
