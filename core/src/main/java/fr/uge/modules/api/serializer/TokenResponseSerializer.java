@@ -11,10 +11,11 @@ import fr.uge.modules.linking.token.type.TokenType;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.List;
+import java.util.Objects;
 
 public class TokenResponseSerializer extends StdSerializer<TokenResponseSerializer.TokensResponse> {
     @JsonSerialize(using = TokenResponseSerializer.class)
-    public record TokensResponse(List<LogEntity> logs) {
+    public record TokensResponse(List<LogEntity> logs, String error) {
     }
 
     private final SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy hh:mm:ss");
@@ -29,7 +30,8 @@ public class TokenResponseSerializer extends StdSerializer<TokenResponseSerializ
 
     @Override
     public void serialize(TokensResponse tokensResponse, JsonGenerator jsonGenerator, SerializerProvider serializerProvider) throws IOException {
-        jsonGenerator.writeStartArray();
+        jsonGenerator.writeStartObject();
+        jsonGenerator.writeArrayFieldStart("logs");
         for(LogEntity logResponse : tokensResponse.logs){
             jsonGenerator.writeStartObject();
             jsonGenerator.writeNumberField("id", logResponse.id);
@@ -46,5 +48,14 @@ public class TokenResponseSerializer extends StdSerializer<TokenResponseSerializ
             jsonGenerator.writeEndObject();
         }
         jsonGenerator.writeEndArray();
+
+        var error = tokensResponse.error;
+        if(Objects.isNull(error)) {
+            jsonGenerator.writeStringField("error", "");
+        } else {
+            jsonGenerator.writeStringField("error", tokensResponse.error);
+        }
+        jsonGenerator.writeEndObject();
+
     }
 }
