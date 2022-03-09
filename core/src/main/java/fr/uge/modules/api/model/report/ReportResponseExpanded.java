@@ -10,6 +10,12 @@ import java.util.List;
 import java.util.PriorityQueue;
 import java.util.Set;
 
+/**
+ * Record representing a detailed generated report that does contain proximity computations.
+ * This report contains:
+ * - a simple report
+ * - a queue of every relation between the related logs. A queue is used to order relations according to their proximity result.
+ */
 @JsonSerialize(using = ExpendedReportSerializer.class)
 public record ReportResponseExpanded(ReportResponse reportResponseBase, PriorityQueue<Relation> relations) implements GenericReport {
 
