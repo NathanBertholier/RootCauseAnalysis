@@ -65,7 +65,7 @@ public class ReportLinking {
     private static final RelationManager relationManager = new RelationManager();
     private static final Logger LOGGER = Logger.getLogger(ReportLinking.class.getName());
 
-    public PriorityQueue<Relation> computeProximityTree(LogEntity logTarget, List<LogEntity> logWithinDelta, ReportParameter rp){
+    public PriorityQueue<Relation> computeProximityQueue(LogEntity logTarget, List<LogEntity> logWithinDelta, ReportParameter rp){
         var targetDatetime = logTarget.datetime;
 
         var delta = rp.delta();
