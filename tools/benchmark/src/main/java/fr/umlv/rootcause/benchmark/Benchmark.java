@@ -31,11 +31,10 @@ public class Benchmark {
     private static final String STAT_PATH = "statPath";
 
     public static void main(String[] args) throws ParseException, IOException, InterruptedException {
-        /*
-        use this to try out spamming rabbitmq with different parameters
-        args = new String[]{"-l", "100000", "-F", "../logs/", "-b", "50", "-d", "85", "-t", "8", "-u", "http://localhost:8081/insertlog"};
+        //use this to try out spamming rabbitmq with different parameters
+        //args = new String[]{"-l", "100000", "-F", "../logs/", "-b", "50", "-d", "85", "-t", "8", "-u", "http://localhost:8081/insertlog"};
         args = new String[]{"-l", "1000", "-F", "../logs/", "-b", "50", "-d", "85", "-t", "4", "-u", "http://localhost:8081/insertlog","-s","stats.csv"};
-         */
+
 
 
         //use this to output to out.txt in exec folder
@@ -349,7 +348,7 @@ class BenchHTTPClient{
                 });
             }
         } catch (IOException e){
-            LOGGER.log(Level.SEVERE, "Error", e);
+            LOGGER.log(Level.INFO, e.getMessage());
         }
     }
 
