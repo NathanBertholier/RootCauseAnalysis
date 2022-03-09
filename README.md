@@ -264,3 +264,43 @@ Nous comparons les deux resources et voici le calcul effectué :
 ### Bugs identifiés
 - Sur Linux, le dossier DockerVolumes semble avoir des problèmes de droits, si on cherche à relancer les dockers apres 
 qu'ils aient écrits dans les volumes ->  `sudo chown -R $USER DockerVolumes/` pour régler le problème
+
+
+- Le port de grafana ne pouvant être modifié via une variable d'environnement il doit être modifié dans les fichiers 
+suivants:
+  - [Docker-compose.yml](docker-compose.yml) : 
+    ```yml
+    - grafana:
+      image: grafana/grafana:8.4.2
+      container_name: "grafana"
+      ports:
+          - "[New Port]:3000"
+    ```
+  - [Performance.tsx](front/src/views/Performance.tsx)
+    ```tsx
+    <Container fluid>
+         <Row className="graph-container" >
+               <Col>
+                  <iframe src={"https://"+window.location.hostname+":[New Port]/d-solo/nMC1qBank/rootcause?orgId=1&refresh=5s&panelId=6"}
+                      width="100%" height="400" frameBorder="0" title="panel1" />
+               </Col>
+               <Col lg md sm xl xs xxl={8}>
+                  <iframe src={"https://"+window.location.hostname+":[New Port]/d-solo/nMC1qBank/rootcause?orgId=1&refresh=5s&panelId=2"}
+                      width="100%" height="400" frameBorder="0" title="panel2" />
+               </Col>
+               <Col><iframe src={"https://"+window.location.hostname+":[New Port]/d-solo/nMC1qBank/rootcause?orgId=1&refresh=5s&panelId=4"}
+                      width="100%" height="400" frameBorder="0" title="panel3" />
+               </Col>
+         </Row>
+         <Row className="graph-container">
+               <Col lg md sm xl xs xxl={8}>
+                  <iframe src={"https://"+window.location.hostname+":[New Port]/d-solo/nMC1qBank/rootcause?orgId=1&refresh=5s&panelId=8"}
+                      width="100%" height="400" frameBorder="0" title="panel4"/>
+               </Col>
+               <Col>
+                  <iframe src={"https://"+window.location.hostname+":[New Port]/d-solo/nMC1qBank/rootcause?orgId=1&refresh=5s&panelId=12"}
+                      width="100%" height="400" frameBorder="0" title="panel5"/>
+               </Col>
+         </Row>
+    </Container>
+    ```
